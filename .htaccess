@@ -1,0 +1,4 @@
+RewriteEngine On
+RewriteBase /blog/
+RewriteRule ^([a-zA-Z0-9_-]+)$ post.php?slug=$1 [L,QSA]
+RewriteRule ^rss$ rss.php [L,QSA]
