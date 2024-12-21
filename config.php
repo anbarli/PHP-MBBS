@@ -6,8 +6,8 @@ $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 
 define('SITE_NAME', 'Kendime Notlar');
 define('POSTS_DIR', realpath(__DIR__ . '/posts/') . '/');
-define('DEFAULT_TITLE', 'Gürkan\'ın Blogu - Teknoloji ve Hayat Hakkında'); // Varsayılan başlık
-define('DEFAULT_DESCRIPTION', 'Gürkan\'ın blogunda teknoloji, yazılım ve hayata dair yazılar!'); // Varsayılan meta açıklama
+define('DEFAULT_TITLE', 'Kendime Notlar - Teknoloji ve Yazılım'); // Varsayılan başlık
+define('DEFAULT_DESCRIPTION', 'Blogumda yayınladığım teknoloji ve yazılıma dair yazılar!'); // Varsayılan meta açıklama
 define('BASE_URL', $protocol . $host . $basePath);
 
 function generateSlug($string) {
