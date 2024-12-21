@@ -12,9 +12,9 @@ echo '
 	<div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
 	<h3>Blog Yazıları</h3>';
 
-// URL'den filtre değerini al
-$filterCategory = $_GET['cat'] ?? null;
-$filterTag = $_GET['tag'] ?? null;
+// URL'den filtre değerini al (case-insensitive)
+$filterCategory = isset($_GET['cat']) ? strtolower($_GET['cat']) : null;
+$filterTag = isset($_GET['tag']) ? strtolower($_GET['tag']) : null;
 
 // Yazı dosyalarını al
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
@@ -46,23 +46,25 @@ foreach ($postFilesWithDates as $postData) {
 
     if ($contentData) {
         $title = htmlspecialchars($contentData['meta']['title']);
-        $category = htmlspecialchars($contentData['meta']['category'] ?? 'Genel');
-        $tags = $contentData['meta']['tags'] ?? [];
+        $category = strtolower(htmlspecialchars($contentData['meta']['category'] ?? 'Genel')); // Category'yi küçük harfe çevir
+		$tags = array_map('strtolower', $contentData['meta']['tags'] ?? []); // Etiketleri küçük harfe çevir
 		$date = htmlspecialchars($contentData['meta']['date']);
 		
-        // Kategori veya etikete göre filtrele
+        // Kategori veya etikete göre filtrele (case-insensitive)
         if (($filterCategory && $category !== $filterCategory) || ($filterTag && !in_array($filterTag, $tags))) {
             continue;
         }
+		
+		$tags = array_map('ucwords', $contentData['meta']['tags'] ?? []); // Etiketleri ucwords harfe çevir
 		
 		echo "
 		  <li class='list-group-item d-flex justify-content-between align-items-start'>
 			<div class='ms-2 me-auto'>
 			  <div class='fw-bold'>
 				<a href='" . $basePath . $slug . "' class='text-dark'>" . $title . "</a></div>
-				Published at " . $date . " under <strong>" . $category . "</strong> / Tags: " . implode(', ', $tags) . "
+				" . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
 			</div>
-			<span class='badge text-bg-primary rounded-pill'>" . $category . "</span>
+			<span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>
 		  </li>
 		";
     }

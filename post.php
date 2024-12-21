@@ -38,7 +38,7 @@ echo '
 			<a class="link-body-emphasis fw-semibold text-decoration-none" href="' . $basePath . '">Blog</a>
 		  </li>
 		  <li class="breadcrumb-item">
-			<a class="link-body-emphasis fw-semibold text-decoration-none" href="' . $basePath . '/cat/' . rawurlencode($category) . '">' . $category . '</a>
+			<a class="link-body-emphasis fw-semibold text-decoration-none" href="' . $basePath . 'cat/' . strtolower(rawurlencode($category)) . '">' . $category . '</a>
 		  </li>
 		  <li class="breadcrumb-item active" aria-current="page">
 			'.$title.'
@@ -65,18 +65,16 @@ if (isset($_GET['slug'])) {
 		// Metadata
 		echo "
 			<div class='alert alert-secondary'>
-				Published at " . $date . "<br>";
+				<strong>Tarih:</strong> " . $date;
 				
 		if (!empty($category)) {
-			echo "Under: ";
-			echo "<a href='" . $basePath . "cat/" . rawurlencode($category) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($category) . "</a> ";
-			echo "<br>";
+			echo " / <strong>Kategori:</strong> <a href='" . $basePath . "cat/" . strtolower(rawurlencode($category)) . "' class='text-dark text-decoration-none'>" . htmlspecialchars(ucwords(strtolower($category))) . "</a>";
 		}
 
 		if (!empty($tags)) {
-			echo "Tags: ";
+			echo " / <strong>Etiketler:</strong> ";
 			foreach ($tags as $tag) {
-				echo "<a href='" . $basePath . "tag/" . rawurlencode($tag) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($tag) . "</a> ";
+				echo "<a href='" . $basePath . "tag/" . strtolower(rawurlencode($tag)) . "' class='text-dark text-decoration-none'>" . htmlspecialchars(ucwords(strtolower($tag))) . "</a> ";
 			}
 		}
 
