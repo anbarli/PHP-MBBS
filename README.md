@@ -52,8 +52,9 @@ RSS beslemesine şu URL üzerinden erişebilirsiniz:
 
 ## Bağımlılıklar
 
+Bu proje [Bootstrap](https://github.com/sindresorhus/github-markdown-css) kütüphanesini kullanır.
 Bu proje Markdown ayrıştırması için [Parsedown](https://github.com/erusev/parsedown) kütüphanesini kullanır.
-
+Bu proje Markdown stilleri için [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) kütüphanesini kullanır.
 
 ## Lisans
 
@@ -117,7 +118,9 @@ Translated with DeepL.com (free version)
 
 ## Dependencies
 
+This project uses the [Bootstrap](https://github.com/sindresorhus/github-markdown-css) library.
 This project uses the [Parsedown](https://github.com/erusev/parsedown) library for Markdown parsing.
+This project uses the [github-markdown-css](https://github.com/sindresorhus/github-markdown-css) library for Markdown styling.
 
 ## License
 
