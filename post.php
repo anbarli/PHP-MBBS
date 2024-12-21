@@ -16,6 +16,7 @@ if (isset($_GET['slug'])) {
 			$title = htmlspecialchars($postData['meta']['title']);
 			$category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
 			$tags = $postData['meta']['tags'] ?? [];
+			$date = htmlspecialchars($postData['meta']['date']);
             // SEO için değişkenler
             $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
             $seoDescription = htmlspecialchars(substr(strip_tags($postData['content']), 0, 150), ENT_QUOTES, 'UTF-8');
@@ -64,18 +65,18 @@ if (isset($_GET['slug'])) {
 		// Metadata
 		echo "
 			<div class='alert alert-secondary'>
-				Published at " . date("d-m-Y", filemtime($postFile)) . "<br>";
+				Published at " . $date . "<br>";
 				
 		if (!empty($category)) {
 			echo "Under: ";
-			echo "<a href='" . $basePath . "/cat/" . rawurlencode($category) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($category) . "</a> ";
+			echo "<a href='" . $basePath . "cat/" . rawurlencode($category) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($category) . "</a> ";
 			echo "<br>";
 		}
 
 		if (!empty($tags)) {
 			echo "Tags: ";
 			foreach ($tags as $tag) {
-				echo "<a href='" . $basePath . "/tag/" . rawurlencode($tag) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($tag) . "</a> ";
+				echo "<a href='" . $basePath . "tag/" . rawurlencode($tag) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($tag) . "</a> ";
 			}
 		}
 

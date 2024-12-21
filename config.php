@@ -2,7 +2,7 @@
 // Temel URL
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
 $host = htmlspecialchars($_SERVER['HTTP_HOST'], ENT_QUOTES, 'UTF-8');
-$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
+$basePath = '/blog/';
 
 define('SITE_NAME', 'Kendime Notlar');
 define('POSTS_DIR', realpath(__DIR__ . '/posts/') . '/');
