@@ -5,10 +5,10 @@ RewriteBase /blog/
 RewriteRule ^rss/?$ rss.php [L,QSA]
 
 # Tag için Rewrite
-RewriteRule ^tag/([a-zA-Z0-9_-]+)/?$ index.php?tag=$1 [L,QSA]
+RewriteRule ^tag/(.+)$ /index.php?tag=$1 [L,QSA]
 
 # Cat için Rewrite
-RewriteRule ^cat/([a-zA-Z0-9_-]+)/?$ index.php?cat=$1 [L,QSA]
+RewriteRule ^cat/(.+)$ index.php?cat=$1 [L,QSA]
 
 # Post için Rewrite
 RewriteRule ^([a-zA-Z0-9_-]+)/?$ post.php?slug=$1 [L,QSA]
