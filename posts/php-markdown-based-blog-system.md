@@ -2,6 +2,7 @@
 title: PHP Markdown Based Blog System (Basit PHP Markdown Blog Sistemi)
 category: Coding
 tags: [PHP, Markdown, Blog]
+date: 20.12.2024
 ---
 
 # PHP-MBBS / PHP Markdown Based Blog System (Basit PHP Markdown Blog Sistemi) [🇹🇷]

@@ -48,6 +48,7 @@ foreach ($postFilesWithDates as $postData) {
         $title = htmlspecialchars($contentData['meta']['title']);
         $category = htmlspecialchars($contentData['meta']['category'] ?? 'Genel');
         $tags = $contentData['meta']['tags'] ?? [];
+		$date = htmlspecialchars($contentData['meta']['date']);
 		
         // Kategori veya etikete göre filtrele
         if (($filterCategory && $category !== $filterCategory) || ($filterTag && !in_array($filterTag, $tags))) {
@@ -58,8 +59,8 @@ foreach ($postFilesWithDates as $postData) {
 		  <li class='list-group-item d-flex justify-content-between align-items-start'>
 			<div class='ms-2 me-auto'>
 			  <div class='fw-bold'>
-				<a href='" . $basePath . "/" . $slug . "' class='text-dark'>" . $title . "</a></div>
-				Published at " . date("d-m-Y", $lastModified) . " under <strong>" . $category . "</strong> / Tags: " . implode(', ', $tags) . "
+				<a href='" . $basePath . $slug . "' class='text-dark'>" . $title . "</a></div>
+				Published at " . $date . " under <strong>" . $category . "</strong> / Tags: " . implode(', ', $tags) . "
 			</div>
 			<span class='badge text-bg-primary rounded-pill'>" . $category . "</span>
 		  </li>
