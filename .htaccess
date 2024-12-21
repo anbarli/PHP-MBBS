@@ -5,7 +5,7 @@ RewriteBase /blog/
 RewriteRule ^rss/?$ rss.php [L,QSA]
 
 # Tag için Rewrite
-RewriteRule ^tag/(.+)$ /index.php?tag=$1 [L,QSA]
+RewriteRule ^tag/(.+)$ index.php?tag=$1 [L,QSA]
 
 # Cat için Rewrite
 RewriteRule ^cat/(.+)$ index.php?cat=$1 [L,QSA]
