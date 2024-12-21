@@ -1,4 +1,4 @@
-# PHP-MBBS / Basit PHP Markdown Blog Sistemi [🇹🇷]
+# PHP-MBBS / PHP Markdown Based Blog System (Basit PHP Markdown Blog Sistemi) [🇹🇷]
 
 Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sağlar. SEO dostu URL'ler ve RSS beslemesi ile modern bir yapı sunar.
 
@@ -62,7 +62,7 @@ Bu proje MIT lisansı ile lisanslanmıştır. Daha fazla bilgi için `LICENSE` d
 
 ---------------------------
 
-# PHP-MBBS / Simple PHP Markdown Blog System [🇬🇧]
+# PHP-MBBS / PHP Markdown Based Blog System [🇬🇧]
 
 This project allows you to create a simple blog system using PHP and Markdown. It offers a modern structure with SEO-friendly URLs and RSS feed.
 

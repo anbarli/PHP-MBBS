@@ -23,4 +23,35 @@ function generateSlug($string) {
     $string = preg_replace('/[^a-z0-9]+/', '-', $string);
     return trim($string, '-');
 }
+
+function getPostContent($filePath) {
+    $content = file_get_contents($filePath);
+
+    // Meta verileri ayırmak için düzenli ifade
+    if (preg_match('/^---(.*?)---(.*)$/s', $content, $matches)) {
+        $metaRaw = trim($matches[1]);
+        $body = trim($matches[2]);
+
+        // Meta verilerini ayrıştır
+        $meta = [];
+        foreach (explode("\n", $metaRaw) as $line) {
+            if (strpos($line, ':') !== false) {
+                [$key, $value] = explode(':', $line, 2);
+                $meta[trim($key)] = trim($value);
+            }
+        }
+
+        // Etiketleri diziye çevir
+        if (isset($meta['tags'])) {
+            $meta['tags'] = array_map('trim', explode(',', trim($meta['tags'], '[]')));
+        }
+
+        return [
+            'meta' => $meta,
+            'content' => $body
+        ];
+    }
+
+    return null;
+}
 ?>

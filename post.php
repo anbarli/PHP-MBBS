@@ -1,29 +1,26 @@
 <?php
 include('config.php');
-include('includes/markdown.php');
+
+$seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
+$seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
 
 if (isset($_GET['slug'])) {
     $slug = htmlspecialchars($_GET['slug'], ENT_QUOTES, 'UTF-8');
     $postFile = POSTS_DIR . basename($slug) . '.md';
 
     if (file_exists($postFile)) {
+		
         $postData = getPostContent($postFile);
-
+		
         if ($postData) {
+			$title = htmlspecialchars($postData['meta']['title']);
+			$category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
+			$tags = $postData['meta']['tags'] ?? [];
             // SEO için değişkenler
-            $seoTitle = htmlspecialchars($postData['title'], ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
+            $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
             $seoDescription = htmlspecialchars(substr(strip_tags($postData['content']), 0, 150), ENT_QUOTES, 'UTF-8');
-        } else {
-            $seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
-            $seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
         }
-    } else {
-        $seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
-        $seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
     }
-} else {
-    $seoTitle = 'Geçersiz Yazı - ' . SITE_NAME;
-    $seoDescription = 'Geçersiz bir yazı istendi. Lütfen doğru bir URL giriniz.';
 }
 
 include('includes/header.php');
@@ -37,10 +34,13 @@ echo '
 			</a>
 		  </li>
 		  <li class="breadcrumb-item">
-			<a class="link-body-emphasis fw-semibold text-decoration-none" href="index.php">Blog</a>
+			<a class="link-body-emphasis fw-semibold text-decoration-none" href="' . $basePath . '">Blog</a>
+		  </li>
+		  <li class="breadcrumb-item">
+			<a class="link-body-emphasis fw-semibold text-decoration-none" href="' . $basePath . '/cat/' . rawurlencode($category) . '">' . $category . '</a>
 		  </li>
 		  <li class="breadcrumb-item active" aria-current="page">
-			'.$seoTitle.'
+			'.$title.'
 		  </li>
 		</ol>
 	</nav>
@@ -50,18 +50,44 @@ echo '
 if (isset($_GET['slug'])) {
     
     if (file_exists($postFile)) {
-        $postContent = convertMarkdownToHTML($postFile);
+		
+		$body = $postData['content'];
+
+		// Markdown içeriği HTML'ye dönüştür
+		require_once 'includes/Parsedown.php';
+		$Parsedown = new Parsedown();
+		$htmlContent = $Parsedown->text($body);
+		
 		// İçerik
-        echo "<div class='markdown-body p-4 mb-4'>";
-		echo $postContent;
-		echo "<hr>";
-		echo "</div>";
-		echo "<label class='badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill'>" . date("d-m-Y", filemtime($postFile)) . "</label>";
+        echo "<div class='markdown-body p-4 mb-4'>" . $htmlContent . "</div>";
+		
+		// Metadata
+		echo "
+			<div class='alert alert-secondary'>
+				Published at " . date("d-m-Y", filemtime($postFile)) . "<br>";
+				
+		if (!empty($category)) {
+			echo "Under: ";
+			echo "<a href='" . $basePath . "/cat/" . rawurlencode($category) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($category) . "</a> ";
+			echo "<br>";
+		}
+
+		if (!empty($tags)) {
+			echo "Tags: ";
+			foreach ($tags as $tag) {
+				echo "<a href='" . $basePath . "/tag/" . rawurlencode($tag) . "' class='badge bg-dark text-decoration-none'>" . htmlspecialchars($tag) . "</a> ";
+			}
+		}
+
+		echo "
+			</div>";
+
+		
     } else {
-        echo "<p>Yazı bulunamadı.</p>";
+        echo "<div class='alert alert-warning'>Yazı bulunamadı.</div>";
     }
 } else {
-    echo "<p>Geçersiz yazı.</p>";
+    echo "<div class='alert alert-warning'>Geçersiz yazı.</div>";
 }
 
 include('includes/footer.php');

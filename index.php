@@ -5,11 +5,16 @@ $seoTitle = 'Son Yazılar - ' . SITE_NAME;
 $seoDescription = 'Blogumuzda son yazılarımızı keşfedin. Teknoloji, yazılım ve hayat üzerine içerikler burada!';
 
 include('includes/header.php');
-include('includes/markdown.php');
 
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.')); // posts klasöründeki dosyaları listele
 
-echo '<h2>Blog Yazıları</h2>';
+echo '
+	<div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
+	<h3>Blog Yazıları</h3>';
+
+// URL'den filtre değerini al
+$filterCategory = $_GET['cat'] ?? null;
+$filterTag = $_GET['tag'] ?? null;
 
 // Yazı dosyalarını al
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
@@ -36,16 +41,31 @@ echo "<ul class='list-group list-group-flush list-group-numbered'>";
 foreach ($postFilesWithDates as $postData) {
     $file = $postData['file'];
     $slug = $postData['slug'];
-    $lastModified = $postData['lastModified'];
-    $contentData = getPostContent($file); // Başlık ve içeriği al
+	$lastModified = $postData['lastModified'];
+    $contentData = getPostContent($file);
 
     if ($contentData) {
-        echo "<a href='$slug' class='list-group-item list-group-item-action'>" . htmlspecialchars($contentData['title']) . "<label class='badge bg-secondary-subtle border border-secondary-subtle text-secondary-emphasis rounded-pill float-end'>".date("d-m-Y", $lastModified)."</label></a>";
-    } else {
-        echo "<li class='list-group-item'>Bir hata oluştu: $file</li>";
+        $title = htmlspecialchars($contentData['meta']['title']);
+        $category = htmlspecialchars($contentData['meta']['category'] ?? 'Genel');
+        $tags = $contentData['meta']['tags'] ?? [];
+		
+        // Kategori veya etikete göre filtrele
+        if (($filterCategory && $category !== $filterCategory) || ($filterTag && !in_array($filterTag, $tags))) {
+            continue;
+        }
+		
+		echo "
+		  <li class='list-group-item d-flex justify-content-between align-items-start'>
+			<div class='ms-2 me-auto'>
+			  <div class='fw-bold'>
+				<a href='" . $basePath . "/" . $slug . "' class='text-dark'>" . $title . "</a></div>
+				Published at " . date("d-m-Y", $lastModified) . " under <strong>" . $category . "</strong> / Tags: " . implode(', ', $tags) . "
+			</div>
+			<span class='badge text-bg-primary rounded-pill'>" . $category . "</span>
+		  </li>
+		";
     }
 }
-
 echo '</ul>';
 
 include('includes/footer.php');
