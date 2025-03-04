@@ -4,6 +4,19 @@ include('config.php');
 $seoTitle = 'Son Yazılar - ' . SITE_NAME;
 $seoDescription = 'Blogumuzda son yazılarımızı keşfedin. Teknoloji, yazılım ve hayat üzerine içerikler burada!';
 
+// URL'den filtre değerini al (case-insensitive)
+$filterCategory = isset($_GET['cat']) ? strtolower($_GET['cat']) : null;
+$filterTag = isset($_GET['tag']) ? strtolower($_GET['tag']) : null;
+
+// Eğer bir kategori veya etiket filtresi varsa, SEO başlığını ona göre ayarla
+if ($filterCategory) {
+    $seoTitle = ucwords($filterCategory) . ' Kategorisi - ' . SITE_NAME;
+    $seoDescription = ucwords($filterCategory) . ' kategorisindeki yazıları keşfedin.';
+} elseif ($filterTag) {
+    $seoTitle = ucwords($filterTag) . ' Etiketi - ' . SITE_NAME;
+    $seoDescription = ucwords($filterTag) . ' etiketiyle ilgili yazıları keşfedin.';
+}
+
 include('includes/header.php');
 
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.')); // posts klasöründeki dosyaları listele
@@ -11,10 +24,6 @@ $posts = array_diff(scandir(POSTS_DIR), array('..', '.')); // posts klasöründe
 echo '
 	<div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
 	<h3>Blog Yazıları</h3>';
-
-// URL'den filtre değerini al (case-insensitive)
-$filterCategory = isset($_GET['cat']) ? strtolower($_GET['cat']) : null;
-$filterTag = isset($_GET['tag']) ? strtolower($_GET['tag']) : null;
 
 // Yazı dosyalarını al
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
