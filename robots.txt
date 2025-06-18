@@ -1,0 +1,76 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yoursite.com/blog/sitemap.xml
+
+# RSS Feed
+Allow: /rss
+
+# Search
+Allow: /search
+
+# Categories and Tags
+Allow: /cat/
+Allow: /tag/
+
+# Block sensitive files
+Disallow: /config.local.php
+Disallow: /.htaccess
+Disallow: /.git/
+Disallow: /cache/
+Disallow: /*.log
+Disallow: /*.cache
+Disallow: /*.tmp
+Disallow: /*.bak
+Disallow: /*.backup
+
+# Block admin areas (if any)
+Disallow: /admin/
+Disallow: /wp-admin/
+Disallow: /administrator/
+
+# Block common CMS paths
+Disallow: /cms/
+Disallow: /system/
+Disallow: /includes/
+Disallow: /vendor/
+
+# Allow important files
+Allow: /includes/style.css
+Allow: /includes/Parsedown.php
+
+# Crawl delay (optional - be nice to servers)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Slurp
+Allow: /
+Crawl-delay: 1
+
+# Block bad bots
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
+
+User-agent: Screaming Frog SEO Spider
+Disallow: / 

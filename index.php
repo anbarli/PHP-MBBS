@@ -19,38 +19,49 @@ if ($filterCategory) {
 
 include('includes/header.php');
 
-$posts = array_diff(scandir(POSTS_DIR), array('..', '.')); // posts klasöründeki dosyaları listele
-
 echo '
 	<div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
 	<h3>Blog Yazıları</h3>';
 
-// Yazı dosyalarını al
-$posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
+// Try to get cached posts first
+$postFilesWithDates = getCachedPosts();
 
-// Dosyaları son düzenlenme tarihine göre sıralamak için bir yardımcı dizi oluştur
-$postFilesWithDates = [];
-foreach ($posts as $post) {
-    $postFile = POSTS_DIR . $post;
-    $lastModified = filemtime($postFile); // Dosyanın son düzenlenme tarihi
-    $postFilesWithDates[] = [
-        'file' => $postFile,
-        'slug' => pathinfo($post, PATHINFO_FILENAME),
-        'lastModified' => $lastModified
-    ];
+if ($postFilesWithDates === null) {
+    // Cache miss - generate posts data
+    $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
+    
+    // Dosyaları son düzenlenme tarihine göre sıralamak için bir yardımcı dizi oluştur
+    $postFilesWithDates = [];
+    foreach ($posts as $post) {
+        if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
+            $postFile = POSTS_DIR . $post;
+            $lastModified = filemtime($postFile); // Dosyanın son düzenlenme tarihi
+            $postFilesWithDates[] = [
+                'file' => $postFile,
+                'slug' => pathinfo($post, PATHINFO_FILENAME),
+                'lastModified' => $lastModified
+            ];
+        }
+    }
+
+    // Tarihe göre sıralama (büyükten küçüğe)
+    usort($postFilesWithDates, function ($a, $b) {
+        return $b['lastModified'] - $a['lastModified'];
+    });
+    
+    // Cache the results
+    setCachedPosts($postFilesWithDates);
 }
-
-// Tarihe göre sıralama (büyükten küçüğe)
-usort($postFilesWithDates, function ($a, $b) {
-    return $b['lastModified'] - $a['lastModified'];
-});
 
 // Sıralanan yazıları listeleme
 echo "<ul class='list-group list-group-flush list-group-numbered'>";
 foreach ($postFilesWithDates as $postData) {
+    if (!isset($postData['file'], $postData['slug'], $postData['lastModified'])) {
+        continue; // Eksik anahtar varsa atla
+    }
     $file = $postData['file'];
     $slug = $postData['slug'];
-	$lastModified = $postData['lastModified'];
+    $lastModified = $postData['lastModified'];
     $contentData = getPostContent($file);
 
     if ($contentData) {
@@ -70,7 +81,7 @@ foreach ($postFilesWithDates as $postData) {
 		  <li class='list-group-item d-flex justify-content-between align-items-start'>
 			<div class='ms-2 me-auto'>
 			  <div class='fw-bold'>
-				<a href='" . $basePath . $slug . "' class='text-dark'>" . $title . "</a></div>
+				<a href='" . BASE_PATH . $slug . "' class='text-dark'>" . $title . "</a></div>
 				" . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
 			</div>
 			<span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>

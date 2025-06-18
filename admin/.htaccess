@@ -1,0 +1,61 @@
+# Admin Panel Security
+# Bu dosya admin klasörünü korur
+
+# admin.env dosyasına erişimi engelle
+<Files "admin.env">
+    Order allow,deny
+    Deny from all
+</Files>
+
+# Diğer gizli dosyalara erişimi engelle
+<FilesMatch "^(\.env|\.htaccess|\.git|admin\.env)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# PHP dosyalarının doğrudan erişimini engelle (gerekirse)
+# <Files "*.php">
+#     Order allow,deny
+#     Deny from all
+# </Files>
+
+# Sadece belirli dosyalara izin ver
+<Files "login.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "dashboard.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "settings.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "posts.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "categories.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "new_post.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "edit_post.php">
+    Order allow,deny
+    Allow from all
+</Files>
+
+<Files "debug.php">
+    Order allow,deny
+    Allow from all
+</Files> 

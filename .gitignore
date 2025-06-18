@@ -1,0 +1,51 @@
+# Kişisel ayarlar dosyası
+config.local.php
+
+# Admin environment dosyası
+admin/admin.env
+
+# Cache dizini
+cache/
+*.cache
+
+# Log dosyaları
+*.log
+logs/
+
+# Geçici dosyalar
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE dosyaları
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backup dosyaları
+*.bak
+*.backup
+
+# Environment dosyaları
+.env
+.env.local
+.env.production
+
+# Composer
+vendor/
+composer.lock
+
+# Node modules (eğer varsa)
+node_modules/
+npm-debug.log*
+
+# Upload dizini (eğer varsa)
+uploads/
+
+# Database dosyaları (eğer varsa)
+*.db
+*.sqlite
+*.sqlite3 
+admin1/admin.env
