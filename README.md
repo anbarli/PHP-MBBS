@@ -1,6 +1,6 @@
 # PHP-MBBS / PHP Markdown Based Blog System (Basit PHP Markdown Blog Sistemi) [🇹🇷]
 
-Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sağlar. SEO dostu URL'ler, RSS beslemesi, güvenlik önlemleri, performans optimizasyonları ve modern özellikler ile tam donanımlı bir yapı sunar.
+Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sağlar. SEO dostu URL'ler, RSS beslemesi, güvenlik önlemleri, performans optimizasyonları, admin paneli ve modern özellikler ile tam donanımlı bir yapı sunar.
 
 ## 🚀 Özellikler
 
@@ -10,7 +10,8 @@ Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sa�
 - **Gelişmiş Arama:** Yazı başlığı, içerik, etiket ve kategori bazlı arama.
 - **Dark Mode:** Kullanıcı tercihine göre karanlık/aydınlık tema.
 - **Sosyal Medya Paylaşım:** Twitter, Facebook, LinkedIn, WhatsApp ve E-posta paylaşım butonları.
-- **Güvenlik Önlemleri:** XSS koruması, path traversal koruması ve input validasyonu.
+- **Admin Paneli:** Güvenli admin paneli ile yazı yönetimi, kategori yönetimi ve ayarlar.
+- **Güvenlik Önlemleri:** XSS koruması, path traversal koruması, input validasyonu ve session yönetimi.
 - **Performans Optimizasyonu:** Dosya tabanlı önbellekleme sistemi, gzip sıkıştırma, browser caching.
 - **SEO Optimizasyonu:** Structured data, meta etiketler, sitemap.xml, robots.txt.
 - **Hata Yönetimi:** Kapsamlı hata yakalama ve loglama sistemi.
@@ -39,7 +40,7 @@ Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sa�
     ```
     
     `config.local.php` dosyasında şu ayarları yapın:
-    - `$basePath`: Blog dizininizin yolu (örn: `/blog/`, `/`, `/my-blog/`)
+    - `BASE_PATH`: Otomatik algılanır, manuel değiştirmeye gerek yoktur
     - `SITE_NAME`: Blog adınız
     - `DEFAULT_TITLE`: Varsayılan sayfa başlığı
     - `DEFAULT_DESCRIPTION`: Varsayılan meta açıklama
@@ -62,6 +63,11 @@ Bu proje, PHP ve Markdown kullanarak basit bir blog sistemi oluşturmanızı sa�
     - `ADMIN_PASSWORD`: Admin şifresi (hash'lenmiş)
     - `ADMIN_EMAIL`: Admin e-posta adresi
     - `ADMIN_NAME`: Admin görünen adı
+
+    **Önemli:** Admin şifresini hash'lemek için PHP'de şu komutu kullanın:
+    ```php
+    <?php echo password_hash('şifreniz', PASSWORD_DEFAULT); ?>
+    ```
 
 4.  `.htaccess` dosyasını kontrol edin ve URL yeniden yazımının etkin olduğundan emin olun.
 5.  Blog yazılarınızı `posts/` klasörüne Markdown formatında ekleyin.
@@ -108,10 +114,28 @@ RSS beslemesine şu URL üzerinden erişebilirsiniz:
 - Arama kutusu header'da mevcuttur
 - Yazı başlığı, içerik, etiket ve kategori bazlı arama
 
+### Admin Paneli Kullanımı
+
+You can access the admin panel at `http://yourdomain.com/blog/admin/`.
+
+#### Available Features:
+- **Dashboard:** General statistics and quick access
+- **Post Management:** Add, edit, delete posts
+- **Category Management:** Add, edit, delete categories
+- **Settings:** Site settings and admin information update
+- **Security:** Session management and secure logout
+
+#### Security Features:
+- Session-based authentication
+- Password hashing (PASSWORD_DEFAULT)
+- Automatic session timeout
+- Secure file upload
+- CSRF protection
+
 ### Dark Mode
 
-- Header'daki ay/güneş ikonuna tıklayarak tema değiştirebilirsiniz
-- Tercih localStorage'da saklanır
+- Click the moon/sun icon in the header to toggle theme
+- Preference is saved in localStorage
 
 ## 🏗️ Proje Yapısı
 
@@ -119,6 +143,9 @@ RSS beslemesine şu URL üzerinden erişebilirsiniz:
         /posts/         - Blog yazılarının tutulduğu klasör
         /includes/      - Header, footer ve Markdown işleme dosyaları
         /cache/         - Önbellek dosyaları (otomatik oluşturulur)
+        /admin/         - Admin paneli dosyaları
+            admin.env   - Admin kimlik bilgileri (güvenli)
+            .htaccess   - Admin klasörü güvenlik kuralları
         index.php       - Ana sayfa
         post.php        - Tekil yazı sayfası
         search.php      - Arama sayfası
@@ -140,6 +167,10 @@ RSS beslemesine şu URL üzerinden erişebilirsiniz:
 - **Error Handling:** Hata mesajları güvenli şekilde gösterilir
 - **Security Headers:** CSP, X-Frame-Options, X-Content-Type-Options
 - **Sensitive Files Protection:** Hassas dosyalar .htaccess ile korunur
+- **Session Management:** Güvenli session yönetimi ve timeout
+- **Password Hashing:** Şifreler PASSWORD_DEFAULT ile hash'lenir
+- **Admin Authentication:** Güvenli admin kimlik doğrulama sistemi
+- **CSRF Protection:** Cross-Site Request Forgery koruması
 
 ### Güvenlik Kontrol Listesi
 
@@ -151,6 +182,10 @@ RSS beslemesine şu URL üzerinden erişebilirsiniz:
 - [x] Security headers
 - [x] Content Security Policy
 - [x] Sensitive files protection
+- [x] Session management
+- [x] Password hashing
+- [x] Admin authentication
+- [x] CSRF protection
 
 ## ⚡ Performans Optimizasyonları
 
@@ -298,6 +333,11 @@ define('CACHE_DURATION', 3600);
 - ✅ Breadcrumb navigation
 - ✅ 404 sayfası
 - ✅ Robots.txt optimizasyonu
+- ✅ Admin paneli (dashboard, yazı yönetimi, kategori yönetimi)
+- ✅ Güvenli admin kimlik doğrulama (admin.env)
+- ✅ Session yönetimi
+- ✅ Şifre hash'leme
+- ✅ Admin ayarları yönetimi
 
 ### v2.0.0
 
@@ -395,7 +435,7 @@ This project allows you to create a simple blog system using PHP and Markdown. I
     ```
     
     Configure the following settings in `config.local.php`:
-    - `$basePath`: Your blog directory path (e.g., `/blog/`, `/`, `/my-blog/`)
+    - `BASE_PATH`: Automatically detected, no manual configuration needed
     - `SITE_NAME`: Your blog name
     - `DEFAULT_TITLE`: Default page title
     - `DEFAULT_DESCRIPTION`: Default meta description
@@ -418,6 +458,11 @@ This project allows you to create a simple blog system using PHP and Markdown. I
     - `ADMIN_PASSWORD`: Admin şifresi (hash'lenmiş)
     - `ADMIN_EMAIL`: Admin e-posta adresi
     - `ADMIN_NAME`: Admin görünen adı
+
+    **Önemli:** Admin şifresini hash'lemek için PHP'de şu komutu kullanın:
+    ```php
+    <?php echo password_hash('şifreniz', PASSWORD_DEFAULT); ?>
+    ```
 
 4.  `.htaccess` dosyasını kontrol edin ve URL rewriting is enabled.
 5.  Add your blog posts in Markdown format to the `posts/` folder.
@@ -460,6 +505,24 @@ You can access the RSS feed via the following URL:
 - Search box available in header
 - Search by title, content, tags, and category
 
+### Admin Panel Usage
+
+You can access the admin panel at `http://yourdomain.com/blog/admin/`.
+
+#### Available Features:
+- **Dashboard:** General statistics and quick access
+- **Post Management:** Add, edit, delete posts
+- **Category Management:** Add, edit, delete categories
+- **Settings:** Site settings and admin information update
+- **Security:** Session management and secure logout
+
+#### Security Features:
+- Session-based authentication
+- Password hashing (PASSWORD_DEFAULT)
+- Automatic session timeout
+- Secure file upload
+- CSRF protection
+
 ### Dark Mode
 
 - Click the moon/sun icon in the header to toggle theme
@@ -471,6 +534,9 @@ You can access the RSS feed via the following URL:
         /posts/         - Folder where blog posts are kept
         /includes/      - Header, footer and Markdown processing files
         /cache/         - Cache files (created automatically)
+        /admin/         - Admin panel files
+            admin.env   - Admin identity information (secure)
+            .htaccess   - Admin folder security rules
         index.php       - Home page
         post.php        - Single post page
         search.php      - Search page
@@ -492,6 +558,10 @@ You can access the RSS feed via the following URL:
 - **Error Handling:** Error messages are displayed safely
 - **Security Headers:** CSP, X-Frame-Options, X-Content-Type-Options
 - **Sensitive Files Protection:** Sensitive files protected with .htaccess
+- **Session Management:** Secure session management and timeout
+- **Password Hashing:** Passwords are hashed with PASSWORD_DEFAULT
+- **Admin Authentication:** Secure admin authentication system
+- **CSRF Protection:** Cross-Site Request Forgery protection
 
 ### Security Checklist
 
@@ -503,6 +573,10 @@ You can access the RSS feed via the following URL:
 - [x] Security headers
 - [x] Content Security Policy
 - [x] Sensitive files protection
+- [x] Session management
+- [x] Password hashing
+- [x] Admin authentication
+- [x] CSRF protection
 
 ## ⚡ Performance Optimizations
 
@@ -572,8 +646,8 @@ You can access the RSS feed via the following URL:
 ## 🎨 User Experience
 
 ### Dark Mode
-- User preference saved in localStorage
-- System preference detection
+- Kullanıcı tercihi localStorage'da saklanır
+- Sistem tercihi algılama
 - Smooth transition animations
 
 ### Search System
@@ -650,6 +724,11 @@ To change cache duration, edit the `CACHE_DURATION` value in the `config.local.p
 - ✅ Breadcrumb navigation
 - ✅ 404 page
 - ✅ Robots.txt optimization
+- ✅ Admin panel (dashboard, post management, category management)
+- ✅ Secure admin authentication (admin.env)
+- ✅ Session management
+- ✅ Password hashing
+- ✅ Admin settings management
 
 ### v2.0.0
 
