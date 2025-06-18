@@ -3,8 +3,15 @@
 // Bu dosyayı config.local.php olarak kopyalayın ve kendi ayarlarınızı yazın
 // config.local.php dosyası git'e dahil edilmez (güvenlik için)
 
-// Temel URL ayarları
-define('BASE_PATH', '/blog/'); // Kendi dizin yapınıza göre değiştirin
+// Temel URL ayarları - Otomatik algılama
+$scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
+$basePath = dirname($scriptName);
+if ($basePath === '/') {
+    $basePath = '/';
+} else {
+    $basePath = rtrim($basePath, '/') . '/';
+}
+define('BASE_PATH', $basePath);
 // Örnekler:
 // define('BASE_PATH', '/'); // Ana dizinde ise
 // define('BASE_PATH', '/my-blog/'); // Alt dizinde ise

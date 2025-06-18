@@ -44,7 +44,6 @@
 
 # URL Rewriting
 RewriteEngine On
-RewriteBase /blog/
 
 # Force HTTPS (uncomment if you have SSL)
 # RewriteCond %{HTTPS} off
@@ -55,7 +54,7 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)/$ /$1 [L,R=301]
 
 # 404 Error Page
-ErrorDocument 404 /blog/404.php
+ErrorDocument 404 404.php
 
 # Sitemap için Rewrite
 RewriteRule ^sitemap\.xml$ sitemap.php [L,QSA]
