@@ -62,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = 'Kullanıcı adı ve şifre gereklidir.';
             } else {
                 // Kullanıcı doğrulama
-                if ($username === $adminConfig['admin_username'] && 
-                    verifyPassword($password, $adminConfig['admin_password'])) {
+                if ($username === $adminConfig['ADMIN_USERNAME'] && 
+                    verifyPassword($password, $adminConfig['ADMIN_PASSWORD'])) {
                     
                     // Giriş başarılı
                     $_SESSION['admin_logged_in'] = true;

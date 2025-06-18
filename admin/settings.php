@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 // Şifre değişikliği
                 if (!empty($currentPassword)) {
-                    if (!password_verify($currentPassword, $adminConfig['admin_password'])) {
+                    if (!password_verify($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
                         $message = 'Mevcut şifre yanlış.';
                         $messageType = 'danger';
                     } elseif (empty($newPassword)) {
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = 'Şifreler eşleşmiyor.';
                         $messageType = 'danger';
                     } else {
-                        $adminConfig['admin_password'] = password_hash($newPassword, PASSWORD_DEFAULT);
+                        $adminConfig['ADMIN_PASSWORD'] = password_hash($newPassword, PASSWORD_DEFAULT);
                         $configUpdated = true;
                         $message .= ' Şifre güncellendi.';
                     }

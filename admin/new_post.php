@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'category' => $category,
                 'description' => $description,
                 'tags' => array_filter(array_map('trim', explode(',', $tags))),
-                'author' => $adminConfig['admin_name'] ?? 'Admin'
+                'author' => $adminConfig['ADMIN_NAME'] ?? 'Admin'
             ];
             
             // Markdown içeriği oluştur
