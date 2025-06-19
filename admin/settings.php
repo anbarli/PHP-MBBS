@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         if ($action === 'update_admin') {
             // Admin bilgilerini güncelle
+            $newAdminUsername = sanitizeInput($_POST['admin_username'] ?? '');
             $newAdminName = sanitizeInput($_POST['admin_name'] ?? '');
             $newAdminEmail = sanitizeInput($_POST['admin_email'] ?? '');
             $currentPassword = $_POST['current_password'] ?? '';
@@ -49,7 +50,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $confirmPassword = $_POST['confirm_password'] ?? '';
             
             // Validasyon
-            if (empty($newAdminName)) {
+            if (empty($newAdminUsername)) {
+                $message = 'Kullanıcı adı gereklidir.';
+                $messageType = 'danger';
+            } elseif (empty($newAdminName)) {
                 $message = 'Admin adı gereklidir.';
                 $messageType = 'danger';
             } elseif (empty($newAdminEmail) || !filter_var($newAdminEmail, FILTER_VALIDATE_EMAIL)) {
@@ -58,14 +62,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $configUpdated = false;
                 
-                // Admin adı ve e-posta güncelle
+                // Admin kullanıcı adı, adı ve e-posta güncelle
+                $adminConfig['ADMIN_USERNAME'] = $newAdminUsername;
                 $adminConfig['ADMIN_NAME'] = $newAdminName;
                 $adminConfig['ADMIN_EMAIL'] = $newAdminEmail;
                 $configUpdated = true;
                 
                 // Şifre değişikliği
                 if (!empty($currentPassword)) {
-                    if (!password_verify($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
+                    if (!verifyPassword($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
                         $message = 'Mevcut şifre yanlış.';
                         $messageType = 'danger';
                     } elseif (empty($newPassword)) {
@@ -78,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = 'Şifreler eşleşmiyor.';
                         $messageType = 'danger';
                     } else {
-                        $adminConfig['ADMIN_PASSWORD'] = password_hash($newPassword, PASSWORD_DEFAULT);
+                        $adminConfig['ADMIN_PASSWORD'] = hashPassword($newPassword);
                         $configUpdated = true;
                         $message .= ' Şifre güncellendi.';
                     }
@@ -264,21 +269,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
 // CSRF token oluştur
 $csrfToken = generateCSRFToken();
 
-// Sistem bilgileri
-$cachedPosts = getCachedPosts();
-$systemInfo = [
-    'php_version' => PHP_VERSION,
-    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
-    'upload_max_filesize' => ini_get('upload_max_filesize'),
-    'post_max_size' => ini_get('post_max_size'),
-    'max_execution_time' => ini_get('max_execution_time') . 's',
-    'memory_limit' => ini_get('memory_limit'),
-    'disk_free_space' => (function_exists('disk_free_space') && function_exists('formatBytes')) ? formatBytes(disk_free_space('.')) : 'Unknown',
-    'disk_total_space' => (function_exists('disk_total_space') && function_exists('formatBytes')) ? formatBytes(disk_total_space('.')) : 'Unknown',
-    'posts_count' => is_array($cachedPosts) ? count($cachedPosts) : 0,
-    'cache_size' => function_exists('getCacheSize') ? getCacheSize() : '0 bytes'
-];
-
 // Mevcut site ayarlarını al
 $currentSiteConfig = [];
 if ($configLocalExists) {
@@ -402,7 +392,7 @@ if ($configLocalExists) {
                         <?php endif; ?>
                         
                         <div class="row">
-                            <!-- Admin Settings -->
+                            <!-- Admin Settings - 1. Sütun -->
                             <div class="col-md-6">
                                 <div class="card mb-4">
                                     <div class="card-header">
@@ -414,6 +404,12 @@ if ($configLocalExists) {
                                         <form method="POST">
                                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                                             <input type="hidden" name="action" value="update_admin">
+                                            
+                                            <div class="mb-3">
+                                                <label for="admin_username" class="form-label">Kullanıcı Adı</label>
+                                                <input type="text" class="form-control" id="admin_username" name="admin_username" 
+                                                       value="<?php echo htmlspecialchars($adminConfig['ADMIN_USERNAME'] ?? ''); ?>" required>
+                                            </div>
                                             
                                             <div class="mb-3">
                                                 <label for="admin_name" class="form-label">Admin Adı</label>
@@ -456,8 +452,46 @@ if ($configLocalExists) {
                                     </div>
                                 </div>
                                 
-                                <!-- Site Settings -->
+                                <!-- System Tools - Admin Bilgileri altında -->
                                 <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-tools"></i> Sistem Araçları
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="d-grid gap-2">
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                <input type="hidden" name="action" value="clear_cache">
+                                                <button type="submit" class="btn btn-outline-warning w-100 mb-2">
+                                                    <i class="bi bi-trash"></i> Cache Temizle
+                                                </button>
+                                            </form>
+                                            
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                <input type="hidden" name="action" value="generate_sitemap">
+                                                <button type="submit" class="btn btn-outline-info w-100 mb-2">
+                                                    <i class="bi bi-sitemap"></i> Sitemap Oluştur
+                                                </button>
+                                            </form>
+                                            
+                                            <form method="POST" class="d-inline">
+                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                <input type="hidden" name="action" value="regenerate_cache">
+                                                <button type="submit" class="btn btn-outline-success w-100 mb-2">
+                                                    <i class="bi bi-arrow-clockwise"></i> Cache Yeniden Oluştur
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Site Settings - 2. Sütun -->
+                            <div class="col-md-6">
+                                <div class="card mb-4">
                                     <div class="card-header">
                                         <h5 class="mb-0">
                                             <i class="bi bi-globe"></i> Site Ayarları
@@ -550,126 +584,6 @@ if ($configLocalExists) {
                                                 <i class="bi bi-check-circle"></i> Site Ayarlarını Güncelle
                                             </button>
                                         </form>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- System Tools -->
-                            <div class="col-md-6">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="bi bi-tools"></i> Sistem Araçları
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="clear_cache">
-                                                <button type="submit" class="btn btn-outline-warning w-100 mb-2">
-                                                    <i class="bi bi-trash"></i> Cache Temizle
-                                                </button>
-                                            </form>
-                                            
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="generate_sitemap">
-                                                <button type="submit" class="btn btn-outline-info w-100 mb-2">
-                                                    <i class="bi bi-sitemap"></i> Sitemap Oluştur
-                                                </button>
-                                            </form>
-                                            
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="regenerate_cache">
-                                                <button type="submit" class="btn btn-outline-success w-100 mb-2">
-                                                    <i class="bi bi-arrow-clockwise"></i> Cache Yeniden Oluştur
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- System Info -->
-                                <div class="card mt-3">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="bi bi-info-circle"></i> Sistem Bilgileri
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small class="text-muted">PHP Sürümü</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['php_version']; ?></div>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">Sunucu</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['server_software']; ?></div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small class="text-muted">Maks. Dosya Boyutu</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['upload_max_filesize']; ?></div>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">POST Boyutu</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['post_max_size']; ?></div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small class="text-muted">Çalışma Süresi</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['max_execution_time']; ?></div>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">Bellek Limiti</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['memory_limit']; ?></div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small class="text-muted">Boş Alan</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['disk_free_space']; ?></div>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">Toplam Alan</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['disk_total_space']; ?></div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <small class="text-muted">Yazı Sayısı</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['posts_count']; ?></div>
-                                            </div>
-                                            <div class="col-6">
-                                                <small class="text-muted">Cache Boyutu</small>
-                                                <div class="fw-bold"><?php echo $systemInfo['cache_size']; ?></div>
-                                            </div>
-                                        </div>
-                                        <hr>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <small class="text-muted">Config.local.php Durumu</small>
-                                                <div class="fw-bold">
-                                                    <?php if ($configLocalExists): ?>
-                                                        <span class="text-success">
-                                                            <i class="bi bi-check-circle"></i> Mevcut
-                                                        </span>
-                                                    <?php else: ?>
-                                                        <span class="text-warning">
-                                                            <i class="bi bi-exclamation-triangle"></i> Bulunamadı
-                                                        </span>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>

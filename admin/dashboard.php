@@ -91,6 +91,25 @@ $categoryCount = getCategoryCount();
 // Son aktiviteleri al
 $recentPosts = array_slice($posts, 0, 5);
 
+// Sistem bilgileri
+$cachedPosts = getCachedPosts();
+$systemInfo = [
+    'php_version' => PHP_VERSION,
+    'server_software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+    'upload_max_filesize' => ini_get('upload_max_filesize'),
+    'post_max_size' => ini_get('post_max_size'),
+    'max_execution_time' => ini_get('max_execution_time') . 's',
+    'memory_limit' => ini_get('memory_limit'),
+    'disk_free_space' => (function_exists('disk_free_space') && function_exists('formatBytes')) ? formatBytes(disk_free_space('.')) : 'Unknown',
+    'disk_total_space' => (function_exists('disk_total_space') && function_exists('formatBytes')) ? formatBytes(disk_total_space('.')) : 'Unknown',
+    'posts_count' => is_array($cachedPosts) ? count($cachedPosts) : 0,
+    'cache_size' => function_exists('getCacheSize') ? getCacheSize() : '0 bytes'
+];
+
+// Config.local.php durumu
+$configLocalPath = '../config.local.php';
+$configLocalExists = file_exists($configLocalPath);
+
 // Çıkış işlemi
 if (isset($_GET['logout'])) {
     secureLogout();
@@ -353,6 +372,80 @@ if (isset($_GET['logout'])) {
                                                 <a href="<?php echo BASE_PATH; ?>" target="_blank" class="btn btn-outline-secondary w-100">
                                                     <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                                                 </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- System Info -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-info-circle"></i> Sistem Bilgileri
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">PHP Sürümü</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['php_version']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Sunucu</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['server_software']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Maks. Dosya Boyutu</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['upload_max_filesize']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">POST Boyutu</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['post_max_size']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Çalışma Süresi</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['max_execution_time']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Bellek Limiti</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['memory_limit']; ?></div>
+                                            </div>
+                                        </div>
+                                        <hr>
+                                        <div class="row">
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Boş Alan</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['disk_free_space']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Toplam Alan</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['disk_total_space']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Yazı Sayısı</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['posts_count']; ?></div>
+                                            </div>
+                                            <div class="col-md-2 col-6">
+                                                <small class="text-muted">Cache Boyutu</small>
+                                                <div class="fw-bold"><?php echo $systemInfo['cache_size']; ?></div>
+                                            </div>
+                                            <div class="col-md-4 col-12">
+                                                <small class="text-muted">Config.local.php Durumu</small>
+                                                <div class="fw-bold">
+                                                    <?php if ($configLocalExists): ?>
+                                                        <span class="text-success">
+                                                            <i class="bi bi-check-circle"></i> Mevcut
+                                                        </span>
+                                                    <?php else: ?>
+                                                        <span class="text-warning">
+                                                            <i class="bi bi-exclamation-triangle"></i> Bulunamadı
+                                                        </span>
+                                                    <?php endif; ?>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

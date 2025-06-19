@@ -30,20 +30,6 @@ $success = '';
 // Admin config yükle
 $adminConfig = loadAdminConfig();
 
-// Klasör adı kontrolü
-$currentDir = basename(__DIR__);
-if ($currentDir === 'admin') {
-    die('<div style="color:red;font-family:monospace;font-size:1.2em;margin:2em auto;text-align:center;max-width:500px;">
-    <b>Güvenlik Uyarısı:</b><br>
-    Yönetim paneli klasörünüzün adı <b>admin</b> olarak bırakılmış.<br>
-    Lütfen bu klasörün adını <b>rastgele ve tahmin edilmesi zor</b> bir isimle değiştirin.<br>
-    <br>
-    Örnek: <code>my-secret-panel-8f3d2</code><br>
-    <br>
-    <b>Paneli kullanabilmek için klasör adını değiştirmeniz zorunludur.</b>
-    </div>');
-}
-
 // Form gönderildi mi?
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // CSRF kontrolü
