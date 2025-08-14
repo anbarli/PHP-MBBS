@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $authorName = sanitizeInput($_POST['author_name'] ?? '');
             $authorEmail = sanitizeInput($_POST['author_email'] ?? '');
             $gaTrackingId = sanitizeInput($_POST['ga_tracking_id'] ?? '');
-            $twitterUsername = sanitizeInput($_POST['twitter_username'] ?? '');
+            $twitterUsername = sanitizeInput($_POST['social_twitter'] ?? '');
             $socialTwitter = sanitizeInput($_POST['social_twitter'] ?? '');
             $socialGithub = sanitizeInput($_POST['social_github'] ?? '');
             $socialLinkedin = sanitizeInput($_POST['social_linkedin'] ?? '');
@@ -556,14 +556,7 @@ if ($configLocalExists) {
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="twitter_username" class="form-label">Twitter Kullanıcı Adı</label>
-                                                <input type="text" class="form-control" id="twitter_username" name="twitter_username" 
-                                                       value="<?php echo htmlspecialchars($currentSiteConfig['twitter_username'] ?? ''); ?>">
-                                                <div class="form-text">Örnek: @kullaniciadi</div>
-                                            </div>
-                                            
-                                            <div class="mb-3">
-                                                <label for="social_twitter" class="form-label">Twitter URL</label>
+                                                <label for="social_twitter" class="form-label">X URL</label>
                                                 <input type="url" class="form-control" id="social_twitter" name="social_twitter" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['social_twitter'] ?? ''); ?>">
                                             </div>
