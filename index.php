@@ -54,10 +54,19 @@ if ($postFilesWithDates === null) {
 }
 
 // Sıralanan yazıları listeleme
-echo "<ul class='list-group list-group-flush list-group-numbered'>";
-foreach ($postFilesWithDates as $postData) {
+
+// Sayfalama ayarları
+$postsPerPage = 5;
+$totalPosts = count($postFilesWithDates);
+$currentPage = isset($_GET['page']) ? max(1, intval($_GET['page'])) : 1;
+$totalPages = ceil($totalPosts / $postsPerPage);
+$startIndex = ($currentPage - 1) * $postsPerPage;
+$pagedPosts = array_slice($postFilesWithDates, $startIndex, $postsPerPage);
+
+echo "<ul class='list-group list-group-flush'>";
+foreach ($pagedPosts as $postData) {
     if (!isset($postData['file'], $postData['slug'], $postData['lastModified'])) {
-        continue; // Eksik anahtar varsa atla
+        continue;
     }
     $file = $postData['file'];
     $slug = $postData['slug'];
@@ -66,30 +75,44 @@ foreach ($postFilesWithDates as $postData) {
 
     if ($contentData) {
         $title = htmlspecialchars($contentData['meta']['title']);
-        $category = strtolower(htmlspecialchars($contentData['meta']['category'] ?? 'Genel')); // Category'yi küçük harfe çevir
-		$tags = array_map('strtolower', $contentData['meta']['tags'] ?? []); // Etiketleri küçük harfe çevir
-		$date = htmlspecialchars($contentData['meta']['date']);
-		
-        // Kategori veya etikete göre filtrele (case-insensitive)
+        $category = strtolower(htmlspecialchars($contentData['meta']['category'] ?? 'Genel'));
+        $tags = array_map('strtolower', $contentData['meta']['tags'] ?? []);
+        $date = htmlspecialchars($contentData['meta']['date']);
+
         if (($filterCategory && $category !== $filterCategory) || ($filterTag && !in_array($filterTag, $tags))) {
             continue;
         }
-		
-		$tags = array_map('ucwords', $contentData['meta']['tags'] ?? []); // Etiketleri ucwords harfe çevir
-		
-                    echo "
-                        <li class='list-group-item d-flex justify-content-between align-items-start'>
-                            <div class='ms-2 me-auto'>
-                                <div class='fw-bold'>
-                                    <a href='" . BASE_PATH . $slug . "' class='text-dark'>" . $title . "</a></div>
-                                    " . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
-                            </div>
-                            <span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>
-                        </li>
-                    ";
+
+        $tags = array_map('ucwords', $contentData['meta']['tags'] ?? []);
+
+        echo "
+            <li class='list-group-item d-flex justify-content-between align-items-start'>
+                <div class='ms-2 me-auto'>
+                    <div class='fw-bold'>
+                        <a href='" . BASE_PATH . $slug . "' class='text-dark'>" . $title . "</a></div>
+                        " . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
+                </div>
+                <span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>
+            </li>
+        ";
     }
 }
 echo '</ul>';
+
+// Sayfalama linkleri
+if ($totalPages > 1) {
+    echo '<nav aria-label="Sayfalama" class="mt-4">';
+    echo '<ul class="pagination justify-content-center">';
+    for ($i = 1; $i <= $totalPages; $i++) {
+        $active = ($i === $currentPage) ? ' active' : '';
+        $url = $_SERVER['PHP_SELF'] . '?page=' . $i;
+        if ($filterCategory) $url .= '&cat=' . urlencode($filterCategory);
+        if ($filterTag) $url .= '&tag=' . urlencode($filterTag);
+        echo '<li class="page-item' . $active . '"><a class="page-link" href="' . $url . '">' . $i . '</a></li>';
+    }
+    echo '</ul>';
+    echo '</nav>';
+}
 
 include('includes/footer.php');
 ?>
