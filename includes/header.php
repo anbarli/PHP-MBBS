@@ -327,32 +327,25 @@
 </head>
 <body>
 <?php
-// Kategorileri ve etiketleri topla
-$categoryList = [];
-$tagList = [];
-$postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
-foreach ($postFiles as $post) {
-	if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
-		$postFile = POSTS_DIR . $post;
-		$postData = getPostContent($postFile);
-		if ($postData) {
-			if (isset($postData['meta']['category'])) {
+function getCategoryListForMenu() {
+	$categoryList = [];
+	$postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
+	foreach ($postFiles as $post) {
+		if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
+			$postFile = POSTS_DIR . $post;
+			$postData = getPostContent($postFile);
+			if ($postData && isset($postData['meta']['category'])) {
 				$category = trim($postData['meta']['category']);
 				if (!empty($category) && !in_array($category, $categoryList)) {
 					$categoryList[] = $category;
 				}
 			}
-			if (isset($postData['meta']['tags']) && is_array($postData['meta']['tags'])) {
-				foreach ($postData['meta']['tags'] as $tag) {
-					$tag = trim($tag);
-					if (!empty($tag) && !in_array($tag, $tagList)) {
-						$tagList[] = $tag;
-					}
-				}
-			}
 		}
 	}
+	return $categoryList;
 }
+$categoryList = getCategoryListForMenu();
+// ...existing code...
 ?>
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Tenth navbar example">
