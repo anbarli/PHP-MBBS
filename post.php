@@ -4,63 +4,33 @@ include('config.php');
 $seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
 $seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
 
-$slug = isset($_GET['slug']) ? $_GET['slug'] : '';
 
-if (!preg_match('/^[a-z0-9-]+$/i', $slug)) {
-    header('HTTP/1.1 400 Bad Request'); exit('Geçersiz slug.');
-}
-$slug = trim($slug, '-');
-$slug = preg_replace('/-+/', '-', $slug);
+$slug = isset($_GET['slug']) ? $_GET['slug'] : '';
+$slug = preg_replace('/[^a-zA-Z0-9_-]/', '', $slug); // Sadece geçerli karakterler
 if (strlen($slug) < 1 || strlen($slug) > 120) {
     header('HTTP/1.1 400 Bad Request'); exit('Geçersiz slug uzunluğu.');
 }
 
-$baseDir     = dirname(__FILE__) . '/posts';
-$targetRel   = str_replace('\\', '/', $slug . '.md');
-$baseReal    = realpath($baseDir);
-$targetReal  = realpath($baseDir . '/' . $targetRel);
-
-if ($baseReal === false || $targetReal === false) {
-    header('HTTP/1.1 404 Not Found'); exit('Yazı bulunamadı.');
-}
-if (strpos($targetReal, $baseReal . DIRECTORY_SEPARATOR) !== 0) {
-    header('HTTP/1.1 403 Forbidden'); exit('Erişim engellendi.');
-}
-if (!is_file($targetReal) || !is_readable($targetReal)) {
+$postFile = POSTS_DIR . $slug . '.md';
+if (!file_exists($postFile) || !is_readable($postFile)) {
     header('HTTP/1.1 404 Not Found'); exit('Yazı bulunamadı.');
 }
 
-if (isset($_GET['slug'])) {
-    $slug = htmlspecialchars($_GET['slug'], ENT_QUOTES, 'UTF-8');
-    
-    // Validate slug format - only allow alphanumeric, hyphens, and underscores
-    if (!preg_match('/^[a-zA-Z0-9_-]+$/', $slug)) {
-        $slug = '';
-    }
-    
-    $postFile = POSTS_DIR . $slug . '.md';
 
-    if (file_exists($postFile)) {
-		
-        $postData = getPostContent($postFile);
-		
-        if ($postData) {
-			$title = htmlspecialchars($postData['meta']['title']);
-			$category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
-			$tags = $postData['meta']['tags'] ?? [];
-			$date = htmlspecialchars($postData['meta']['date']);
-			
-            // SEO için değişkenler
-            $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
-            
-            // Daha iyi meta description oluştur
-            $contentText = strip_tags($postData['content']);
-            $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
-            $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
-            if (strlen($contentText) > 160) {
-                $seoDescription .= '...';
-            }
-        }
+$postData = getPostContent($postFile);
+if ($postData) {
+    $title = htmlspecialchars($postData['meta']['title']);
+    $category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
+    $tags = $postData['meta']['tags'] ?? [];
+    $date = htmlspecialchars($postData['meta']['date']);
+    // SEO için değişkenler
+    $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
+    // Daha iyi meta description oluştur
+    $contentText = strip_tags($postData['content']);
+    $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
+    $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
+    if (strlen($contentText) > 160) {
+        $seoDescription .= '...';
     }
 }
 

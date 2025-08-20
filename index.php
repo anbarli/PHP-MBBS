@@ -77,16 +77,16 @@ foreach ($postFilesWithDates as $postData) {
 		
 		$tags = array_map('ucwords', $contentData['meta']['tags'] ?? []); // Etiketleri ucwords harfe çevir
 		
-		echo "
-		  <li class='list-group-item d-flex justify-content-between align-items-start'>
-			<div class='ms-2 me-auto'>
-			  <div class='fw-bold'>
-				<a href='" . BASE_PATH . $slug . "' class='text-dark'>" . $title . "</a></div>
-				" . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
-			</div>
-			<span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>
-		  </li>
-		";
+                    echo "
+                        <li class='list-group-item d-flex justify-content-between align-items-start'>
+                            <div class='ms-2 me-auto'>
+                                <div class='fw-bold'>
+                                    <a href='" . BASE_PATH . $slug . "' class='text-dark'>" . $title . "</a></div>
+                                    " . $date . " tarihinde <strong>" . ucwords(strtolower($category)) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $tags) . "
+                            </div>
+                            <span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($category)) . "</span>
+                        </li>
+                    ";
     }
 }
 echo '</ul>';
