@@ -327,34 +327,86 @@
 </head>
 <body>
 
+
+
+<?php
+// Kategorileri ve etiketleri topla
+$categoryList = [];
+$tagList = [];
+$postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
+foreach ($postFiles as $post) {
+	if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
+		$postFile = POSTS_DIR . $post;
+		$postData = getPostContent($postFile);
+		if ($postData) {
+			if (isset($postData['meta']['category'])) {
+				$category = trim($postData['meta']['category']);
+				if (!empty($category) && !in_array($category, $categoryList)) {
+					$categoryList[] = $category;
+				}
+			}
+			if (isset($postData['meta']['tags']) && is_array($postData['meta']['tags'])) {
+				foreach ($postData['meta']['tags'] as $tag) {
+					$tag = trim($tag);
+					if (!empty($tag) && !in_array($tag, $tagList)) {
+						$tagList[] = $tag;
+					}
+				}
+			}
+		}
+	}
+}
+?>
+
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Tenth navbar example">
-    <div class="container-fluid">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse justify-content-md-center" id="navbara">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item h3">
-            <a class="nav-link active" aria-current="page" href="<?php echo BASE_PATH; ?>"><?php echo SITE_NAME; ?></a>
-          </li>
-        </ul>
-        <!-- Search Form -->
-        <form class="d-flex me-2" role="search" method="get" action="<?php echo BASE_URL; ?>search">
-          <input class="form-control me-2" type="search" name="q" placeholder="Ara..." aria-label="Ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>" style="min-width: 180px;">
-          <button class="btn btn-outline-light" type="submit">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-            </svg>
-          </button>
-        </form>
-        <!-- Dark Mode Toggle -->
-        <button id="darkModeToggle" class="btn btn-outline-light" type="button" title="Karanlık Modu Aç/Kapat" aria-label="Karanlık Mod">
-          <i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
-          <i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
-        </button>
-      </div>
-    </div>
-</nav>
+
+			<div class="container-fluid">
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbara">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-center">
+						<li class="nav-item h3 me-3">
+							<a class="nav-link active fw-bold" aria-current="page" href="<?php echo BASE_PATH; ?>" style="font-size:1.5rem; letter-spacing:1px;"><i class="bi bi-journal-richtext"></i> <?php echo SITE_NAME; ?></a>
+						</li>
+						<!-- Kategori Dropdown -->
+						<li class="nav-item dropdown me-2">
+							<a class="nav-link dropdown-toggle fw-semibold" href="#" id="kategoriDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="bi bi-folder"></i> Kategoriler
+							</a>
+							<ul class="dropdown-menu shadow-lg rounded" aria-labelledby="kategoriDropdown">
+								<?php foreach ($categoryList as $cat): ?>
+									<li><a class="dropdown-item" href="<?php echo BASE_URL . '?cat=' . urlencode($cat); ?>"><i class="bi bi-tag-fill text-primary"></i> <?php echo htmlspecialchars($cat); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</li>
+						<!-- Etiket Dropdown -->
+						<li class="nav-item dropdown me-2">
+							<a class="nav-link dropdown-toggle fw-semibold" href="#" id="etiketDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="bi bi-hash"></i> Etiketler
+							</a>
+							<ul class="dropdown-menu shadow-lg rounded" aria-labelledby="etiketDropdown">
+								<?php foreach ($tagList as $tag): ?>
+									<li><a class="dropdown-item" href="<?php echo BASE_URL . '?tag=' . urlencode($tag); ?>"><i class="bi bi-hash text-success"></i> <?php echo htmlspecialchars($tag); ?></a></li>
+								<?php endforeach; ?>
+							</ul>
+						</li>
+					</ul>
+					<!-- Search Form -->
+					<form class="d-flex ms-auto me-2" role="search" method="get" action="<?php echo BASE_URL; ?>search">
+						<input class="form-control me-2 rounded-pill border-0 shadow-sm" type="search" name="q" placeholder="Ara..." aria-label="Ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>" style="min-width: 200px;">
+						<button class="btn btn-primary rounded-pill px-3" type="submit">
+							<i class="bi bi-search"></i>
+						</button>
+					</form>
+					<!-- Dark Mode Toggle -->
+					<button id="darkModeToggle" class="btn btn-outline-light ms-2 rounded-circle" type="button" title="Karanlık Modu Aç/Kapat" aria-label="Karanlık Mod">
+						<i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
+						<i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
+					</button>
+				</div>
+			</div>
+	</nav>
 
 <div class="container p-2">
 	<div class="row g-4 py-5">  
