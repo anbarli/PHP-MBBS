@@ -113,37 +113,10 @@ $csrfToken = generateCSRFToken();
     <title>Yeni Yazı - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .CodeMirror {
-            height: 400px;
-            border-radius: 8px;
-        }
-    </style>
+<link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
     <div class="container-fluid">
@@ -175,9 +148,13 @@ $csrfToken = generateCSRFToken();
                         <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
                             <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                         </a>
-                        <a class="nav-link" href="dashboard.php?logout=1">
-                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                        </a>
+                        <form method="POST" action="dashboard.php" class="sidebar-logout-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            <input type="hidden" name="action" value="logout">
+                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                            </button>
+                        </form>
                     </nav>
                 </div>
             </div>
@@ -226,7 +203,7 @@ $csrfToken = generateCSRFToken();
                                         <!-- İçerik -->
                                         <div class="mb-3">
                                             <label for="content" class="form-label">İçerik *</label>
-                                            <textarea class="form-control" id="content" name="content" rows="20" required><?php echo htmlspecialchars($_POST['content'] ?? ''); ?></textarea>
+                                            <textarea class="form-control" id="content" name="content" rows="20"><?php echo htmlspecialchars($_POST['content'] ?? ''); ?></textarea>
                                         </div>
                                     </div>
                                     
@@ -287,6 +264,7 @@ $csrfToken = generateCSRFToken();
         // Markdown Editor
         const easyMDE = new EasyMDE({
             element: document.getElementById('content'),
+            autoDownloadFontAwesome: false,
             spellChecker: false,
             placeholder: 'Yazınızı buraya yazın...',
             toolbar: [

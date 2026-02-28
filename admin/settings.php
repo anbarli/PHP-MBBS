@@ -104,19 +104,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $envFile = $adminDir . '/admin.env';
                     
-                    // Debug bilgisi
-                    $debugInfo = "Admin dizini: " . basename($adminDir) . "\n";
-                    $debugInfo .= "admin.env dosya yolu: " . basename($envFile) . "\n";
-                    $debugInfo .= "admin.env mevcut: " . (file_exists($envFile) ? 'Evet' : 'Hayır') . "\n";
-                    $debugInfo .= "admin.env yazılabilir: " . (is_writable($envFile) ? 'Evet' : 'Hayır') . "\n";
-                    
-                    // Dosya izinlerini kontrol et
-                    if (!is_writable($envFile)) {
-                        // Dosya izinlerini düzeltmeyi dene
-                        chmod($envFile, 0666);
-                        $debugInfo .= "Dosya izinleri düzeltildi: " . (is_writable($envFile) ? 'Başarılı' : 'Başarısız') . "\n";
-                    }
-                    
                     // Admin config dosyasını güncelle
                     if (updateAdminConfig($adminConfig)) {
                         // Config'i yeniden yükle
@@ -125,8 +112,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $messageType = 'success';
                         logAdminAction('update_admin_settings', 'Updated admin settings');
                     } else {
-                        $message = 'Admin ayarları kaydedilirken hata oluştu. Debug: ' . $debugInfo;
+                        $message = 'Admin ayarları kaydedilirken hata oluştu.';
                         $messageType = 'danger';
+                        logError('Admin settings update failed', ['file' => 'admin/settings.php']);
                     }
                 }
             }
@@ -193,23 +181,18 @@ define('DEFAULT_LOCALE', 'tr_TR');
 define('SITE_KEYWORDS', '$siteKeywords');
 ?>";
             
-            // Debug bilgileri
-            $debugInfo = "Dosya yolu: $configLocalPath\n";
-            $debugInfo .= "Dosya mevcut: " . ($configLocalExists ? 'Evet' : 'Hayır') . "\n";
-            $debugInfo .= "Dosya yazılabilir: " . ($configLocalWritable ? 'Evet' : 'Hayır') . "\n";
-            $debugInfo .= "Site adı: $siteName\n";
-            
             // Config.local.php dosyasını güncelle
             if (file_put_contents($configLocalPath, $configContent)) {
-                $message = 'Site ayarları başarıyla güncellendi. Debug: ' . $debugInfo;
+                $message = 'Site ayarları başarıyla güncellendi.';
                 $messageType = 'success';
                 logAdminAction('update_site_config', 'Updated site configuration');
                 
                 // Cache'i temizle
                 clearCache();
             } else {
-                $message = 'Site ayarları kaydedilirken hata oluştu. Debug: ' . $debugInfo;
+                $message = 'Site ayarları kaydedilirken hata oluştu.';
                 $messageType = 'danger';
+                logError('Site config write failed', ['file' => $configLocalPath]);
             }
         } elseif ($action === 'clear_cache') {
             // Cache temizle
@@ -297,38 +280,8 @@ if ($configLocalExists) {
     <title>Ayarlar - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .info-card {
-            transition: transform 0.2s ease;
-        }
-        .info-card:hover {
-            transform: translateY(-2px);
-        }
-    </style>
+<link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
     <div class="container-fluid">
@@ -360,9 +313,13 @@ if ($configLocalExists) {
                         <a class="nav-link" href="../" target="_blank">
                             <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                         </a>
-                        <a class="nav-link" href="dashboard.php?logout=1">
-                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                        </a>
+                        <form method="POST" action="dashboard.php" class="sidebar-logout-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            <input type="hidden" name="action" value="logout">
+                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                            </button>
+                        </form>
                     </nav>
                 </div>
             </div>
@@ -452,7 +409,7 @@ if ($configLocalExists) {
                                     </div>
                                 </div>
                                 
-                                <!-- System Tools - Admin Bilgileri altında -->
+                                <!-- System Tools - Admin Bilgileri altinda -->
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">

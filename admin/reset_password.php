@@ -1,24 +1,29 @@
 <?php
 /**
- * Şifre Sıfırlama Aracı
- * Bu dosyayı kullandıktan sonra silin!
+ * �?ifre Sifirlama Araci
+ * Bu dosyayi kullandiktan sonra silin!
  */
 
-// Yeni şifre (buraya istediğiniz şifreyi yazın)
+if (php_sapi_name() !== 'cli') {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+// Yeni sifre (buraya istediginiz sifreyi yazin)
 $newPassword = 'yeni_sifreniz123';
 
-// Şifreyi hash'le
+// �?ifreyi hash'le
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-echo "Yeni şifre: $newPassword\n";
-echo "Hash'lenmiş şifre: $hashedPassword\n\n";
+echo "Yeni sifre: $newPassword\n";
+echo "Hash'lenmis sifre: $hashedPassword\n\n";
 
-echo "Bu hash'i admin.env dosyasındaki ADMIN_PASSWORD satırına yapıştırın.\n";
-echo "Örnek:\n";
+echo "Bu hash'i admin.env dosyasindaki ADMIN_PASSWORD satirina yapistirin.\n";
+echo "�rnek:\n";
 echo "ADMIN_PASSWORD=$hashedPassword\n\n";
 
-echo "⚠️  Bu dosyayı kullandıktan sonra silin!\n";
+echo "⚠️  Bu dosyayi kullandiktan sonra silin!\n";
 
-// Dosyayı otomatik sil
+// Dosyayi otomatik sil
 unlink(__FILE__);
 ?> 

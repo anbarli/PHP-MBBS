@@ -18,6 +18,7 @@ require_once '../includes/security.php';
 // Session başlat ve yetki kontrolü
 initSecureSession();
 requireAdminAuth();
+$csrfToken = generateCSRFToken();
 
 // Admin config yükle
 $adminConfig = loadAdminConfig();
@@ -111,8 +112,10 @@ $configLocalPath = '../config.local.php';
 $configLocalExists = file_exists($configLocalPath);
 
 // Çıkış işlemi
-if (isset($_GET['logout'])) {
-    secureLogout();
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logout') {
+    if (validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        secureLogout();
+    }
     secureRedirect('login.php');
 }
 ?>
@@ -124,61 +127,8 @@ if (isset($_GET['logout'])) {
     <title>Dashboard - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .stat-card {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            border: none;
-            transition: transform 0.3s ease;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .table {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .btn-action {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-    </style>
+<link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
     <div class="container-fluid">
@@ -210,9 +160,13 @@ if (isset($_GET['logout'])) {
                         <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
                             <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                         </a>
-                        <a class="nav-link" href="?logout=1">
-                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                        </a>
+                        <form method="POST" action="dashboard.php" class="sidebar-logout-form" id="logoutForm">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            <input type="hidden" name="action" value="logout">
+                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                            </button>
+                        </form>
                     </nav>
                 </div>
             </div>
@@ -469,11 +423,14 @@ if (isset($_GET['logout'])) {
         }, 300000); // 5 minutes
         
         // Confirm logout
-        document.querySelector('a[href*="logout"]').addEventListener('click', function(e) {
-            if (!confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
-                e.preventDefault();
-            }
-        });
+        const logoutForm = document.getElementById('logoutForm');
+        if (logoutForm) {
+            logoutForm.addEventListener('submit', function(e) {
+                if (!confirm('Çıkış yapmak istediğinizden emin misiniz?')) {
+                    e.preventDefault();
+                }
+            });
+        }
     </script>
 </body>
 </html> 

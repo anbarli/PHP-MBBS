@@ -15,6 +15,7 @@ require_once '../includes/security.php';
 // Session başlat ve yetki kontrolü
 initSecureSession();
 requireAdminAuth();
+$csrfToken = generateCSRFToken();
 
 // Admin config yükle
 $adminConfig = loadAdminConfig();
@@ -89,8 +90,12 @@ $message = '';
 $messageType = '';
 
 // Kategori silme işlemi
-if (isset($_GET['delete']) && !empty($_GET['delete'])) {
-    $categoryToDelete = sanitizeInput($_GET['delete']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_category') {
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $message = 'Güvenlik hatası. Lütfen tekrar deneyin.';
+        $messageType = 'danger';
+    } else {
+    $categoryToDelete = sanitizeInput($_POST['category'] ?? '');
     
     if ($categoryToDelete === 'Genel') {
         $message = 'Genel kategorisi silinemez.';
@@ -144,19 +149,26 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     }
     
     // Kategorileri yeniden yükle
-    $posts = getCachedPosts();
     $categories = [];
-    foreach ($posts as $post) {
-        if (isset($post['meta']) && isset($post['meta']['category'])) {
-            $category = trim($post['meta']['category']);
-            if (!empty($category)) {
-                if (!isset($categories[$category])) {
-                    $categories[$category] = 0;
-                }
-                $categories[$category]++;
-            }
+    $postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
+    foreach ($postFiles as $postFileName) {
+        if (pathinfo($postFileName, PATHINFO_EXTENSION) !== 'md') {
+            continue;
         }
+
+        $postFile = POSTS_DIR . $postFileName;
+        $postData = getPostContent($postFile);
+        if (!$postData) {
+            continue;
+        }
+
+        $category = trim($postData['meta']['category'] ?? 'Genel');
+        if (!isset($categories[$category])) {
+            $categories[$category] = 0;
+        }
+        $categories[$category]++;
     }
+}
 }
 ?>
 <!DOCTYPE html>
@@ -167,38 +179,8 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     <title>Kategoriler - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .category-card {
-            transition: transform 0.2s ease;
-        }
-        .category-card:hover {
-            transform: translateY(-2px);
-        }
-    </style>
+<link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
     <div class="container-fluid">
@@ -230,9 +212,13 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
                         <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
                             <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                         </a>
-                        <a class="nav-link" href="dashboard.php?logout=1">
-                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                        </a>
+                        <form method="POST" action="dashboard.php" class="sidebar-logout-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            <input type="hidden" name="action" value="logout">
+                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                            </button>
+                        </form>
                     </nav>
                 </div>
             </div>
@@ -370,12 +356,19 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
             </div>
         </div>
     </div>
+    <form id="deleteCategoryForm" method="POST" action="categories.php" class="d-none">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+        <input type="hidden" name="action" value="delete_category">
+        <input type="hidden" name="category" id="deleteCategoryValue">
+    </form>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function deleteCategory(category, count) {
             if (confirm(`"${category}" kategorisini silmek istediğinizden emin misiniz?\n\nBu kategorideki ${count} yazı "Genel" kategorisine taşınacak.\n\nBu işlem geri alınamaz!`)) {
-                window.location.href = `categories.php?delete=${encodeURIComponent(category)}`;
+                const form = document.getElementById('deleteCategoryForm');
+                document.getElementById('deleteCategoryValue').value = category;
+                form.submit();
             }
         }
         

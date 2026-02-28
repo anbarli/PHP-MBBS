@@ -4,9 +4,8 @@
  * Yazı yönetimi sayfası
  */
 
-// Hata raporlama (geliştirme için)
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Hata raporlama (production-safe)
+ini_set('display_errors', 0);
 
 define('ADMIN_SECURE', true);
 
@@ -19,6 +18,7 @@ require_once '../includes/security.php';
 // Session başlat ve yetki kontrolü
 initSecureSession();
 requireAdminAuth();
+$csrfToken = generateCSRFToken();
 
 // Admin config yükle
 $adminConfig = loadAdminConfig();
@@ -112,8 +112,16 @@ $message = '';
 $messageType = '';
 
 // Yazı silme işlemi
-if (isset($_GET['delete']) && !empty($_GET['delete'])) {
-    $slug = sanitizeInput($_GET['delete']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete_post') {
+    if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
+        $message = 'Güvenlik hatası. Lütfen tekrar deneyin.';
+        $messageType = 'danger';
+    } else {
+        $slug = sanitizeInput($_POST['slug'] ?? '');
+        if (empty($slug)) {
+            $message = 'Geçersiz yazı bilgisi.';
+            $messageType = 'danger';
+        } else {
     $postFile = POSTS_DIR . $slug . '.md';
     
     if (file_exists($postFile)) {
@@ -131,6 +139,8 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
         $message = 'Yazı bulunamadı.';
         $messageType = 'danger';
     }
+        }
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -141,41 +151,8 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
     <title>Yazı Yönetimi - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <style>
-        .sidebar {
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-        .sidebar .nav-link {
-            color: rgba(255, 255, 255, 0.8);
-            border-radius: 10px;
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .main-content {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-        .navbar {
-            background: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        .table {
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .btn-action {
-            padding: 5px 10px;
-            font-size: 12px;
-        }
-    </style>
+<link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
+    <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
     <div class="container-fluid">
@@ -207,9 +184,13 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
                         <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
                             <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
                         </a>
-                        <a class="nav-link" href="dashboard.php?logout=1">
-                            <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                        </a>
+                        <form method="POST" action="dashboard.php" class="sidebar-logout-form">
+                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                            <input type="hidden" name="action" value="logout">
+                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                            </button>
+                        </form>
                     </nav>
                 </div>
             </div>
@@ -369,12 +350,19 @@ if (isset($_GET['delete']) && !empty($_GET['delete'])) {
             </div>
         </div>
     </div>
+    <form id="deletePostForm" method="POST" action="posts.php" class="d-none">
+        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+        <input type="hidden" name="action" value="delete_post">
+        <input type="hidden" name="slug" id="deletePostSlug">
+    </form>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function deletePost(slug, title) {
             if (confirm(`"${title}" yazısını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`)) {
-                window.location.href = `posts.php?delete=${slug}`;
+                const form = document.getElementById('deletePostForm');
+                document.getElementById('deletePostSlug').value = slug;
+                form.submit();
             }
         }
         
