@@ -41,6 +41,17 @@ define('POSTS_DIR', __DIR__ . DIRECTORY_SEPARATOR . 'posts' . DIRECTORY_SEPARATO
 define('CACHE_DIR', __DIR__ . DIRECTORY_SEPARATOR . 'cache' . DIRECTORY_SEPARATOR);
 define('BASE_URL', $protocol . $host . BASE_PATH);
 
+function assetVersion($relativePath) {
+    $normalized = str_replace(['\\', '/'], DIRECTORY_SEPARATOR, ltrim($relativePath, '\\/'));
+    $fullPath = __DIR__ . DIRECTORY_SEPARATOR . $normalized;
+    return file_exists($fullPath) ? filemtime($fullPath) : time();
+}
+
+function assetPath($relativePath) {
+    $normalized = ltrim(str_replace('\\', '/', $relativePath), '/');
+    return BASE_PATH . $normalized . '?v=' . assetVersion($normalized);
+}
+
 // Ensure cache directory exists
 if (!is_dir(CACHE_DIR)) {
     if (!mkdir(CACHE_DIR, 0755, true)) {
@@ -98,6 +109,68 @@ function setCachedPosts($posts) {
     
     $cacheFile = CACHE_DIR . 'posts.json';
     file_put_contents($cacheFile, json_encode($posts));
+}
+
+function getBlogStats() {
+    static $stats = null;
+    if ($stats !== null) {
+        return $stats;
+    }
+
+    $defaultStats = [
+        'post_count' => 0,
+        'category_count' => 0,
+        'categories' => []
+    ];
+
+    if (!CACHE_ENABLED) {
+        $stats = buildBlogStats();
+        return $stats;
+    }
+
+    $cacheFile = CACHE_DIR . 'stats.json';
+    if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < CACHE_DURATION) {
+        $cached = json_decode(file_get_contents($cacheFile), true);
+        if (is_array($cached)) {
+            $stats = array_merge($defaultStats, $cached);
+            return $stats;
+        }
+    }
+
+    $stats = buildBlogStats();
+    file_put_contents($cacheFile, json_encode($stats));
+    return $stats;
+}
+
+function buildBlogStats() {
+    $categories = [];
+    $postCount = 0;
+    $postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
+
+    foreach ($postFiles as $post) {
+        if (pathinfo($post, PATHINFO_EXTENSION) !== 'md') {
+            continue;
+        }
+
+        $postCount++;
+        $postFile = POSTS_DIR . $post;
+        $postData = getPostContent($postFile);
+
+        if ($postData && isset($postData['meta']['category'])) {
+            $category = trim($postData['meta']['category']);
+            if (!empty($category) && !in_array($category, $categories, true)) {
+                $categories[] = $category;
+            }
+        }
+    }
+
+    sort($categories);
+
+    return [
+        'post_count' => $postCount,
+        'category_count' => count($categories),
+        'categories' => $categories
+    ];
 }
 
 function getPostContent($filePath) {
@@ -176,34 +249,19 @@ function validateInput($input, $type = 'string') {
 }
 
 function getPostCount() {
-    $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
-    return count($posts);
+    $stats = getBlogStats();
+    return $stats['post_count'] ?? 0;
 }
 
 function getCategoryCount() {
-    $categories = [];
-    $postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
-    
-    foreach ($postFiles as $post) {
-        if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
-            $postFile = POSTS_DIR . $post;
-            $postData = getPostContent($postFile);
-            
-            if ($postData && isset($postData['meta']['category'])) {
-                $category = trim($postData['meta']['category']);
-                if (!empty($category) && !in_array($category, $categories)) {
-                    $categories[] = $category;
-                }
-            }
-        }
-    }
-    
-    return count($categories);
+    $stats = getBlogStats();
+    return $stats['category_count'] ?? 0;
 }
 
 function clearCache() {
     $cacheFile = CACHE_DIR . 'posts.json';
     $sitemapCacheFile = CACHE_DIR . 'sitemap.xml';
+    $statsCacheFile = CACHE_DIR . 'stats.json';
     
     if (file_exists($cacheFile)) {
         unlink($cacheFile);
@@ -211,6 +269,10 @@ function clearCache() {
     
     if (file_exists($sitemapCacheFile)) {
         unlink($sitemapCacheFile);
+    }
+
+    if (file_exists($statsCacheFile)) {
+        unlink($statsCacheFile);
     }
     
     return true;

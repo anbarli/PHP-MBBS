@@ -6,11 +6,11 @@
     Header always set X-XSS-Protection "1; mode=block"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://www.googletagmanager.com;"
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; img-src 'self' data: https:; font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; connect-src 'self' https://www.googletagmanager.com https://cdn.jsdelivr.net https://static.cloudflareinsights.com;"
     
     # Performance Headers
     Header always set Cache-Control "public, max-age=3600" env=!NO_CACHE
-    Header always set Expires "Thu, 15 Apr 2024 20:00:00 GMT" env=!NO_CACHE
+    Header always set Expires "Thu, 31 Dec 2037 23:55:55 GMT" env=!NO_CACHE
     Header always set Vary "Accept-Encoding"
     
     # Compression

@@ -1,7 +1,7 @@
 <?php
 /**
  * Security Functions for Admin Panel
- * Güvenlik fonksiyonları
+ * Güvenlik fonksiyonlari
  */
 
 // Prevent direct access
@@ -11,22 +11,22 @@ if (!defined('ADMIN_SECURE')) {
 }
 
 /**
- * Session başlatma ve güvenlik ayarları
+ * Session baslatma ve güvenlik ayarlari
  */
 function initSecureSession() {
-    // Session başlamadan önce güvenli session ayarları
+    // Session baslamadan önce g�venli session ayarlari
     if (session_status() === PHP_SESSION_NONE) {
-        // Güvenli session ayarları
+        // G�venli session ayarlari
         ini_set('session.cookie_httponly', 1);
         ini_set('session.cookie_secure', isset($_SERVER['HTTPS']));
         ini_set('session.use_strict_mode', 1);
         ini_set('session.cookie_samesite', 'Strict');
         
-        // Session başlat
+        // Session baslat
         session_start();
     }
     
-    // Session hijacking koruması
+    // Session hijacking korumasi
     if (!isset($_SESSION['user_agent'])) {
         $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'] ?? '';
     } elseif ($_SESSION['user_agent'] !== ($_SERVER['HTTP_USER_AGENT'] ?? '')) {
@@ -45,7 +45,7 @@ function initSecureSession() {
 }
 
 /**
- * CSRF token oluşturma
+ * CSRF token olusturma
  */
 function generateCSRFToken() {
     if (!isset($_SESSION['csrf_token'])) {
@@ -55,7 +55,7 @@ function generateCSRFToken() {
 }
 
 /**
- * CSRF token doğrulama
+ * CSRF token dogrulama
  */
 function validateCSRFToken($token) {
     if (!isset($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $token)) {
@@ -65,29 +65,34 @@ function validateCSRFToken($token) {
 }
 
 /**
- * Basit şifre hash'leme (GÜVENLİ DEĞİLDİR!)
- * Sadece uyumluluk/test amaçlı md5 kullanılır.
+ * Basit sifre hash'leme (G?VENLI DE??ILDIR!)
+ * Sadece uyumluluk/test ama?li md5 kullanilir.
  */
 function hashPassword($password) {
-    return md5($password);
+    return password_hash($password, PASSWORD_DEFAULT);
 }
 
 /**
- * Basit şifre doğrulama (GÜVENLİ DEĞİLDİR!)
+ * Basit sifre dogrulama (G?VENLI DE??ILDIR!)
  */
 function verifyPassword($password, $hash) {
-    return md5($password) === $hash;
+    // Backward compatibility for legacy md5 hashes.
+    if (preg_match('/^[a-f0-9]{32}$/i', $hash)) {
+        return md5($password) === strtolower($hash);
+    }
+
+    return password_verify($password, $hash);
 }
 
 /**
- * Güvenli dosya upload kontrolü
+ * G�venli dosya upload kontrolü
  */
 function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'], $maxSize = 5242880) {
     $errors = [];
     
-    // Dosya yükleme hatası kontrolü
+    // Dosya yükleme hatasi kontrolü
     if ($file['error'] !== UPLOAD_ERR_OK) {
-        $errors[] = 'Dosya yükleme hatası: ' . $file['error'];
+        $errors[] = 'Dosya yükleme hatasi: ' . $file['error'];
         return $errors;
     }
     
@@ -101,7 +106,7 @@ function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif',
     $extension = strtolower($fileInfo['extension']);
     
     if (!in_array($extension, $allowedTypes)) {
-        $errors[] = 'Geçersiz dosya türü. İzin verilen: ' . implode(', ', $allowedTypes);
+        $errors[] = 'Geçersiz dosya türü. Izin verilen: ' . implode(', ', $allowedTypes);
     }
     
     // MIME type kontrolü
@@ -125,7 +130,7 @@ function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif',
 }
 
 /**
- * Güvenli dosya adı oluşturma
+ * G�venli dosya adi olusturma
  */
 function generateSafeFileName($originalName, $extension) {
     $timestamp = time();
@@ -134,7 +139,7 @@ function generateSafeFileName($originalName, $extension) {
 }
 
 /**
- * XSS koruması için input temizleme
+ * XSS korumasi için input temizleme
  */
 function sanitizeInput($input) {
     if (is_array($input)) {
@@ -162,7 +167,7 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
         return true;
     }
     
-    // Deneme sayısı kontrolü
+    // Deneme sayisi kontrolü
     if ($rateData['attempts'] >= $maxAttempts) {
         return false;
     }
@@ -172,13 +177,13 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
 }
 
 /**
- * Güvenli log kaydı
+ * G�venli log kaydi
  */
 function logAdminAction($action, $details = '', $userId = null) {
     $logFile = __DIR__ . '/../logs/admin.log';
     $logDir = dirname($logFile);
     
-    // Log dizini oluştur
+    // Log dizini olustur
     if (!is_dir($logDir)) {
         mkdir($logDir, 0755, true);
     }
@@ -219,10 +224,10 @@ function requireAdminAuth() {
 }
 
 /**
- * Güvenli çıkış
+ * G�venli çıkış
  */
 function secureLogout() {
-    // Log kaydı
+    // Log kaydi
     logAdminAction('logout', 'User logged out');
     
     // Session temizleme
@@ -241,7 +246,7 @@ function secureLogout() {
 }
 
 /**
- * Dosya boyutu formatı
+ * Dosya boyutu formati
  */
 function formatBytes($bytes, $precision = 2) {
     $units = array('B', 'KB', 'MB', 'GB', 'TB');
@@ -254,10 +259,10 @@ function formatBytes($bytes, $precision = 2) {
 }
 
 /**
- * Güvenli redirect
+ * G�venli redirect
  */
 function secureRedirect($url) {
-    // URL doğrulama
+    // URL dogrulama
     if (!filter_var($url, FILTER_VALIDATE_URL) && !preg_match('/^[a-zA-Z0-9\/\-_\.]+$/', $url)) {
         $url = 'dashboard.php';
     }
@@ -267,7 +272,7 @@ function secureRedirect($url) {
 }
 
 /**
- * Admin config dosyası kontrolü
+ * Admin config dosyasi kontrolü
  */
 function loadAdminConfig() {
     // Admin klasörünü dinamik olarak bul
@@ -275,7 +280,7 @@ function loadAdminConfig() {
     
     $envFile = $adminDir . '/admin.env';
     
-    // Varsayılan config
+    // Varsayilan config
     $config = [
         'ADMIN_USERNAME' => 'admin',
         'ADMIN_PASSWORD' => hashPassword('yeni_sifreniz123'),
@@ -286,7 +291,7 @@ function loadAdminConfig() {
         'ALLOWED_FILE_TYPES' => ['jpg', 'jpeg', 'png', 'gif', 'webp']
     ];
     
-    // admin.env dosyasını oku
+    // admin.env dosyasini oku
     if (file_exists($envFile)) {
         $envContent = file_get_contents($envFile);
         $lines = explode("\n", $envContent);
@@ -294,18 +299,18 @@ function loadAdminConfig() {
         foreach ($lines as $line) {
             $line = trim($line);
             
-            // Yorum satırlarını ve boş satırları atla
+            // Yorum satirlarini ve bos satirlari atla
             if (empty($line) || strpos($line, '#') === 0) {
                 continue;
             }
             
-            // KEY=VALUE formatını parse et
+            // KEY=VALUE formatini parse et
             if (strpos($line, '=') !== false) {
                 list($key, $value) = explode('=', $line, 2);
                 $key = trim($key);
                 $value = trim($value);
                 
-                // Değeri config'e ekle
+                // Degeri config'e ekle
                 switch ($key) {
                     case 'ADMIN_USERNAME':
                         $config['ADMIN_USERNAME'] = $value;
@@ -337,7 +342,7 @@ function loadAdminConfig() {
 }
 
 /**
- * Varsayılan kimlik bilgilerini kontrol et
+ * Varsayilan kimlik bilgilerini kontrol et
  */
 function checkDefaultCredentials($username, $password) {
     $defaultUsernames = ['admin', 'administrator', 'root', 'user', 'test'];
@@ -359,37 +364,37 @@ function checkDefaultCredentials($username, $password) {
 }
 
 /**
- * Şifre güvenlik kontrolü
+ * �??ifre güvenlik kontrolü
  */
 function validatePasswordStrength($password) {
     $errors = [];
     
     // Minimum uzunluk kontrolü
     if (strlen($password) < 8) {
-        $errors[] = 'Şifre en az 8 karakter olmalıdır.';
+        $errors[] = '�??ifre en az 8 karakter olmalidir.';
     }
     
     // Büyük harf kontrolü
     if (!preg_match('/[A-Z]/', $password)) {
-        $errors[] = 'Şifre en az bir büyük harf içermelidir.';
+        $errors[] = '�??ifre en az bir büyük harf içermelidir.';
     }
     
     // Küçük harf kontrolü
     if (!preg_match('/[a-z]/', $password)) {
-        $errors[] = 'Şifre en az bir küçük harf içermelidir.';
+        $errors[] = '�??ifre en az bir k???k harf içermelidir.';
     }
     
     // Rakam kontrolü
     if (!preg_match('/[0-9]/', $password)) {
-        $errors[] = 'Şifre en az bir rakam içermelidir.';
+        $errors[] = '�??ifre en az bir rakam içermelidir.';
     }
     
-    // Özel karakter kontrolü
+    // özel karakter kontrolü
     if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
-        $errors[] = 'Şifre en az bir özel karakter içermelidir (!@#$%^&* vb.).';
+        $errors[] = '�??ifre en az bir özel karakter içermelidir (!@#$%^&* vb.).';
     }
     
-    // Basit şifre kontrolü
+    // Basit sifre kontrolü
     $simplePasswords = [
         'password', '123456', '12345678', 'qwerty', 'abc123', 'password123',
         'admin', 'admin123', 'root', 'test', 'guest', '1234', '12345',
@@ -398,54 +403,54 @@ function validatePasswordStrength($password) {
     ];
     
     if (in_array(strtolower($password), $simplePasswords)) {
-        $errors[] = 'Bu şifre çok yaygın, daha güçlü bir şifre seçin.';
+        $errors[] = 'Bu sifre çok yaygin, daha g??l? bir sifre seçin.';
     }
     
-    // Ardışık karakter kontrolü
+    // Ardisik karakter kontrolü
     if (preg_match('/(.)\1{2,}/', $password)) {
-        $errors[] = 'Şifre aynı karakterin 3 veya daha fazla tekrarını içermemelidir.';
+        $errors[] = '�??ifre ayni karakterin 3 veya daha fazla tekrarini içermemelidir.';
     }
     
-    // Ardışık sayı kontrolü
+    // Ardisik sayi kontrolü
     if (preg_match('/123|234|345|456|567|678|789|012/', $password)) {
-        $errors[] = 'Şifre ardışık sayılar içermemelidir (123, 234 vb.).';
+        $errors[] = '�??ifre ardisik sayilar içermemelidir (123, 234 vb.).';
     }
     
     return $errors;
 }
 
 /**
- * Kullanıcı adı güvenlik kontrolü
+ * Kullanici adi güvenlik kontrolü
  */
 function validateUsername($username) {
     $errors = [];
     
     // Minimum uzunluk kontrolü
     if (strlen($username) < 3) {
-        $errors[] = 'Kullanıcı adı en az 3 karakter olmalıdır.';
+        $errors[] = 'Kullanici adi en az 3 karakter olmalidir.';
     }
     
     // Maksimum uzunluk kontrolü
     if (strlen($username) > 20) {
-        $errors[] = 'Kullanıcı adı en fazla 20 karakter olabilir.';
+        $errors[] = 'Kullanici adi en fazla 20 karakter olabilir.';
     }
     
     // Karakter kontrolü
     if (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
-        $errors[] = 'Kullanıcı adı sadece harf, rakam, tire (-) ve alt çizgi (_) içerebilir.';
+        $errors[] = 'Kullanici adi sadece harf, rakam, tire (-) ve alt çizgi (_) i?erebilir.';
     }
     
-    // Varsayılan kullanıcı adı kontrolü
+    // Varsayilan kullanici adi kontrolü
     $defaultUsernames = ['admin', 'administrator', 'root', 'user', 'test', 'guest'];
     if (in_array(strtolower($username), $defaultUsernames)) {
-        $errors[] = 'Bu kullanıcı adı çok yaygın, daha güvenli bir kullanıcı adı seçin.';
+        $errors[] = 'Bu kullanici adi çok yaygin, daha g�venli bir kullanici adi seçin.';
     }
     
     return $errors;
 }
 
 /**
- * Admin config güncelleme
+ * Admin config göncelleme
  */
 function updateAdminConfig($newConfig) {
     // Admin klasörünü dinamik olarak bul
@@ -464,67 +469,57 @@ function updateAdminConfig($newConfig) {
     
     $envFile = $adminDir . '/admin.env';
     
-    // Debug bilgisi
-    error_log("updateAdminConfig: Admin dizini: " . basename($adminDir));
-    error_log("updateAdminConfig: Dosya yolu: " . basename($envFile));
-    error_log("updateAdminConfig: Dosya mevcut: " . (file_exists($envFile) ? 'Evet' : 'Hayır'));
-    error_log("updateAdminConfig: Dosya yazılabilir: " . (is_writable($envFile) ? 'Evet' : 'Hayır'));
-    error_log("updateAdminConfig: Güncellenecek anahtar sayısı: " . count($newConfig));
-    
-    // Mevcut admin.env dosyasını oku
+    // Mevcut admin.env dosyasini oku
     if (!file_exists($envFile)) {
-        error_log("updateAdminConfig: admin.env dosyası bulunamadı");
+        error_log("updateAdminConfig: admin.env dosyasi bulunamadi");
         return false;
     }
     
     if (!is_writable($envFile)) {
-        error_log("updateAdminConfig: admin.env dosyası yazılabilir değil");
+        error_log("updateAdminConfig: admin.env dosyasi yazilabilir degil");
         return false;
     }
     
     $envContent = file_get_contents($envFile);
     if ($envContent === false) {
-        error_log("updateAdminConfig: admin.env dosyası okunamadı");
+        error_log("updateAdminConfig: admin.env dosyasi okunamadi");
         return false;
     }
     
     $lines = explode("\n", $envContent);
     $updatedLines = [];
     
-    // Mevcut satırları işle
+    // Mevcut satirlari isle
     foreach ($lines as $line) {
         $line = trim($line);
         
-        // Yorum satırlarını ve boş satırları koru
+        // Yorum satirlarini ve bos satirlari koru
         if (empty($line) || strpos($line, '#') === 0) {
             $updatedLines[] = $line;
             continue;
         }
         
-        // KEY=VALUE formatını kontrol et
+        // KEY=VALUE formatini kontrol et
         if (strpos($line, '=') !== false) {
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
             
-            // Güncellenecek anahtar var mı?
+            // Göncellenecek anahtar var mi?
             $updated = false;
             foreach ($newConfig as $newKey => $newValue) {
-                // Anahtar zaten doğru formatta (ADMIN_NAME, ADMIN_EMAIL)
-                error_log("updateAdminConfig: Karşılaştırma - Mevcut: '$key', Aranan: '$newKey'");
                 if ($key === $newKey) {
-                    // Değeri güncelle
+                    // Degeri göncelle
                     if (is_array($newValue)) {
                         $updatedLines[] = $key . '=' . implode(',', $newValue);
                     } else {
                         $updatedLines[] = $key . '=' . $newValue;
                     }
                     $updated = true;
-                    error_log("updateAdminConfig: $key güncellendi: $newValue");
                     break;
                 }
             }
             
-            // Güncellenmediyse mevcut satırı koru
+            // Göncellenmediyse mevcut satiri koru
             if (!$updated) {
                 $updatedLines[] = $line;
             }
@@ -533,16 +528,15 @@ function updateAdminConfig($newConfig) {
         }
     }
     
-    // Yeni içeriği dosyaya yaz
+    // Yeni i?erigi dosyaya yaz
     $newContent = implode("\n", $updatedLines);
     $result = file_put_contents($envFile, $newContent);
     
     if ($result === false) {
-        error_log("updateAdminConfig: Dosya yazma hatası");
+        error_log("updateAdminConfig: Dosya yazma hatasi");
         return false;
     }
     
-    error_log("updateAdminConfig: Başarılı - $result byte yazıldı");
     return true;
 }
 ?> 
