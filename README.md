@@ -194,3 +194,21 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 🆘 Support
 For issues, use [GitHub Issues](https://github.com/anbarli/PHP-MBBS/issues).
+
+---
+
+## 28.20.2026 / Update Notes
+
+### Turkish (TR)
+- `admin/admin.env` icindeki `ADMIN_PASSWORD` alani artik `password_hash()` cikti formatini kullanir (`$2y$...` / bcrypt-argon2).
+- Frontend/admin CSS ve JS dosyalari `assetPath()` ile versiyonlanir (`?v=filemtime`) ve cache kaynakli eski dosya sorunu azalir.
+- `.htaccess` CSP kurallari guncellendi:
+  - `script-src`: `https://static.cloudflareinsights.com` eklendi.
+  - `connect-src`: `https://cdn.jsdelivr.net` ve `https://static.cloudflareinsights.com` eklendi.
+
+### English (EN)
+- `ADMIN_PASSWORD` in `admin/admin.env` now expects `password_hash()` output format (`$2y$...` / bcrypt-argon2).
+- Frontend/admin CSS and JS assets are versioned via `assetPath()` (`?v=filemtime`) to reduce stale-cache issues.
+- `.htaccess` CSP has been updated:
+  - `script-src`: added `https://static.cloudflareinsights.com`
+  - `connect-src`: added `https://cdn.jsdelivr.net` and `https://static.cloudflareinsights.com`
