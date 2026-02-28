@@ -20,35 +20,35 @@ echo "<h1>Debug - Post Loading Test</h1>";
 // Test 1: Check if cache directory exists
 echo "<h2>1. Cache Directory Check</h2>";
 if (is_dir(CACHE_DIR)) {
-    echo "✓ Cache directory exists: " . CACHE_DIR . "<br>";
+    echo "[OK] Cache directory exists: " . CACHE_DIR . "<br>";
 } else {
-    echo "✗ Cache directory does not exist: " . CACHE_DIR . "<br>";
+    echo "[ERR] Cache directory does not exist: " . CACHE_DIR . "<br>";
     echo "Creating cache directory...<br>";
     mkdir(CACHE_DIR, 0755, true);
-    echo "✓ Cache directory created<br>";
+    echo "[OK] Cache directory created<br>";
 }
 
 // Test 2: Check cached posts
 echo "<h2>2. Cached Posts Check</h2>";
 $cachedPosts = getCachedPosts();
 if ($cachedPosts === null) {
-    echo "✗ No cached posts found<br>";
+    echo "[ERR] No cached posts found<br>";
 } else {
-    echo "✓ Found " . count($cachedPosts) . " cached posts<br>";
+    echo "[OK] Found " . count($cachedPosts) . " cached posts<br>";
 }
 
 // Test 3: Check posts directory
 echo "<h2>3. Posts Directory Check</h2>";
 if (is_dir(POSTS_DIR)) {
-    echo "✓ Posts directory exists: " . POSTS_DIR . "<br>";
+    echo "[OK] Posts directory exists: " . POSTS_DIR . "<br>";
     $postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
-    echo "✓ Found " . count($postFiles) . " files in posts directory<br>";
+    echo "[OK] Found " . count($postFiles) . " files in posts directory<br>";
     
     foreach ($postFiles as $file) {
         echo "- " . $file . "<br>";
     }
 } else {
-    echo "✗ Posts directory does not exist: " . POSTS_DIR . "<br>";
+    echo "[ERR] Posts directory does not exist: " . POSTS_DIR . "<br>";
 }
 
 // Test 4: Load posts directly from files
@@ -66,7 +66,7 @@ foreach ($postFiles as $file) {
         echo "Slug: " . $slug . "<br>";
         
         if ($postData && isset($postData['meta'])) {
-            echo "✓ Meta data found<br>";
+            echo "[OK] Meta data found<br>";
             echo "Title: " . ($postData['meta']['title'] ?? 'No title') . "<br>";
             echo "Category: " . ($postData['meta']['category'] ?? 'No category') . "<br>";
             echo "Date: " . ($postData['meta']['date'] ?? 'No date') . "<br>";
@@ -77,7 +77,7 @@ foreach ($postFiles as $file) {
                 'content' => $postData['content']
             ];
         } elseif ($postData) {
-            echo "✓ Content found but no meta<br>";
+            echo "[OK] Content found but no meta<br>";
             $posts[] = [
                 'slug' => $slug,
                 'meta' => [
@@ -89,7 +89,7 @@ foreach ($postFiles as $file) {
                 'content' => $postData['content'] ?? ''
             ];
         } else {
-            echo "✗ No content found<br>";
+            echo "[ERR] No content found<br>";
         }
     }
 }
@@ -97,9 +97,9 @@ foreach ($postFiles as $file) {
 // Test 5: Sort and display recent posts
 echo "<h2>5. Recent Posts Test</h2>";
 if (empty($posts)) {
-    echo "✗ No posts loaded<br>";
+    echo "[ERR] No posts loaded<br>";
 } else {
-    echo "✓ Loaded " . count($posts) . " posts<br>";
+    echo "[OK] Loaded " . count($posts) . " posts<br>";
     
     // Tarihe göre sırala (en yeni önce)
     usort($posts, function($a, $b) {
@@ -119,10 +119,10 @@ if (empty($posts)) {
 echo "<h2>6. Cache Posts Test</h2>";
 if (!empty($posts)) {
     setCachedPosts($posts);
-    echo "✓ Posts cached successfully<br>";
+    echo "[OK] Posts cached successfully<br>";
 } else {
-    echo "✗ No posts to cache<br>";
+    echo "[ERR] No posts to cache<br>";
 }
 
-echo "<br><a href='dashboard.php'>← Back to Dashboard</a>";
+echo "<br><a href='dashboard.php'>&larr; Back to Dashboard</a>";
 ?> 
