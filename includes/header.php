@@ -105,7 +105,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"/>
-    <link rel="stylesheet" href="<?php echo BASE_URL; ?>/includes/style.css">
+    <link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
 	
 	<!-- Performance Optimizations -->
 	<link rel="preconnect" href="https://cdn.jsdelivr.net">
@@ -143,250 +143,79 @@
 	
 	<!-- Fallback dark mode styles in case CSS file doesn't load -->
 	<style>
-		/* Critical dark mode styles */
-		body.dark-mode {
-			background-color: #1a1a1a !important;
-			color: #e0e0e0 !important;
-		}
-		
+		/* Palette: 3A015C / 32004F / 220135 / 190028 / 11001C */
+		body.dark-mode { background: #11001c !important; color: #f2ebff !important; }
 		body.dark-mode .navbar,
-		body.dark-mode .navbar-dark {
-			background-color: #2d2d2d !important;
-			border-bottom: 1px solid #404040 !important;
-		}
-		
-		body.dark-mode .navbar .nav-link,
-		body.dark-mode .navbar .navbar-brand {
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .card {
-			background-color: #2d2d2d !important;
-			border-color: #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .card-header {
-			background-color: #1a1a1a !important;
-			border-bottom-color: #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .card-body {
-			background-color: #2d2d2d !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .list-group-item {
-			background-color: #2d2d2d !important;
-			border-color: #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .alert {
-			background-color: #2d2d2d !important;
-			border-color: #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .markdown-body {
-			color: #e0e0e0 !important;
-			background-color: transparent !important;
-		}
-		
-		body.dark-mode .markdown-body h1,
-		body.dark-mode .markdown-body h2,
-		body.dark-mode .markdown-body h3,
-		body.dark-mode .markdown-body h4,
-		body.dark-mode .markdown-body h5,
-		body.dark-mode .markdown-body h6 {
-			color: #ffffff !important;
-			border-bottom-color: #404040 !important;
-		}
-		
+		body.dark-mode .navbar-dark,
+		body.dark-mode .footer { background: #190028 !important; border-color: #32004f !important; }
+		body.dark-mode .card,
+		body.dark-mode .card-body,
+		body.dark-mode .list-group-item,
+		body.dark-mode .alert,
+		body.dark-mode .breadcrumb,
+		body.dark-mode .dropdown-menu { background: #190028 !important; border-color: #32004f !important; color: #f2ebff !important; }
+		body.dark-mode .card-header { background: #220135 !important; border-color: #32004f !important; color: #f2ebff !important; }
+		body.dark-mode .form-control { background: #220135 !important; border-color: #32004f !important; color: #f2ebff !important; }
+		body.dark-mode a,
+		body.dark-mode .text-dark,
+		body.dark-mode a.text-dark,
+		body.dark-mode a.text-secondary,
+		body.dark-mode a.text-body-secondary { color: #c8b7e6 !important; }
+		body.dark-mode a:hover { color: #f2ebff !important; }
+		body.dark-mode .text-muted,
+		body.dark-mode .text-secondary,
+		body.dark-mode .text-body-secondary { color: #c8b7e6 !important; }
 		body.dark-mode .markdown-body code,
-		body.dark-mode .markdown-body pre {
-			background-color: #1a1a1a !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .markdown-body blockquote {
-			border-left-color: #404040 !important;
-			color: #b0b0b0 !important;
-		}
-		
-		body.dark-mode .markdown-body a {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode .markdown-body a:hover {
-			color: #6bb6ff !important;
-		}
-		
-		body.dark-mode .form-control {
-			background-color: #2d2d2d !important;
-			border-color: #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .form-control:focus {
-			background-color: #2d2d2d !important;
-			border-color: #4a9eff !important;
-			color: #e0e0e0 !important;
-			box-shadow: 0 0 0 0.2rem rgba(74, 158, 255, 0.25) !important;
-		}
-		
-		body.dark-mode .text-muted {
-			color: #b0b0b0 !important;
-		}
-		
-		body.dark-mode .bg-light {
-			background-color: #2d2d2d !important;
-		}
-		
-		body.dark-mode .bg-body-secondary {
-			background-color: #1a1a1a !important;
-		}
-		
-		body.dark-mode .breadcrumb {
-			background-color: #2d2d2d !important;
-			border: 1px solid #404040 !important;
-			color: #e0e0e0 !important;
-		}
-		
-		/* Fix breadcrumb links in dark mode */
-		body.dark-mode .breadcrumb a {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode .breadcrumb a:hover {
-			color: #6bb6ff !important;
-		}
-		
-		body.dark-mode .breadcrumb-item.active {
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .breadcrumb-item + .breadcrumb-item::before {
-			color: #888 !important;
-		}
-		
-		body.dark-mode .footer {
-			background-color: #1a1a1a !important;
-			color: #e0e0e0 !important;
-		}
-		
-		/* Fix for text-dark links in dark mode */
-		body.dark-mode .text-dark {
-			color: #e0e0e0 !important;
-		}
-		
-		body.dark-mode .text-dark:hover {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode a.text-dark {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode a.text-dark:hover {
-			color: #6bb6ff !important;
-		}
-		
-		/* Fix for text-secondary in dark mode */
-		body.dark-mode .text-secondary {
-			color: #b0b0b0 !important;
-		}
-		
-		body.dark-mode a.text-secondary {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode a.text-secondary:hover {
-			color: #6bb6ff !important;
-		}
-		
-		/* Fix for text-body-secondary in dark mode */
-		body.dark-mode .text-body-secondary {
-			color: #b0b0b0 !important;
-		}
-		
-		body.dark-mode a.text-body-secondary {
-			color: #4a9eff !important;
-		}
-		
-		body.dark-mode a.text-body-secondary:hover {
-			color: #6bb6ff !important;
-		}
-		
-		/* Smooth transitions */
-		* {
-			transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-		}
+		body.dark-mode .markdown-body pre { background: #220135 !important; color: #f2ebff !important; }
+		body.dark-mode .markdown-body blockquote { border-left-color: #3a015c !important; color: #c8b7e6 !important; }
+		body.dark-mode .share-panel { background: #220135 !important; border: 1px solid #32004f !important; }
 	</style>
 </head>
 <body>
 <?php
 function getCategoryListForMenu() {
-	$categoryList = [];
-	$postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
-	foreach ($postFiles as $post) {
-		if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
-			$postFile = POSTS_DIR . $post;
-			$postData = getPostContent($postFile);
-			if ($postData && isset($postData['meta']['category'])) {
-				$category = trim($postData['meta']['category']);
-				if (!empty($category) && !in_array($category, $categoryList)) {
-					$categoryList[] = $category;
-				}
-			}
-		}
-	}
-	return $categoryList;
+	$stats = getBlogStats();
+	return $stats['categories'] ?? [];
 }
 $categoryList = getCategoryListForMenu();
 // ...existing code...
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Tenth navbar example">
-    <div class="container-fluid">
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="Toggle navigation">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark site-nav" aria-label="Ana menü">
+    <div class="container">
+      <a class="navbar-brand site-brand" href="<?php echo BASE_PATH; ?>"><?php echo SITE_NAME; ?></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="Menüyü aç/kapat">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse justify-content-md-center" id="navbara">
-				<ul class="navbar-nav mb-2 mb-lg-0">
-					<li class="nav-item h3">
-						<a class="nav-link active" aria-current="page" href="<?php echo BASE_PATH; ?>"><?php echo SITE_NAME; ?></a>
-					</li>
-				</ul>
-				<div class="d-flex align-items-center ms-auto" style="gap: 1.5rem;">
-					<!-- Kategoriler Dropdown -->
-					<div class="dropdown">
-						<a class="btn btn-lg btn-outline-light dropdown-toggle px-4 py-2 fw-bold" href="#" id="kategoriDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size:1.2rem;">
-							<i class="bi bi-folder me-2"></i> Kategoriler
-						</a>
-						<ul class="dropdown-menu dropdown-menu-end shadow-lg rounded" aria-labelledby="kategoriDropdown" style="min-width: 220px; font-size:1.1rem;">
-							<?php foreach ($categoryList as $cat): ?>
-								<li><a class="dropdown-item py-2" href="<?php echo BASE_PATH . 'cat/' . urlencode(strtolower($cat)); ?>" style="font-size:1.1rem;"><i class="bi bi-tag-fill text-primary me-2"></i><?php echo htmlspecialchars($cat); ?></a></li>
-							<?php endforeach; ?>
-						</ul>
-					</div>
-					<!-- Search Form -->
-					<form class="d-flex" role="search" method="get" action="<?php echo BASE_URL; ?>search">
-						<input class="form-control me-2" type="search" name="q" placeholder="Ara..." aria-label="Ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>" style="min-width: 180px; font-size:1.1rem; height:48px;">
-						<button class="btn btn-outline-light" type="submit" style="height:48px; font-size:1.1rem;">
-							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-								<path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-							</svg>
-						</button>
-					</form>
-					<!-- Dark Mode Toggle -->
-					<button id="darkModeToggle" class="btn btn-outline-light" type="button" title="Karanlık Modu Aç/Kapat" aria-label="Karanlık Mod" style="height:48px; font-size:1.1rem;">
-						<i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
-						<i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
-					</button>
-				</div>
-        
+      <div class="collapse navbar-collapse" id="navbara">
+                <div class="ms-auto d-flex align-items-center nav-tools">
+                    <div class="dropdown nav-categories">
+                        <button class="btn btn-outline-light nav-btn dropdown-toggle" type="button" id="kategoriDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-folder me-2"></i>Kategoriler
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end nav-dropdown" aria-labelledby="kategoriDropdown">
+                            <?php foreach ($categoryList as $cat): ?>
+                                <li>
+                                    <a class="dropdown-item" href="<?php echo BASE_PATH . 'cat/' . urlencode(strtolower($cat)); ?>">
+                                        <i class="bi bi-tag-fill text-primary me-2"></i><?php echo htmlspecialchars($cat); ?>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+
+                    <form class="d-flex nav-search" role="search" method="get" action="<?php echo BASE_URL; ?>search">
+                        <input class="form-control nav-search-input" type="search" name="q" placeholder="Yazı ara..." aria-label="Yazı ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                        <button class="btn btn-outline-light nav-btn nav-search-btn" type="submit" aria-label="Ara">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </form>
+
+                    <button id="darkModeToggle" class="btn btn-outline-light nav-btn nav-theme-toggle" type="button" title="Karanlık modu aç/kapat" aria-label="Karanlık mod">
+                        <i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
+                        <i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
+                    </button>
+                </div>
       </div>
     </div>
 </nav>
