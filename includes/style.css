@@ -321,6 +321,17 @@ a:hover {
     font-weight: 700;
 }
 
+.footer-social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 1px solid var(--line-1);
+    border-radius: 999px;
+    text-decoration: none;
+}
+
 .btn:focus,
 .form-control:focus,
 a:focus {

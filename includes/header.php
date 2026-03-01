@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="tr">
 <head>
 	<?php
@@ -275,44 +275,45 @@ $categoryList = getCategoryListForMenu();
 // ...existing code...
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark site-nav" aria-label="Ana menÃ¼">
-    <div class="container">
-      <a class="navbar-brand site-brand" href="<?php echo BASE_PATH; ?>"><?php echo SITE_NAME; ?></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="MenÃ¼yÃ¼ aÃ§/kapat">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbara">
-                <div class="ms-auto d-flex align-items-center nav-tools">
-                    <div class="dropdown nav-categories">
-                        <button class="btn btn-outline-light nav-btn dropdown-toggle" type="button" id="kategoriDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="bi bi-folder me-2"></i>Kategoriler
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end nav-dropdown" aria-labelledby="kategoriDropdown">
-                            <?php foreach ($categoryList as $cat): ?>
-                                <li>
-                                    <a class="dropdown-item" href="<?php echo BASE_PATH . 'cat/' . urlencode(strtolower($cat)); ?>">
-                                        <i class="bi bi-tag-fill text-primary me-2"></i><?php echo htmlspecialchars($cat); ?>
-                                    </a>
-                                </li>
-                            <?php endforeach; ?>
-                        </ul>
-                    </div>
+<header class="p-3 text-bg-dark site-header">
+	<div class="container">
+		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+			<a href="<?php echo BASE_PATH; ?>" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none site-brand">
+				<?php echo SITE_NAME; ?>
+			</a>
 
-                    <form class="d-flex nav-search" role="search" method="get" action="<?php echo BASE_URL; ?>search">
-                        <input class="form-control nav-search-input" type="search" name="q" placeholder="YazÄ± ara..." aria-label="YazÄ± ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>">
-                        <button class="btn btn-outline-light nav-btn nav-search-btn" type="submit" aria-label="Ara">
-                            <i class="bi bi-search"></i>
-                        </button>
-                    </form>
+			<ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+				<li><a href="<?php echo BASE_PATH; ?>" class="nav-link px-2 text-secondary">Home</a></li>
+				<li class="nav-item dropdown">
+					<a class="nav-link px-2 text-white dropdown-toggle" href="#" id="kategoriDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+						Kategoriler
+					</a>
+					<ul class="dropdown-menu nav-dropdown" aria-labelledby="kategoriDropdown">
+						<?php foreach ($categoryList as $cat): ?>
+							<li>
+								<a class="dropdown-item" href="<?php echo BASE_PATH . 'cat/' . urlencode(strtolower($cat)); ?>">
+									<?php echo htmlspecialchars($cat); ?>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				</li>
+				<li><a href="<?php echo BASE_URL; ?>rss" class="nav-link px-2 text-white">RSS</a></li>
+			</ul>
 
-                    <button id="darkModeToggle" class="btn btn-outline-light nav-btn nav-theme-toggle" type="button" title="Tema degistir" aria-label="Tema degistir" aria-pressed="false">
-                        <i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
-                        <i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
-                    </button>
-                </div>
-      </div>
-    </div>
-</nav>
+			<form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search" method="get" action="<?php echo BASE_URL; ?>search">
+				<input type="search" class="form-control form-control-dark text-bg-dark" name="q" placeholder="Search..." aria-label="Search" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+			</form>
+
+			<div class="text-end d-flex gap-2">
+				<button id="darkModeToggle" class="btn btn-warning" type="button" title="Tema degistir" aria-label="Tema degistir" aria-pressed="false">
+					<i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
+					<i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
+				</button>
+			</div>
+		</div>
+	</div>
+</header>
 
 <main id="main-content">
 	<div class="container p-2">

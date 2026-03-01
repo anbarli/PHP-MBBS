@@ -1,4 +1,4 @@
-﻿		</div>
+		</div>
 	</div>
 </div>
 </main>
@@ -30,6 +30,28 @@
                     <span>Powered By <a href="https://github.com/anbarli/PHP-MBBS" class="text-secondary" target="_blank" rel="noopener">PHP-MBBS</a></span>
                 </div>
                 <div class="footer-meta footer-meta-right">
+                    <?php
+                    $socialLinks = [];
+                    if (!empty(trim((string)SOCIAL_TWITTER))) {
+                        $socialLinks[] = ['label' => 'X', 'icon' => 'bi-twitter-x', 'url' => SOCIAL_TWITTER];
+                    }
+                    if (!empty(trim((string)SOCIAL_GITHUB))) {
+                        $socialLinks[] = ['label' => 'GitHub', 'icon' => 'bi-github', 'url' => SOCIAL_GITHUB];
+                    }
+                    if (!empty(trim((string)SOCIAL_LINKEDIN))) {
+                        $socialLinks[] = ['label' => 'LinkedIn', 'icon' => 'bi-linkedin', 'url' => SOCIAL_LINKEDIN];
+                    }
+                    ?>
+                    <?php if (!empty($socialLinks)): ?>
+                        <?php foreach ($socialLinks as $social): ?>
+                            <a href="<?php echo htmlspecialchars($social['url'], ENT_QUOTES, 'UTF-8'); ?>" target="_blank" rel="noopener noreferrer"
+                               class="text-secondary footer-social-link" title="<?php echo htmlspecialchars($social['label'], ENT_QUOTES, 'UTF-8'); ?>">
+                                <i class="bi <?php echo $social['icon']; ?>" aria-hidden="true"></i>
+                                <span class="visually-hidden"><?php echo htmlspecialchars($social['label'], ENT_QUOTES, 'UTF-8'); ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                        <span class="footer-sep">|</span>
+                    <?php endif; ?>
                     <a href="<?php echo BASE_URL; ?>rss" target="_blank" class="text-secondary footer-rss-link" title="RSS Feed">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 448 512">
                             <path d="M0 64C0 46.3 14.3 32 32 32c229.8 0 416 186.2 416 416c0 17.7-14.3 32-32 32s-32-14.3-32-32C384 253.6 226.4 96 32 96C14.3 96 0 81.7 0 64zM0 416a64 64 0 1 1 128 0A64 64 0 1 1 0 416zM32 160c159.1 0 288 128.9 288 288c0 17.7-14.3 32-32 32s-32-14.3-32-32c0-123.7-100.3-224-224-224c-17.7 0-32-14.3-32-32s14.3-32 32-32z"/>

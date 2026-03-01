@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include('config.php');
 
 $searchQuery = isset($_GET['q']) ? trim((string)$_GET['q']) : '';

@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Admin New Post
  * Yeni yazı ekleme sayfası

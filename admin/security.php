@@ -14,9 +14,9 @@ if (!defined('ADMIN_SECURE')) {
  * Session baslatma ve güvenlik ayarlari
  */
 function initSecureSession() {
-    // Session baslamadan önce g�venli session ayarlari
+    // Session baslamadan önce güvenli session ayarlari
     if (session_status() === PHP_SESSION_NONE) {
-        // G�venli session ayarlari
+        // Güvenli session ayarlari
         ini_set('session.cookie_httponly', 1);
         ini_set('session.cookie_secure', isset($_SERVER['HTTPS']));
         ini_set('session.use_strict_mode', 1);
@@ -85,7 +85,7 @@ function verifyPassword($password, $hash) {
 }
 
 /**
- * G�venli dosya upload kontrolü
+ * Güvenli dosya upload kontrolü
  */
 function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'], $maxSize = 5242880) {
     $errors = [];
@@ -130,7 +130,7 @@ function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif',
 }
 
 /**
- * G�venli dosya adi olusturma
+ * Güvenli dosya adi olusturma
  */
 function generateSafeFileName($originalName, $extension) {
     $timestamp = time();
@@ -177,7 +177,7 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
 }
 
 /**
- * G�venli log kaydi
+ * Güvenli log kaydi
  */
 function logAdminAction($action, $details = '', $userId = null) {
     $logFile = __DIR__ . '/../logs/admin.log';
@@ -224,7 +224,7 @@ function requireAdminAuth() {
 }
 
 /**
- * G�venli çıkış
+ * Güvenli çıkış
  */
 function secureLogout() {
     // Log kaydi
@@ -259,7 +259,7 @@ function formatBytes($bytes, $precision = 2) {
 }
 
 /**
- * G�venli redirect
+ * Güvenli redirect
  */
 function secureRedirect($url) {
     // URL dogrulama
@@ -364,34 +364,34 @@ function checkDefaultCredentials($username, $password) {
 }
 
 /**
- * �??ifre güvenlik kontrolü
+ * Şifre güvenlik kontrolü
  */
 function validatePasswordStrength($password) {
     $errors = [];
     
     // Minimum uzunluk kontrolü
     if (strlen($password) < 8) {
-        $errors[] = '�??ifre en az 8 karakter olmalidir.';
+        $errors[] = 'Şifre en az 8 karakter olmalidir.';
     }
     
     // Büyük harf kontrolü
     if (!preg_match('/[A-Z]/', $password)) {
-        $errors[] = '�??ifre en az bir büyük harf içermelidir.';
+        $errors[] = 'Şifre en az bir büyük harf içermelidir.';
     }
     
     // Küçük harf kontrolü
     if (!preg_match('/[a-z]/', $password)) {
-        $errors[] = '�??ifre en az bir k???k harf içermelidir.';
+        $errors[] = 'Şifre en az bir küçük harf içermelidir.';
     }
     
     // Rakam kontrolü
     if (!preg_match('/[0-9]/', $password)) {
-        $errors[] = '�??ifre en az bir rakam içermelidir.';
+        $errors[] = 'Şifre en az bir rakam içermelidir.';
     }
     
     // özel karakter kontrolü
     if (!preg_match('/[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]/', $password)) {
-        $errors[] = '�??ifre en az bir özel karakter içermelidir (!@#$%^&* vb.).';
+        $errors[] = 'Şifre en az bir özel karakter içermelidir (!@#$%^&* vb.).';
     }
     
     // Basit sifre kontrolü
@@ -403,17 +403,17 @@ function validatePasswordStrength($password) {
     ];
     
     if (in_array(strtolower($password), $simplePasswords)) {
-        $errors[] = 'Bu sifre çok yaygin, daha g??l? bir sifre seçin.';
+        $errors[] = 'Bu sifre çok yaygin, daha güçlü bir sifre seçin.';
     }
     
     // Ardisik karakter kontrolü
     if (preg_match('/(.)\1{2,}/', $password)) {
-        $errors[] = '�??ifre ayni karakterin 3 veya daha fazla tekrarini içermemelidir.';
+        $errors[] = 'Şifre ayni karakterin 3 veya daha fazla tekrarini içermemelidir.';
     }
     
     // Ardisik sayi kontrolü
     if (preg_match('/123|234|345|456|567|678|789|012/', $password)) {
-        $errors[] = '�??ifre ardisik sayilar içermemelidir (123, 234 vb.).';
+        $errors[] = 'Şifre ardisik sayilar içermemelidir (123, 234 vb.).';
     }
     
     return $errors;
@@ -437,13 +437,13 @@ function validateUsername($username) {
     
     // Karakter kontrolü
     if (!preg_match('/^[a-zA-Z0-9_-]+$/', $username)) {
-        $errors[] = 'Kullanici adi sadece harf, rakam, tire (-) ve alt çizgi (_) i?erebilir.';
+        $errors[] = 'Kullanici adi sadece harf, rakam, tire (-) ve alt çizgi (_) içerebilir.';
     }
     
     // Varsayilan kullanici adi kontrolü
     $defaultUsernames = ['admin', 'administrator', 'root', 'user', 'test', 'guest'];
     if (in_array(strtolower($username), $defaultUsernames)) {
-        $errors[] = 'Bu kullanici adi çok yaygin, daha g�venli bir kullanici adi seçin.';
+        $errors[] = 'Bu kullanici adi çok yaygin, daha güvenli bir kullanici adi seçin.';
     }
     
     return $errors;
@@ -540,3 +540,4 @@ function updateAdminConfig($newConfig) {
     return true;
 }
 ?> 
+

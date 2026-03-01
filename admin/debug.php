@@ -126,3 +126,4 @@ if (!empty($posts)) {
 
 echo "<br><a href='dashboard.php'>&larr; Back to Dashboard</a>";
 ?> 
+

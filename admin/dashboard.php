@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Admin Dashboard
  * Yönetim paneli ana sayfası
@@ -431,6 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
     </script>
 </body>
 </html> 
+
 
 
 

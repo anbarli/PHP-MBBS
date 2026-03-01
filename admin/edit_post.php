@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * Admin Edit Post
  * Yazı düzenleme sayfası
