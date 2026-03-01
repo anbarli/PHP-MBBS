@@ -192,11 +192,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $adminConfig = loadAdminConfig();
                         $message = 'Admin ayarları başarıyla güncellendi.' . $message;
                         $messageType = 'success';
-                        logAdminAction('update_admin_settings', 'Updated admin settings');
                     } else {
                         $message = 'Admin ayarları kaydedilirken hata oluştu.';
                         $messageType = 'danger';
-                        logError('Admin settings update failed', ['file' => 'admin/settings.php']);
                     }
                 }
             }
@@ -253,7 +251,6 @@ define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600); // 1 saat
 
 // Güvenlik ayarları
-define('ENABLE_ERROR_LOGGING', true);
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('SESSION_TIMEOUT', 1800); // 30 dakika
 
@@ -267,21 +264,18 @@ define('SITE_KEYWORDS', '$siteKeywords');
             if (file_put_contents($configLocalPath, $configContent)) {
                 $message = 'Site ayarları başarıyla güncellendi.';
                 $messageType = 'success';
-                logAdminAction('update_site_config', 'Updated site configuration');
 
                 // Cache'i temizle
                 clearCache();
             } else {
                 $message = 'Site ayarları kaydedilirken hata oluştu.';
                 $messageType = 'danger';
-                logError('Site config write failed', ['file' => $configLocalPath]);
             }
         } elseif ($action === 'clear_cache') {
             // Cache temizle
             if (clearCache()) {
                 $message = 'Cache başarıyla temizlendi.';
                 $messageType = 'success';
-                logAdminAction('clear_cache', 'Cleared application cache');
             } else {
                 $message = 'Cache temizlenirken hata oluştu.';
                 $messageType = 'danger';
@@ -291,7 +285,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
             if (generateSitemap()) {
                 $message = 'Sitemap başarıyla oluşturuldu.';
                 $messageType = 'success';
-                logAdminAction('generate_sitemap', 'Generated sitemap');
             } else {
                 $message = 'Sitemap oluşturulurken hata oluştu.';
                 $messageType = 'danger';
@@ -322,7 +315,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 setCachedPosts($postFilesWithDates);
                 $message = 'Cache başarıyla yeniden oluşturuldu. Yazı sayısı: ' . count($postFilesWithDates);
                 $messageType = 'success';
-                logAdminAction('regenerate_cache', 'Regenerated cache with ' . count($postFilesWithDates) . ' posts');
             } else {
                 $message = 'Cache yeniden oluşturulurken hata oluştu.';
                 $messageType = 'danger';
@@ -370,7 +362,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         clearCache();
                         $message = 'Yedek oluşturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
                         $messageType = 'success';
-                        logAdminAction('create_backup', 'Created backup: ' . $backupFile);
                     }
                 }
             }
@@ -440,7 +431,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         clearCache();
                         $message = 'Geri yükleme tamamlandı. Güncellenen dosya sayısı: ' . $restoredCount;
                         $messageType = $restoredCount > 0 ? 'success' : 'warning';
-                        logAdminAction('restore_backup', 'Restored backup file upload, files: ' . $restoredCount);
                     }
                 }
             }
@@ -457,7 +447,6 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 } elseif (@unlink($targetBackup)) {
                     $message = 'Yedek dosyası silindi: ' . $backupFilename;
                     $messageType = 'success';
-                    logAdminAction('delete_backup', 'Deleted backup: ' . $backupFilename);
                 } else {
                     $message = 'Yedek dosyası silinemedi.';
                     $messageType = 'danger';
@@ -935,5 +924,4 @@ if ($configLocalExists) {
     <script src="<?php echo assetPath('admin/sidebar.js'); ?>"></script>
 </body>
 </html>
-
 

@@ -41,7 +41,6 @@ define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600); // 1 saat (saniye cinsinden)
 
 // Güvenlik ayarları
-define('ENABLE_ERROR_LOGGING', true);
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('SESSION_TIMEOUT', 1800); // 30 dakika
 

@@ -171,36 +171,6 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
 }
 
 /**
- * Guvenli log kaydi
- */
-function logAdminAction($action, $details = '', $userId = null) {
-    $logFile = __DIR__ . '/../logs/admin.log';
-    $logDir = dirname($logFile);
-
-    // Log dizini olustur
-    if (!is_dir($logDir)) {
-        mkdir($logDir, 0755, true);
-    }
-
-    $timestamp = date('Y-m-d H:i:s');
-    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
-    $userId = $userId ?? ($_SESSION['user_id'] ?? 'unknown');
-
-    $logEntry = sprintf(
-        "[%s] User: %s | IP: %s | Action: %s | Details: %s | UA: %s\n",
-        $timestamp,
-        $userId,
-        $ip,
-        $action,
-        $details,
-        $userAgent
-    );
-
-    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-}
-
-/**
  * Admin yetki kontrolü
  */
 function requireAdminAuth() {
@@ -221,9 +191,6 @@ function requireAdminAuth() {
  * Guvenli çıkış
  */
 function secureLogout() {
-    // Log kaydi
-    logAdminAction('logout', 'User logged out');
-
     // Session temizleme
     $_SESSION = array();
 

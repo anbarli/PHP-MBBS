@@ -144,7 +144,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 
             $message = "$categoryToDelete kategorisi silindi ve $updatedCount yazı Genel kategorisine taşındı.";
             $messageType = 'success';
-            logAdminAction('delete_category', "Deleted category: $categoryToDelete, moved $updatedCount posts");
         }
     }
 
@@ -399,4 +398,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     </script>
 </body>
 </html>
-

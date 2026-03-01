@@ -131,7 +131,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
             clearCache();
             $message = 'Yazı başarıyla silindi.';
             $messageType = 'success';
-            logAdminAction('delete_post', "Deleted post: $slug");
         } else {
             $message = 'Yazı silinirken hata oluştu.';
             $messageType = 'danger';
@@ -401,4 +400,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     </script>
 </body>
 </html>
-

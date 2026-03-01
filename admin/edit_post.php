@@ -96,8 +96,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Yazı başarıyla güncellendi!';
                 $messageType = 'success';
 
-                // Log
-                logAdminAction('edit_post', "Edited post: $slug");
             } else {
                 $message = 'Yazı kaydedilirken hata oluştu.';
                 $messageType = 'danger';
@@ -332,5 +330,4 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html>
-
 

@@ -85,9 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Yazı başarıyla oluşturuldu!';
                 $messageType = 'success';
 
-                // Log
-                logAdminAction('create_post', "Created post: $slug");
-
                 // Başarılı ise yazılar sayfasına yönlendir
                 header("Location: posts.php?success=1");
                 exit;
@@ -339,6 +336,5 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html>
-
 
 

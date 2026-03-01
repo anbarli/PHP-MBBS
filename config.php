@@ -21,7 +21,6 @@ if (file_exists(__DIR__ . '/config.local.php')) {
     define('SOCIAL_LINKEDIN', '');
     define('CACHE_ENABLED', true);
     define('CACHE_DURATION', 3600);
-    define('ENABLE_ERROR_LOGGING', true);
     define('MAX_LOGIN_ATTEMPTS', 5);
     define('SESSION_TIMEOUT', 1800);
     define('DEFAULT_LANGUAGE', 'tr');
@@ -307,21 +306,6 @@ function getPostContent($filePath) {
     return null;
 }
 
-function logError($message, $context = []) {
-    if (!ENABLE_ERROR_LOGGING) {
-        return;
-    }
-
-    $logFile = CACHE_DIR . 'error.log';
-    $timestamp = date('Y-m-d H:i:s');
-    $logEntry = "[$timestamp] $message";
-    if (!empty($context)) {
-        $logEntry .= " - " . json_encode($context);
-    }
-    $logEntry .= PHP_EOL;
-    file_put_contents($logFile, $logEntry, FILE_APPEND | LOCK_EX);
-}
-
 function validateInput($input, $type = 'string') {
     switch ($type) {
         case 'slug':
@@ -571,4 +555,3 @@ function getCacheSize() {
     }
 }
 ?>
-

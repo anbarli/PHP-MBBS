@@ -40,11 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_id'] = $username;
                     $_SESSION['login_time'] = time();
 
-                    logAdminAction('login', 'Successful login');
                     secureRedirect('dashboard.php');
                 } else {
                     $error = 'Ge&ccedil;ersiz kullan&#305;c&#305; ad&#305; veya &#351;ifre.';
-                    logAdminAction('login_failed', "Failed login attempt for username: $username");
                 }
             }
         }
