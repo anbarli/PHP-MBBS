@@ -216,7 +216,7 @@
   - Arama sayfasinda `h1` kullan.
   - Sayfa basliklarinda `h1 -> h2 -> ...` akisini koru.
 
-- [x] Layout semantiÄŸini guclendir.
+- [x] Layout semantigini guclendir.
   - Ana icerik kapsayicisini `main` ile tanimla.
   - Gereken yerlerde `section` ve `article` kullanimini arttir.
 
@@ -230,7 +230,7 @@
 ## Core Web Vitals ve Lighthouse Iyilestirmeleri
 
 - [x] Markdown CSS yuklemesini sayfa bazli yap.
-  - `github-markdown-css` sadece post detay sayfalarinda yÃ¼klensin.
+  - `github-markdown-css` sadece post detay sayfalarinda yuklensin.
   - Liste, arama ve diger sayfalarda gereksiz render-blocking CSS'i kaldir.
 
 - [x] 3rd-party baglanti hazirliklarini kosullu hale getir.
@@ -282,7 +282,7 @@
   - Baslik ve etiket eslesmelerine daha yuksek agirlik ver.
   - Basit typo toleransi (hafif fuzzy) ekle.
 
-- [x] Tema (dark/light) kodunu sadeleÅŸtir.
+- [x] Tema (dark/light) kodunu sadelestir.
   - Mevcut scripti modulerlestir ve gereksiz isleri kaldir.
   - INP acisindan daha az ana thread maliyeti hedefle.
 

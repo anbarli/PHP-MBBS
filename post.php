@@ -78,8 +78,9 @@ if (isset($postData) && $postData) {
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-chevron p-3 bg-body-tertiary rounded-3">
               <li class="breadcrumb-item">
-                <a class="link-body-emphasis" href="/">
+                <a class="link-body-emphasis" href="/" aria-label="Ana Sayfa">
                   <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m4 12 8-8 8 8M6 10.5V19a1 1 0 0 0 1 1h3v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h3a1 1 0 0 0 1-1v-8.5"/></svg>
+                  <span class="visually-hidden">Ana Sayfa</span>
                 </a>
               </li>
               <li class="breadcrumb-item">
@@ -169,12 +170,11 @@ if (isset($_GET['slug']) && !empty($slug)) {
 
 
     } else {
-        echo '<div class="alert alert-warning">YazÃ„Â± bulunamadÃ„Â±.</div>';
+        echo '<div class="alert alert-warning">Yazi bulunamadi.</div>';
     }
 } else {
-    echo '<div class="alert alert-warning">GeÃƒÂ§ersiz yazÃ„Â±.</div>';
+    echo '<div class="alert alert-warning">Gecersiz yazi.</div>';
 }
 
 include('includes/footer.php');
 ?>
-

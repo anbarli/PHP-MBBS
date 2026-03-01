@@ -369,7 +369,7 @@ function generateSitemap() {
     // sitemap.php dosyasını çalıştırarak sitemap oluştur
     $sitemapCacheFile = CACHE_DIR . 'sitemap.xml';
 
-    // sitemap.php'nin iÃ§eriÄŸini simÃ¼le et
+    // sitemap.php'nin içeriğini simüle et
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 

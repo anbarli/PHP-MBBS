@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $adminConfig['ADMIN_EMAIL'] = $newAdminEmail;
                 $configUpdated = true;
 
-                // Şifre değişikliği
+                // Sifre değişikliği
                 if (!empty($currentPassword)) {
                     if (!verifyPassword($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
                         $message = 'Mevcut şifre yanlış.';
@@ -162,12 +162,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = 'Yeni şifre en az 8 karakter olmalıdır.';
                         $messageType = 'danger';
                     } elseif ($newPassword !== $confirmPassword) {
-                        $message = 'Şifreler eşleşmiyor.';
+                        $message = 'Sifreler eşleşmiyor.';
                         $messageType = 'danger';
                     } else {
                         $adminConfig['ADMIN_PASSWORD'] = hashPassword($newPassword);
                         $configUpdated = true;
-                        $message .= ' Şifre güncellendi.';
+                        $message .= ' Sifre güncellendi.';
                     }
                 }
 
@@ -509,7 +509,7 @@ if ($configLocalExists) {
 <body>
     <!-- Sidebar Wrapper -->
     <div class="sidebar-wrapper">
-        <button class="sidebar-toggle" type="button" title="Menüyü Aç/Kapat">
+        <button class="sidebar-toggle nav-link" type="button" title="Menüyü Aç/Kapat">
             <i class="bi bi-chevron-left"></i>
         </button>
         <div class="sidebar p-3">
@@ -542,14 +542,6 @@ if ($configLocalExists) {
                     <i class="bi bi-box-arrow-up-right"></i>
                     <span class="link-text">Siteyi Görüntüle</span>
                 </a>
-                <form method="POST" action="dashboard.php" class="sidebar-logout-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span class="link-text">Çıkış Yap</span>
-                    </button>
-                </form>
             </nav>
         </div>
     </div>
@@ -561,11 +553,27 @@ if ($configLocalExists) {
             <nav class="navbar navbar-expand-lg">
                 <div class="container-fluid">
                     <h4 class="mb-0">Ayarlar</h4>
-                    <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                         <span class="badge bg-primary fs-6">
                             <i class="bi bi-gear"></i> Yönetim
                         </span>
+                        <div class="admin-user-panel">
+                            <div class="admin-user-meta">
+                                <div class="admin-user-name">
+                                    <i class="bi bi-person-circle"></i>
+                                    <?php echo htmlspecialchars($_SESSION['user_id'] ?? 'admin'); ?>
+                                </div>
+                                <small class="admin-user-login">Son giris: <?php echo isset($_SESSION['login_time']) ? date('d.m.Y H:i', $_SESSION['login_time']) : '-'; ?></small>
                             </div>
+                            <form method="POST" action="dashboard.php" class="admin-logout-inline" onsubmit="return confirm('Cikis yapmak istediginizden emin misiniz?');">
+                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                <input type="hidden" name="action" value="logout">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="bi bi-box-arrow-right me-1"></i>Cikis Yap
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                         </div>
                     </nav>
 
@@ -666,23 +674,23 @@ if ($configLocalExists) {
                                             </div>
 
                                             <hr>
-                                            <h6>Şifre Değiştir</h6>
-                                            <small class="text-muted">Şifrenizi değiştirmek istemiyorsanız boş bırakın.</small>
+                                            <h6>Sifre Değiştir</h6>
+                                            <small class="text-muted">Sifrenizi değiştirmek istemiyorsanız boş bırakın.</small>
 
                                             <div class="mb-3">
-                                                <label for="current_password" class="form-label">Mevcut Şifre</label>
+                                                <label for="current_password" class="form-label">Mevcut Sifre</label>
                                                 <input type="password" class="form-control" id="current_password" name="current_password">
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="new_password" class="form-label">Yeni Şifre</label>
+                                                <label for="new_password" class="form-label">Yeni Sifre</label>
                                                 <input type="password" class="form-control" id="new_password" name="new_password"
                                                        minlength="8">
                                                 <div class="form-text">En az 8 karakter</div>
                                             </div>
 
                                             <div class="mb-3">
-                                                <label for="confirm_password" class="form-label">Yeni Şifre (Tekrar)</label>
+                                                <label for="confirm_password" class="form-label">Yeni Sifre (Tekrar)</label>
                                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password"
                                                        minlength="8">
                                             </div>

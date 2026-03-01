@@ -1,82 +1,176 @@
 /**
  * Admin Sidebar Toggle
- * Sidebar açma/kapama işlevselliği
+ * Desktop: collapsible sidebar
+ * Tablet/Mobile: drawer with backdrop and ESC close
  */
-(function() {
+(function () {
     'use strict';
+
+    const DESKTOP_BREAKPOINT = 991;
+    const STORAGE_KEY = 'adminSidebarCollapsed';
+    const BACKDROP_CLASS = 'admin-sidebar-backdrop';
+    const BODY_OPEN_CLASS = 'admin-drawer-open';
+
+    const isDesktop = () => window.innerWidth > DESKTOP_BREAKPOINT;
 
     const initSidebar = () => {
         const sidebarWrapper = document.querySelector('.sidebar-wrapper');
         const toggleBtn = document.querySelector('.sidebar-toggle');
 
-        if (!sidebarWrapper || !toggleBtn) return;
-
-        // LocalStorage'dan durumu al
-        const savedState = localStorage.getItem('adminSidebarCollapsed');
-        const isMobile = window.innerWidth <= 991;
-
-        // Başlangıç durumunu ayarla
-        if (savedState === 'true' && !isMobile) {
-            sidebarWrapper.classList.add('collapsed');
+        if (!sidebarWrapper || !toggleBtn) {
+            return false;
         }
 
-        // Toggle butonu click event
-        toggleBtn.addEventListener('click', () => {
-            const isCollapsed = sidebarWrapper.classList.toggle('collapsed');
+        if (!sidebarWrapper.id) {
+            sidebarWrapper.id = 'adminSidebar';
+        }
 
-            // Mobilde farklı class kullan
-            if (window.innerWidth <= 576) {
-                sidebarWrapper.classList.toggle('mobile-open');
-            }
+        toggleBtn.setAttribute('aria-controls', sidebarWrapper.id);
+        toggleBtn.setAttribute('type', 'button');
 
-            // Durumu kaydet (sadece desktop için)
-            if (window.innerWidth > 991) {
-                localStorage.setItem('adminSidebarCollapsed', isCollapsed);
-            }
-        });
+        let toggleIcon = toggleBtn.querySelector('i');
+        if (!toggleIcon) {
+            toggleIcon = document.createElement('i');
+            toggleBtn.appendChild(toggleIcon);
+        }
 
-        // Sidebar dışına tıklama ile kapatma (mobilde)
-        document.addEventListener('click', (e) => {
-            if (window.innerWidth <= 576) {
-                if (!sidebarWrapper.contains(e.target) && !toggleBtn.contains(e.target)) {
-                    if (sidebarWrapper.classList.contains('mobile-open')) {
-                        sidebarWrapper.classList.remove('mobile-open');
-                    }
+        let toggleLabel = toggleBtn.querySelector('.sidebar-toggle-label');
+        if (!toggleLabel) {
+            toggleLabel = document.createElement('span');
+            toggleLabel.className = 'sidebar-toggle-label';
+            toggleBtn.appendChild(toggleLabel);
+        }
+
+        let backdrop = document.querySelector('.' + BACKDROP_CLASS);
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.className = BACKDROP_CLASS;
+            document.body.appendChild(backdrop);
+        }
+
+        const syncAria = () => {
+            const expanded = isDesktop()
+                ? !sidebarWrapper.classList.contains('collapsed')
+                : sidebarWrapper.classList.contains('mobile-open');
+
+            toggleBtn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+        };
+
+        const updateToggleButton = () => {
+            const desktop = isDesktop();
+            const expanded = desktop
+                ? !sidebarWrapper.classList.contains('collapsed')
+                : sidebarWrapper.classList.contains('mobile-open');
+
+            toggleBtn.classList.toggle('expanded', expanded);
+
+            if (desktop) {
+                if (expanded) {
+                    toggleIcon.className = 'bi bi-chevron-left';
+                    toggleLabel.textContent = 'Menüyü Daralt';
+                    toggleBtn.setAttribute('aria-label', 'Menüyü daralt');
+                    toggleBtn.setAttribute('title', 'Menüyü Daralt');
+                } else {
+                    toggleIcon.className = 'bi bi-chevron-right';
+                    toggleLabel.textContent = 'Menüyü Aç';
+                    toggleBtn.setAttribute('aria-label', 'Menüyü aç');
+                    toggleBtn.setAttribute('title', 'Menüyü Aç');
                 }
+
+                return;
+            }
+
+            if (expanded) {
+                toggleIcon.className = 'bi bi-x-lg';
+                toggleLabel.textContent = 'Menüyü Kapat';
+                toggleBtn.setAttribute('aria-label', 'Menüyü kapat');
+                toggleBtn.setAttribute('title', 'Menüyü Kapat');
+            } else {
+                toggleIcon.className = 'bi bi-list';
+                toggleLabel.textContent = 'Menüyü Aç';
+                toggleBtn.setAttribute('aria-label', 'Menüyü aç');
+                toggleBtn.setAttribute('title', 'Menüyü Aç');
+            }
+        };
+
+        const setDrawerState = (open) => {
+            sidebarWrapper.classList.toggle('mobile-open', open);
+            backdrop.classList.toggle('active', open);
+            document.body.classList.toggle(BODY_OPEN_CLASS, open);
+            syncAria();
+            updateToggleButton();
+        };
+
+        const applyResponsiveState = () => {
+            const savedCollapsed = localStorage.getItem(STORAGE_KEY) === 'true';
+
+            if (isDesktop()) {
+                sidebarWrapper.classList.remove('mobile-open');
+                document.body.classList.remove(BODY_OPEN_CLASS);
+                backdrop.classList.remove('active');
+                sidebarWrapper.classList.toggle('collapsed', savedCollapsed);
+            } else {
+                sidebarWrapper.classList.remove('collapsed');
+                setDrawerState(false);
+            }
+
+            syncAria();
+            updateToggleButton();
+        };
+
+        const mainWrapper = document.querySelector('.admin-main-wrapper');
+        sidebarWrapper.classList.add('sidebar-no-transition');
+        if (mainWrapper) {
+            mainWrapper.classList.add('sidebar-no-transition');
+        }
+
+        applyResponsiveState();
+
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                sidebarWrapper.classList.remove('sidebar-no-transition');
+                if (mainWrapper) {
+                    mainWrapper.classList.remove('sidebar-no-transition');
+                }
+            });
+        });
+
+        toggleBtn.addEventListener('click', () => {
+            if (isDesktop()) {
+                const collapsed = sidebarWrapper.classList.toggle('collapsed');
+                localStorage.setItem(STORAGE_KEY, collapsed ? 'true' : 'false');
+                syncAria();
+                updateToggleButton();
+                return;
+            }
+
+            const shouldOpen = !sidebarWrapper.classList.contains('mobile-open');
+            setDrawerState(shouldOpen);
+        });
+
+        backdrop.addEventListener('click', () => {
+            if (!isDesktop()) {
+                setDrawerState(false);
             }
         });
 
-        // Ekran boyutu değiştiğinde
-        let resizeTimer;
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !isDesktop() && sidebarWrapper.classList.contains('mobile-open')) {
+                setDrawerState(false);
+                toggleBtn.focus();
+            }
+        });
+
+        let resizeTimer = null;
         window.addEventListener('resize', () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const width = window.innerWidth;
-
-                if (width <= 576) {
-                    // Çok küçük ekranlarda mobile-open kontrolü
-                    sidebarWrapper.classList.remove('collapsed');
-                } else if (width <= 991) {
-                    // Tablet: collapsed varsayılan
-                    sidebarWrapper.classList.remove('mobile-open');
-                } else {
-                    // Desktop: saved state kullan
-                    sidebarWrapper.classList.remove('mobile-open');
-                    const savedState = localStorage.getItem('adminSidebarCollapsed');
-                    if (savedState === 'true') {
-                        sidebarWrapper.classList.add('collapsed');
-                    } else {
-                        sidebarWrapper.classList.remove('collapsed');
-                    }
-                }
-            }, 250);
+            resizeTimer = setTimeout(applyResponsiveState, 150);
         });
+
+        return true;
     };
 
-    // DOM hazır olduğunda başlat
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initSidebar);
-    } else {
-        initSidebar();
+    if (!initSidebar()) {
+        document.addEventListener('DOMContentLoaded', initSidebar, { once: true });
     }
 })();

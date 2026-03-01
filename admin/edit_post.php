@@ -129,7 +129,7 @@ $csrfToken = generateCSRFToken();
 <body>
     <!-- Sidebar -->
     <div class="sidebar-wrapper">
-        <button class="sidebar-toggle" type="button" aria-label="Toggle Sidebar">
+        <button class="sidebar-toggle nav-link" type="button" title="Menüyü Aç/Kapat" aria-label="Menuyu daralt">
             <i class="bi bi-chevron-left"></i>
         </button>
         <div class="sidebar p-3">
@@ -157,13 +157,6 @@ $csrfToken = generateCSRFToken();
                 <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
                     <i class="bi bi-box-arrow-up-right"></i> <span class="link-text">Siteyi Görüntüle</span>
                 </a>
-                <form method="POST" action="dashboard.php" class="sidebar-logout-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                        <i class="bi bi-box-arrow-right"></i> <span class="link-text">Çıkış Yap</span>
-                    </button>
-                </form>
             </nav>
         </div>
     </div>
@@ -175,16 +168,32 @@ $csrfToken = generateCSRFToken();
                     <nav class="navbar navbar-expand-lg">
                         <div class="container-fluid">
                             <h4 class="mb-0">Yazı Düzenle: <?php echo htmlspecialchars($post['meta']['title']); ?></h4>
-                            <div class="d-flex align-items-center">
-                                <a href="<?php echo BASE_PATH . $slug; ?>" target="_blank" class="btn btn-outline-info me-2">
+                            <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
+                                <a href="<?php echo BASE_PATH . $slug; ?>" target="_blank" class="btn btn-outline-info">
                                     <i class="bi bi-eye"></i> Görüntüle
                                 </a>
-                                <a href="posts.php" class="btn btn-outline-secondary me-2">
+                                <a href="posts.php" class="btn btn-outline-secondary">
                                     <i class="bi bi-arrow-left"></i> Geri
                                 </a>
                                 <button type="submit" form="postForm" class="btn btn-primary">
                                     <i class="bi bi-check-circle"></i> Kaydet
                                 </button>
+                                <div class="admin-user-panel">
+                                    <div class="admin-user-meta">
+                                        <div class="admin-user-name">
+                                            <i class="bi bi-person-circle"></i>
+                                            <?php echo htmlspecialchars($_SESSION['user_id'] ?? 'admin'); ?>
+                                        </div>
+                                        <small class="admin-user-login">Son giris: <?php echo isset($_SESSION['login_time']) ? date('d.m.Y H:i', $_SESSION['login_time']) : '-'; ?></small>
+                                    </div>
+                                    <form method="POST" action="dashboard.php" class="admin-logout-inline" onsubmit="return confirm('Cikis yapmak istediginizden emin misiniz?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="logout">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-box-arrow-right me-1"></i>Cikis Yap
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </nav>
@@ -323,6 +332,5 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html>
-
 
 

@@ -43,3 +43,9 @@ Before commit:
 1. If mojibake appears again, first suspect write path/encoding, not HTML meta tags.
 2. `header('Content-Type: text/html; charset=utf-8')` is necessary but not sufficient if source text is already corrupted.
 3. Preserve UTF-8 discipline in scripts, shell commands, and editor settings.
+4. Known break pattern: reading UTF-8 text with PowerShell default decoding, then writing it back as UTF-8 causes `Yazi -> YazÄ±` style corruption.
+5. Never use `Get-Content` without `-Encoding UTF8` on files that contain Turkish text.
+6. If bulk replacement is required in PowerShell, safe pattern is:
+   - `Get-Content -Raw -Encoding UTF8`
+   - transform text
+   - `Set-Content -Encoding utf8` or `[System.IO.File]::WriteAllText(..., [System.Text.UTF8Encoding]::new($false))`

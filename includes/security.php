@@ -124,7 +124,7 @@ function validateFileUpload($file, $allowedTypes = ['jpg', 'jpeg', 'png', 'gif',
 }
 
 /**
- * Gï¿½venli dosya adi olusturma
+ * Guvenli dosya adi olusturma
  */
 function generateSafeFileName($originalName, $extension) {
     $timestamp = time();
@@ -133,7 +133,7 @@ function generateSafeFileName($originalName, $extension) {
 }
 
 /**
- * XSS korumasi iÃ§in input temizleme
+ * XSS korumasi için input temizleme
  */
 function sanitizeInput($input) {
     if (is_array($input)) {
@@ -143,7 +143,7 @@ function sanitizeInput($input) {
 }
 
 /**
- * Rate limiting kontrolÃ¼
+ * Rate limiting kontrolü
  */
 function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
@@ -155,13 +155,13 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
 
     $rateData = $_SESSION[$key];
 
-    // Zaman penceresi kontrolÃ¼
+    // Zaman penceresi kontrolü
     if (time() - $rateData['first_attempt'] > $timeWindow) {
         $_SESSION[$key] = ['attempts' => 1, 'first_attempt' => time()];
         return true;
     }
 
-    // Deneme sayisi kontrolÃ¼
+    // Deneme sayisi kontrolü
     if ($rateData['attempts'] >= $maxAttempts) {
         return false;
     }
@@ -171,7 +171,7 @@ function checkRateLimit($action, $maxAttempts = 5, $timeWindow = 300) {
 }
 
 /**
- * Gï¿½venli log kaydi
+ * Guvenli log kaydi
  */
 function logAdminAction($action, $details = '', $userId = null) {
     $logFile = __DIR__ . '/../logs/admin.log';
@@ -201,7 +201,7 @@ function logAdminAction($action, $details = '', $userId = null) {
 }
 
 /**
- * Admin yetki kontrolÃ¼
+ * Admin yetki kontrolü
  */
 function requireAdminAuth() {
     if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
@@ -209,7 +209,7 @@ function requireAdminAuth() {
         exit;
     }
 
-    // Session gÃ¼venlik kontrolÃ¼
+    // Session güvenlik kontrolü
     if (!initSecureSession()) {
         session_destroy();
         header('Location: login.php?error=session_expired');
@@ -218,7 +218,7 @@ function requireAdminAuth() {
 }
 
 /**
- * Gï¿½venli Ã§Ä±kÄ±ÅŸ
+ * Guvenli çıkış
  */
 function secureLogout() {
     // Log kaydi
@@ -253,7 +253,7 @@ function formatBytes($bytes, $precision = 2) {
 }
 
 /**
- * Gï¿½venli redirect
+ * Guvenli redirect
  */
 function secureRedirect($url) {
     // URL dogrulama
@@ -266,7 +266,7 @@ function secureRedirect($url) {
 }
 
 /**
- * Admin config dosyasi kontrolÃ¼
+ * Admin config dosyasi kontrolü
  */
 function loadAdminConfig() {
     // Admin klasorunu dinamik olarak bul
@@ -278,7 +278,7 @@ function loadAdminConfig() {
         die('Admin yapilandirma dosyasi (admin.env) bulunamadi veya okunamiyor. Lutfen yoneticinizle iletisime gecin.');
     }
 
-    // Varsayilan config (kullanilmayacak, sadece anahtarlar iÃ§in referans)
+    // Varsayilan config (kullanilmayacak, sadece anahtarlar için referans)
     $config = [
         'ADMIN_USERNAME' => '',
         'ADMIN_PASSWORD' => '',
@@ -422,10 +422,10 @@ function validateUsername($username) {
 }
 
 /**
- * Admin config gÃ¶ncelleme
+ * Admin config göncelleme
  */
 function updateAdminConfig($newConfig) {
-    // Admin klasÃ¶rÃ¼nÃ¼ dinamik olarak bul
+    // Admin klasörünü dinamik olarak bul
     $adminDir = dirname(__DIR__) . '/admin';
     if (!is_dir($adminDir)) {
         // admin1, admin2 gibi alternatif isimleri dene
@@ -476,11 +476,11 @@ function updateAdminConfig($newConfig) {
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
 
-            // GÃ¶ncellenecek anahtar var mi?
+            // Göncellenecek anahtar var mi?
             $updated = false;
             foreach ($newConfig as $newKey => $newValue) {
                 if ($key === $newKey) {
-                    // Degeri gÃ¶ncelle
+                    // Degeri göncelle
                     if (is_array($newValue)) {
                         $updatedLines[] = $key . '=' . implode(',', $newValue);
                     } else {
@@ -491,7 +491,7 @@ function updateAdminConfig($newConfig) {
                 }
             }
 
-            // GÃ¶ncellenmediyse mevcut satiri koru
+            // Göncellenmediyse mevcut satiri koru
             if (!$updated) {
                 $updatedLines[] = $line;
             }

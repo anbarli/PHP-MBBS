@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
 <body>
     <!-- Sidebar Wrapper -->
     <div class="sidebar-wrapper">
-        <button class="sidebar-toggle" type="button" title="Menüyü Aç/Kapat">
+        <button class="sidebar-toggle nav-link" type="button" title="Menüyü Aç/Kapat">
             <i class="bi bi-chevron-left"></i>
         </button>
         <div class="sidebar p-3">
@@ -191,14 +191,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                     <i class="bi bi-box-arrow-up-right"></i>
                     <span class="link-text">Siteyi Görüntüle</span>
                 </a>
-                <form method="POST" action="dashboard.php" class="sidebar-logout-form">
-                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                    <input type="hidden" name="action" value="logout">
-                    <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                        <i class="bi bi-box-arrow-right"></i>
-                        <span class="link-text">Çıkış Yap</span>
-                    </button>
-                </form>
             </nav>
         </div>
     </div>
@@ -210,10 +202,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                     <nav class="navbar navbar-expand-lg">
                         <div class="container-fluid">
                             <h4 class="mb-0">Yazı Yönetimi</h4>
-                            <div class="d-flex align-items-center">
+                            <div class="d-flex align-items-center gap-2 flex-wrap justify-content-end">
                                 <a href="new_post.php" class="btn btn-primary">
                                     <i class="bi bi-plus-circle"></i> Yeni Yazı
                                 </a>
+                                <div class="admin-user-panel">
+                                    <div class="admin-user-meta">
+                                        <div class="admin-user-name">
+                                            <i class="bi bi-person-circle"></i>
+                                            <?php echo htmlspecialchars($_SESSION['user_id'] ?? 'admin'); ?>
+                                        </div>
+                                        <small class="admin-user-login">Son giris: <?php echo isset($_SESSION['login_time']) ? date('d.m.Y H:i', $_SESSION['login_time']) : '-'; ?></small>
+                                    </div>
+                                    <form method="POST" action="dashboard.php" class="admin-logout-inline" onsubmit="return confirm('Cikis yapmak istediginizden emin misiniz?');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                        <input type="hidden" name="action" value="logout">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-box-arrow-right me-1"></i>Cikis Yap
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </nav>
