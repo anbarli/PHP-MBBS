@@ -1,5 +1,205 @@
 ﻿# TODO
 
+## ✅ Tamamlanan İyileştirmeler (Mart 2026)
+
+- [x] **Mojibake (karakter bozulması) düzeltildi** - Tüm PHP dosyalarında UTF-8 encoding sorunları giderildi
+- [x] **MD5 şifre desteği kaldırıldı** - Güvenlik: Artık sadece `password_hash()` kullanılıyor
+- [x] **CDN için SRI hash'leri eklendi** - Bootstrap, Bootstrap Icons, EasyMDE, Font Awesome
+- [x] **Bootstrap Icons SRI hash'i düzeltildi** - Doğru integrity değeri: `sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+`
+- [x] **Google Analytics CSP güncellendi** - `analytics.google.com` connect-src'ye eklendi
+- [x] **Deprecated meta tag güncellendi** - `mobile-web-app-capable` eklendi
+- [x] **Service Worker 404 hatası düzeltildi** - `sw.js` dosyası oluşturuldu (offline support & caching)
+- [x] **Dinamik CSP implementasyonu** - Google Analytics kullanıldığında otomatik olarak domain'ler ekleniyor
+- [x] **500 Internal Server Error düzeltildi** - config.php syntax hatası giderildi
+- [x] **Anasayfa sayfalama iyileştirildi** - 10 yazı/sayfa, prev/next butonları, ellipsis, sayfa bilgisi, modern tasarım
+
+> **Not:** CSP artık `config.php`'den dinamik olarak gönderiliyor. `GA_TRACKING_ID` tanımlıysa Google Analytics domain'leri otomatik eklenir.
+
+---
+
+## Güvenlik İyileştirmeleri (Security)
+
+### Yüksek Öncelik
+- [ ] Rate limiting implementasyonu ekle
+  - Login girişimleri için mevcut
+  - Admin panel tüm aksiyonları için genişlet
+  - API endpoint'leri için rate limiting ekle
+
+- [ ] Session güvenliği geliştir
+  - Login sonrası `session_regenerate_id(true)` ekle
+  - Session fixation korumasını güçlendir
+
+- [ ] CSP (Content Security Policy) iyileştir
+  - `unsafe-inline` kullanımını kaldır
+  - Nonce veya hash-based CSP kullan
+  - Inline scriptleri external dosyalara taşı
+
+### Orta Öncelik
+- [ ] Dosya upload güvenliği geliştir
+  - Mime type kontrolü ekle (sadece extension değil)
+  - Magic byte validation ekle
+  - Upload edilmiş dosyaları webroot dışında sakla
+
+- [ ] Path traversal koruması güçlendir
+  - Double-encoding attack kontrolü ekle
+  - Tüm file path parametrelerini validate et
+
+## Performans İyileştirmeleri (Performance)
+
+### Yüksek Öncelik
+- [ ] Asset minification sistemi kur
+  - CSS ve JS dosyalarını minify et
+  - Build step ekle (Gulp, Webpack, vb.)
+  - Production/Development ortam ayrımı yap
+
+- [ ] Image optimization sistemi ekle
+  - Otomatik image compression/resize
+  - WebP formatı desteği
+  - Responsive image generation (srcset)
+  - Intervention Image veya GD kullan
+
+- [ ] OPcache ayarlarını optimize et
+  - `opcache.enable=1` kontrol et
+  - `opcache.memory_consumption` ayarla
+  - `opcache.max_accelerated_files` optimize et
+
+### Orta Öncelik
+- [ ] HTTP/2 Server Push kullan
+  - Kritik CSS ve JS için server push
+  - .htaccess'e Link header ekle
+
+- [ ] Critical CSS implementasyonu
+  - Above-the-fold CSS'i inline ekle
+  - Geri kalan CSS'i async yükle
+  - Critical CSS extraction tool kullan
+
+- [ ] Service Worker tam implementasyonu
+  - sw.js dosyasını oluştur
+  - Offline-first stratejisi
+  - Cache stratejileri (cache-first, network-first)
+  - Background sync desteği
+
+- [ ] Lazy loading geliştir
+  - Native lazy loading attribute'ları ekle
+  - Intersection Observer optimizasyonu
+  - Progressive image loading
+
+## SEO İyileştirmeleri
+
+### Yüksek Öncelik
+- [ ] Schema.org Structured Data geliştir
+  - BreadcrumbList schema ekle
+  - FAQPage schema ekle (eğer FAQ içerik varsa)
+  - Author için sameAs property'si ekle (social media)
+  - Organization schema ekle
+
+- [ ] XML Sitemap iyileştir
+  - lastmod gerçek dosya değişim zamanını kullan
+  - Image sitemap oluştur
+  - Video sitemap ekle (eğer video varsa)
+  - Priority ve changefreq değerlerini optimize et
+
+- [ ] Internal linking sistemi
+  - İlgili yazılar (related posts) özelliği
+  - Tag/category bazlı otomatik linking
+  - Breadcrumb navigation geliştir
+
+- [ ] Meta description optimizasyonu
+  - Dinamik olarak önemli kelimeleri seç
+  - İlk 160 karakter yerine akıllı kesme
+  - Keyword density analizi
+
+### Orta Öncelik
+- [ ] Alt text validation geliştir
+  - Admin panelinde warning göster
+  - Yayınlanmadan önce zorunlu kıl
+  - AI ile otomatik alt text öneri (opsiyonel)
+
+- [ ] Robots.txt geliştir
+  - Dynamic robots.txt
+  - Sitemap URL'i otomatik ekle
+  - Crawl delay ayarlarını değişken yap
+
+- [ ] Pagination SEO
+  - rel="prev" ve rel="next" ekle
+  - Canonical URL'leri doğru ayarla
+  - Load more/infinite scroll için SEO düzenlemesi
+
+- [ ] hreflang tags hazırlığı
+  - Çoklu dil desteği altyapısı
+  - Dil bazlı URL yapısı
+
+### Nice to Have
+- [ ] AMP support
+  - Mobile-first için AMP versiyonları
+  - AMP validator entegrasyonu
+
+- [ ] Rich snippets geliştir
+  - Review snippets
+  - Article snippets
+  - HowTo snippets
+
+## Genel Kod Kalitesi ve Altyapı
+
+### Must Have
+- [ ] Hata yönetimi sistemi
+  - Try-catch blokları ekle
+  - Custom exception handler
+  - Graceful error handling
+
+- [ ] Logging mekanizması geliştir
+  - Structured logging
+  - Log seviyeleri (DEBUG, INFO, WARNING, ERROR)
+  - Log rotation
+
+- [ ] Environment-based configuration
+  - .env file desteği
+  - Development/staging/production ortamları
+  - Hassas bilgileri .env'de sakla
+
+- [ ] Composer ile dependency management
+  - Parsedown'ı composer ile yönet
+  - Diğer kütüphaneleri ekle
+  - Autoloading kullan
+
+### Nice to Have
+- [ ] Unit testler
+  - PHPUnit kurulumu
+  - Core fonksiyonlar için testler
+  - Test coverage hedefi: %70+
+
+- [ ] Monitoring ve Analytics
+  - Error tracking (Sentry, Rollbar)
+  - Performance monitoring
+  - Uptime monitoring
+
+- [ ] Backup ve restore sistemi geliştir
+  - Otomatik scheduled backup
+  - Cloud storage entegrasyonu (S3, Dropbox)
+  - Incremental backup desteği
+
+## Özellik Geliştirmeleri (Feature Development)
+
+- [ ] Çoklu dil desteği (i18n)
+  - Arayüz çevirisi sistemi
+  - İçerik lokalizasyonu
+  - URL yapısı (tr/, en/)
+
+- [ ] Yorum sistemi veya geri bildirim formu
+  - Spam korumalı
+  - Email notification
+  - Moderasyon paneli
+
+- [ ] Newsletter sistemi
+  - Email listesi yönetimi
+  - RSS-to-Email
+  - GDPR uyumlu
+
+- [ ] API endpoint'leri
+  - REST API
+  - JSON response
+  - API authentication
+
 ## SEO Iyilestirmeleri
 
 - [x] Robots meta etiketini sayfa tipine gore dinamik yap.
@@ -82,10 +282,6 @@
   - Baslik ve etiket eslesmelerine daha yuksek agirlik ver.
   - Basit typo toleransi (hafif fuzzy) ekle.
 
-- [ ] RSS ozellestirmeleri ekle.
-  - Ozet/tam icerik secimi.
-  - Kategori veya etikete gore feed uretimi.
-
 - [x] Tema (dark/light) kodunu sadeleÅŸtir.
   - Mevcut scripti modulerlestir ve gereksiz isleri kaldir.
   - INP acisindan daha az ana thread maliyeti hedefle.
@@ -100,7 +296,3 @@
 
 - [x] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
-
-
-
-

@@ -1,27 +1,20 @@
 <?php
-// Security headers
-header("X-Content-Type-Options: nosniff");
-header("X-Frame-Options: DENY");
-header("X-XSS-Protection: 1; mode=block");
-header("Referrer-Policy: strict-origin-when-cross-origin");
-header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
-
 // Temel URL
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
 $host = htmlspecialchars($_SERVER['SERVER_NAME'] ?? 'localhost', ENT_QUOTES, 'UTF-8');
 
-// KiÅŸisel ayarlarÄ± dahil et
+// Kişisel ayarları dahil et
 if (file_exists(__DIR__ . '/config.local.php')) {
     include_once __DIR__ . '/config.local.php';
 } else {
-    // VarsayÄ±lan ayarlar (config.local.php yoksa)
+    // Varsayılan ayarlar (config.local.php yoksa)
     define('BASE_PATH', '/blog/');
     define('SITE_NAME', 'Blog');
-    define('DEFAULT_TITLE', 'Blog - Teknoloji ve YazÄ±lÄ±m');
-    define('DEFAULT_DESCRIPTION', 'Blog yazÄ±larÄ±');
+    define('DEFAULT_TITLE', 'Blog - Teknoloji ve Yazılım');
+    define('DEFAULT_DESCRIPTION', 'Blog yazıları');
     define('GA_TRACKING_ID', '');
     define('TWITTER_USERNAME', '');
-    define('AUTHOR_NAME', 'Blog YazarÄ±');
+    define('AUTHOR_NAME', 'Blog Yazarı');
     define('AUTHOR_EMAIL', '');
     define('SOCIAL_TWITTER', '');
     define('SOCIAL_GITHUB', '');
@@ -33,8 +26,33 @@ if (file_exists(__DIR__ . '/config.local.php')) {
     define('SESSION_TIMEOUT', 1800);
     define('DEFAULT_LANGUAGE', 'tr');
     define('DEFAULT_LOCALE', 'tr_TR');
-    define('SITE_KEYWORDS', 'blog, yazÄ±lÄ±m, teknoloji');
+    define('SITE_KEYWORDS', 'blog, yazılım, teknoloji');
 }
+
+// Security headers
+header("X-Content-Type-Options: nosniff");
+header("X-Frame-Options: DENY");
+header("X-XSS-Protection: 1; mode=block");
+header("Referrer-Policy: strict-origin-when-cross-origin");
+header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
+
+// Dynamic CSP based on GA usage
+$csp_script_src = "'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://static.cloudflareinsights.com";
+$csp_connect_src = "'self' https://cdn.jsdelivr.net https://static.cloudflareinsights.com";
+
+if (defined('GA_TRACKING_ID') && !empty(trim(GA_TRACKING_ID))) {
+    $csp_script_src .= " https://www.googletagmanager.com";
+    $csp_connect_src .= " https://www.googletagmanager.com https://analytics.google.com";
+}
+
+$csp = "default-src 'self'; ";
+$csp .= "script-src " . $csp_script_src . "; ";
+$csp .= "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ";
+$csp .= "img-src 'self' data: https:; ";
+$csp .= "font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; ";
+$csp .= "connect-src " . $csp_connect_src . ";";
+
+header("Content-Security-Policy: " . $csp);
 
 // Sistem sabitleri
 define('POSTS_DIR', __DIR__ . DIRECTORY_SEPARATOR . 'posts' . DIRECTORY_SEPARATOR);
@@ -157,17 +175,17 @@ function getCachedPosts() {
     if (!CACHE_ENABLED) {
         return null;
     }
-    
+
     $cacheFile = CACHE_DIR . 'posts.json';
     $cacheTime = CACHE_DURATION;
-    
+
     if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheTime) {
         $cached = json_decode(file_get_contents($cacheFile), true);
         if ($cached !== null) {
             return $cached;
         }
     }
-    
+
     return null;
 }
 
@@ -175,7 +193,7 @@ function setCachedPosts($posts) {
     if (!CACHE_ENABLED) {
         return;
     }
-    
+
     $cacheFile = CACHE_DIR . 'posts.json';
     file_put_contents($cacheFile, json_encode($posts));
 }
@@ -247,31 +265,31 @@ function getPostContent($filePath) {
     if (!file_exists($filePath) || !is_readable($filePath)) {
         return null;
     }
-    
+
     $content = file_get_contents($filePath);
     if ($content === false) {
         return null;
     }
 
-    // Meta verileri ayÄ±rmak iÃ§in dÃ¼zenli ifade
+    // Meta verileri ayırmak için düzenli ifade
     if (preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $content, $matches)) {
         $metaRaw = trim($matches[1]);
         $body = trim($matches[2]);
 
-        // Meta verilerini ayrÄ±ÅŸtÄ±r
+        // Meta verilerini ayırıştır
         $meta = [];
         foreach (explode("\n", $metaRaw) as $line) {
             $line = trim($line);
             if (empty($line)) continue;
-            
+
             if (strpos($line, ':') !== false) {
                 [$key, $value] = explode(':', $line, 2);
                 $key = trim($key);
                 $value = trim($value);
-                
-                // Etiketler iÃ§in Ã¶zel iÅŸlem
+
+                // Etiketler için özel işlem
                 if ($key === 'tags') {
-                    // [tag1, tag2, tag3] formatÄ±nÄ± temizle
+                    // [tag1, tag2, tag3] formatını temizle
                     $value = trim($value, '[]');
                     $meta[$key] = array_map('trim', explode(',', $value));
                 } else {
@@ -293,7 +311,7 @@ function logError($message, $context = []) {
     if (!ENABLE_ERROR_LOGGING) {
         return;
     }
-    
+
     $logFile = CACHE_DIR . 'error.log';
     $timestamp = date('Y-m-d H:i:s');
     $logEntry = "[$timestamp] $message";
@@ -331,11 +349,11 @@ function clearCache() {
     $cacheFile = CACHE_DIR . 'posts.json';
     $sitemapCacheFile = CACHE_DIR . 'sitemap.xml';
     $statsCacheFile = CACHE_DIR . 'stats.json';
-    
+
     if (file_exists($cacheFile)) {
         unlink($cacheFile);
     }
-    
+
     if (file_exists($sitemapCacheFile)) {
         unlink($sitemapCacheFile);
     }
@@ -343,14 +361,14 @@ function clearCache() {
     if (file_exists($statsCacheFile)) {
         unlink($statsCacheFile);
     }
-    
+
     return true;
 }
 
 function generateSitemap() {
-    // sitemap.php dosyasÄ±nÄ± Ã§alÄ±ÅŸtÄ±rarak sitemap oluÅŸtur
+    // sitemap.php dosyasını çalıştırarak sitemap oluştur
     $sitemapCacheFile = CACHE_DIR . 'sitemap.xml';
-    
+
     // sitemap.php'nin iÃ§eriÄŸini simÃ¼le et
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
@@ -363,7 +381,7 @@ function generateSitemap() {
     $xml .= '    <priority>1.0</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // Arama sayfasÄ±
+    // Arama sayfası
     $xml .= '  <url>' . "\n";
     $xml .= '    <loc>' . BASE_URL . 'search</loc>' . "\n";
     $xml .= '    <lastmod>' . date('Y-m-d\TH:i:sP') . '</lastmod>' . "\n";
@@ -371,7 +389,7 @@ function generateSitemap() {
     $xml .= '    <priority>0.8</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // RSS sayfasÄ±
+    // RSS sayfası
     $xml .= '  <url>' . "\n";
     $xml .= '    <loc>' . BASE_URL . 'rss</loc>' . "\n";
     $xml .= '    <lastmod>' . date('Y-m-d\TH:i:sP') . '</lastmod>' . "\n";
@@ -379,7 +397,7 @@ function generateSitemap() {
     $xml .= '    <priority>0.9</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // Blog yazÄ±larÄ±
+    // Blog yazıları
     $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
     $categories = [];
     $tags = [];
@@ -388,13 +406,13 @@ function generateSitemap() {
         if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
             $postFile = POSTS_DIR . $post;
             $postData = getPostContent($postFile);
-            
+
             if ($postData && isPostPublished($postData)) {
                 $slug = pathinfo($post, PATHINFO_FILENAME);
                 $lastModified = filemtime($postFile);
                 $category = strtolower($postData['meta']['category'] ?? 'genel');
                 $postTags = $postData['meta']['tags'] ?? [];
-                
+
                 // Kategori ve etiketleri topla
                 if (!in_array($category, $categories)) {
                     $categories[] = $category;
@@ -404,14 +422,14 @@ function generateSitemap() {
                         $tags[] = $tag;
                     }
                 }
-                
+
                 $xml .= '  <url>' . "\n";
                 $xml .= '    <loc>' . BASE_URL . $slug . '</loc>' . "\n";
                 $xml .= '    <lastmod>' . date('Y-m-d\TH:i:sP', $lastModified) . '</lastmod>' . "\n";
                 $xml .= '    <changefreq>monthly</changefreq>' . "\n";
                 $xml .= '    <priority>0.8</priority>' . "\n";
-                
-                // News sitemap iÃ§in ek bilgiler
+
+                // News sitemap için ek bilgiler
                 $xml .= '    <news:news>' . "\n";
                 $xml .= '      <news:publication>' . "\n";
                 $xml .= '        <news:name>' . htmlspecialchars(SITE_NAME) . '</news:name>' . "\n";
@@ -421,13 +439,13 @@ function generateSitemap() {
                 $xml .= '      <news:title>' . htmlspecialchars($postData['meta']['title']) . '</news:title>' . "\n";
                 $xml .= '      <news:keywords>' . htmlspecialchars(implode(', ', $postTags)) . '</news:keywords>' . "\n";
                 $xml .= '    </news:news>' . "\n";
-                
+
                 $xml .= '  </url>' . "\n";
             }
         }
     }
 
-    // Kategori sayfalarÄ±
+    // Kategori sayfaları
     foreach ($categories as $category) {
         $xml .= '  <url>' . "\n";
         $xml .= '    <loc>' . BASE_URL . 'cat/' . rawurlencode($category) . '</loc>' . "\n";
@@ -437,7 +455,7 @@ function generateSitemap() {
         $xml .= '  </url>' . "\n";
     }
 
-    // Etiket sayfalarÄ±
+    // Etiket sayfaları
     foreach ($tags as $tag) {
         $xml .= '  <url>' . "\n";
         $xml .= '    <loc>' . BASE_URL . 'tag/' . rawurlencode($tag) . '</loc>' . "\n";
@@ -453,30 +471,30 @@ function generateSitemap() {
     if (CACHE_ENABLED) {
         return file_put_contents($sitemapCacheFile, $xml);
     }
-    
+
     return false;
 }
 
 function parsePost($content, $slug) {
-    // Meta verileri ayÄ±rmak iÃ§in dÃ¼zenli ifade
+    // Meta verileri ayırmak için düzenli ifade
     if (preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $content, $matches)) {
         $metaRaw = trim($matches[1]);
         $body = trim($matches[2]);
 
-        // Meta verilerini ayrÄ±ÅŸtÄ±r
+        // Meta verilerini ayırıştır
         $meta = [];
         foreach (explode("\n", $metaRaw) as $line) {
             $line = trim($line);
             if (empty($line)) continue;
-            
+
             if (strpos($line, ':') !== false) {
                 [$key, $value] = explode(':', $line, 2);
                 $key = trim($key);
                 $value = trim($value);
-                
-                // Etiketler iÃ§in Ã¶zel iÅŸlem
+
+                // Etiketler için özel işlem
                 if ($key === 'tags') {
-                    // [tag1, tag2, tag3] formatÄ±nÄ± temizle
+                    // [tag1, tag2, tag3] formatını temizle
                     $value = trim($value, '[]');
                     $meta[$key] = array_map('trim', explode(',', $value));
                 } else {
@@ -533,7 +551,7 @@ function getCacheSize() {
     if (!is_dir(CACHE_DIR)) {
         return '0 bytes';
     }
-    
+
     $size = 0;
     $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator(CACHE_DIR));
     foreach ($files as $file) {
@@ -541,7 +559,7 @@ function getCacheSize() {
             $size += $file->getSize();
         }
     }
-    
+
     if ($size >= 1073741824) {
         return number_format($size / 1073741824, 2) . ' GB';
     } elseif ($size >= 1048576) {

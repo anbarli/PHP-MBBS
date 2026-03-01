@@ -2,8 +2,8 @@
     'use strict';
 
     const addBreadcrumbData = () => {
-        const breadcrumbLinks = document.querySelectorAll('.breadcrumb-item a');
-        if (!breadcrumbLinks.length) {
+        const breadcrumbItems = document.querySelectorAll('.breadcrumb-item');
+        if (!breadcrumbItems.length) {
             return;
         }
 
@@ -13,13 +13,26 @@
             itemListElement: []
         };
 
-        breadcrumbLinks.forEach((link, index) => {
-            breadcrumbData.itemListElement.push({
-                '@type': 'ListItem',
-                position: index + 1,
-                name: (link.textContent || '').trim(),
-                item: link.href
-            });
+        breadcrumbItems.forEach((item, index) => {
+            const link = item.querySelector('a');
+            const isActive = item.classList.contains('active');
+
+            if (link) {
+                // Link varsa (aktif değilse)
+                breadcrumbData.itemListElement.push({
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    name: (link.textContent || '').trim(),
+                    item: link.href
+                });
+            } else if (isActive) {
+                // Aktif item (link yok, sadece text)
+                breadcrumbData.itemListElement.push({
+                    '@type': 'ListItem',
+                    position: index + 1,
+                    name: (item.textContent || '').trim()
+                });
+            }
         });
 
         const script = document.createElement('script');

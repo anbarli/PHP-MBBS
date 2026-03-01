@@ -22,6 +22,10 @@
     --admin-radius-sm: 0.5rem;
     --admin-radius-md: 0.75rem;
     --admin-radius-lg: 1rem;
+
+    /* Sidebar dimensions */
+    --sidebar-width: 240px;
+    --sidebar-collapsed-width: 70px;
 }
 
 html {
@@ -62,19 +66,116 @@ small, .small, .form-text, .text-muted {
     color: var(--admin-muted) !important;
 }
 
-.sidebar {
-    min-height: 100vh;
-    background: linear-gradient(180deg, var(--admin-sidebar-1), var(--admin-sidebar-2));
+/* Sidebar Container */
+.sidebar-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    z-index: 1000;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
+.sidebar-wrapper.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.sidebar {
+    min-height: 100vh;
+    height: 100%;
+    background: linear-gradient(180deg, var(--admin-sidebar-1), var(--admin-sidebar-2));
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Toggle Button */
+.sidebar-toggle {
+    position: absolute;
+    top: 15px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    background: var(--admin-primary);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.sidebar-toggle:hover {
+    background: var(--admin-primary-strong);
+    transform: scale(1.1);
+}
+
+.sidebar-toggle i {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-wrapper.collapsed .sidebar-toggle i {
+    transform: rotate(180deg);
+}
+
+/* Sidebar Header */
+.sidebar-header {
+    padding: 1rem;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 0.5rem;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar-wrapper.collapsed .sidebar-header {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Nav Links */
 .sidebar .nav-link {
     color: #dce3ea;
     border-radius: var(--admin-radius-sm);
-    margin: 0.2rem 0;
-    padding: 0.55rem 0.75rem;
+    margin: 0.2rem 0.5rem;
+    padding: 0.7rem 0.75rem;
     font-size: var(--admin-fs-sm);
     font-weight: 600;
     transition: background-color 0.2s ease, color 0.2s ease;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1rem;
+    min-width: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar .nav-link .link-text {
+    margin-left: 0.75rem;
+    transition: opacity 0.2s ease;
+}
+
+.sidebar-wrapper.collapsed .sidebar .nav-link .link-text {
+    opacity: 0;
+    width: 0;
+    margin-left: 0;
+}
+
+.sidebar-wrapper.collapsed .sidebar .nav-link {
+    justify-content: center;
+    padding: 0.7rem 0.5rem;
 }
 
 .sidebar .nav-link:hover,
@@ -99,6 +200,18 @@ small, .small, .form-text, .text-muted {
     text-align: left;
     border: 0;
     background: transparent;
+}
+
+/* Main Content Adjustment */
+.admin-main-wrapper {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    width: calc(100% - var(--sidebar-width));
+}
+
+.sidebar-wrapper.collapsed ~ .admin-main-wrapper {
+    margin-left: var(--sidebar-collapsed-width);
+    width: calc(100% - var(--sidebar-collapsed-width));
 }
 
 .main-content {
@@ -407,6 +520,24 @@ body.dark-mode .summary-item {
 }
 
 @media (max-width: 991px) {
+    .sidebar-wrapper {
+        width: var(--sidebar-collapsed-width);
+    }
+
+    .sidebar-wrapper.mobile-open {
+        width: var(--sidebar-width);
+    }
+
+    .admin-main-wrapper {
+        margin-left: var(--sidebar-collapsed-width);
+        width: calc(100% - var(--sidebar-collapsed-width));
+    }
+
+    .sidebar-wrapper.mobile-open ~ .admin-main-wrapper {
+        margin-left: var(--sidebar-width);
+        width: calc(100% - var(--sidebar-width));
+    }
+
     .sidebar {
         min-height: auto;
     }
@@ -417,5 +548,28 @@ body.dark-mode .summary-item {
 
     .settings-sticky-stack {
         position: static;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar-wrapper {
+        transform: translateX(-100%);
+    }
+
+    .sidebar-wrapper.mobile-open {
+        transform: translateX(0);
+        width: 80%;
+        max-width: 280px;
+    }
+
+    .admin-main-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .sidebar-toggle {
+        right: auto;
+        left: 10px;
+        top: 15px;
     }
 }

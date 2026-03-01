@@ -33,25 +33,25 @@ function optimizeMarkdownImages($htmlContent) {
     }, $htmlContent);
 }
 
-$seoTitle = 'YazÃ„Â± BulunamadÃ„Â± - ' . SITE_NAME;
-$seoDescription = 'Bu yazÃ„Â± bulunamadÃ„Â±. FarklÃ„Â± bir yazÃ„Â± deneyebilirsiniz.';
+$seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
+$seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
 
 
 $slug = isset($_GET['slug']) ? $_GET['slug'] : '';
-$slug = preg_replace('/[^a-zA-Z0-9_-]/', '', $slug); // Sadece geÃƒÂ§erli karakterler
+$slug = preg_replace('/[^a-zA-Z0-9_-]/', '', $slug); // Sadece geçerli karakterler
 if (strlen($slug) < 1 || strlen($slug) > 120) {
-    header('HTTP/1.1 400 Bad Request'); exit('GeÃƒÂ§ersiz slug uzunluÃ„Å¸u.');
+    header('HTTP/1.1 400 Bad Request'); exit('Geçersiz slug uzunluğu.');
 }
 
 $postFile = POSTS_DIR . $slug . '.md';
 if (!file_exists($postFile) || !is_readable($postFile)) {
-    header('HTTP/1.1 404 Not Found'); exit('YazÃ„Â± bulunamadÃ„Â±.');
+    header('HTTP/1.1 404 Not Found'); exit('Yazı bulunamadı.');
 }
 
 
 $postData = getPostContent($postFile);
 if (!$postData || !isPostPublished($postData)) {
-    header('HTTP/1.1 404 Not Found'); exit('YazÃƒâ€Ã‚Â± bulunamadÃƒâ€Ã‚Â±.');
+    header('HTTP/1.1 404 Not Found'); exit('Yazı bulunamadı.');
 }
 
 if ($postData) {
@@ -59,11 +59,11 @@ if ($postData) {
     $category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
     $tags = $postData['meta']['tags'] ?? [];
     $date = htmlspecialchars($postData['meta']['date']);
-    // SEO iÃƒÂ§in deÃ„Å¸iÃ…Å¸kenler
+    // SEO için değişkenler
     $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
-    // Daha iyi meta description oluÃ…Å¸tur
+    // Daha iyi meta description oluştur
     $contentText = strip_tags($postData['content']);
-    $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boÃ…Å¸luklarÃ„Â± temizle
+    $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
     $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
     if (strlen($contentText) > 160) {
         $seoDescription .= '...';
@@ -96,63 +96,63 @@ if (isset($postData) && $postData) {
     ';
 }
 
-// Ã„Â°ÃƒÂ§eriÃ„Å¸i GÃƒÂ¶ster
+// İçeriği Göster
 if (isset($_GET['slug']) && !empty($slug)) {
-    
+
     if (file_exists($postFile) && isset($postData) && $postData) {
-		
+
 		$body = $postData['content'];
 
-		// Markdown iÃƒÂ§eriÃ„Å¸i HTML'ye dÃƒÂ¶nÃƒÂ¼Ã…Å¸tÃƒÂ¼r
+		// Markdown içeriği HTML'ye dönüştür
 		require_once 'includes/Parsedown.php';
 		$Parsedown = new Parsedown();
         $Parsedown->setSafeMode(true);
 		$htmlContent = $Parsedown->text($body);
 		$htmlContent = optimizeMarkdownImages($htmlContent);
-		
-		// Ã„Â°ÃƒÂ§erik - Semantic HTML ile
+
+		// İçerik - Semantic HTML ile
         echo '<article class="markdown-body p-4 mb-4">' . $htmlContent . '</article>';
 
-        // Sosyal Medya PaylaÃ…Å¸Ã„Â±m ButonlarÃ„Â±
+        // Sosyal Medya Paylaşım Butonları
         $shareUrl = BASE_URL . $slug;
         $shareTitle = $title;
         echo '<div class="mb-4 p-3 bg-light rounded share-panel">';
         echo '<h6 class="mb-3"><i class="bi bi-share me-2"></i>Bu yazıyı paylaş:</h6>';
         echo '<div class="d-flex flex-wrap gap-2">';
-        
+
         // Twitter/X
         echo '<a href="https://twitter.com/intent/tweet?text=' . rawurlencode($shareTitle) . '&url=' . rawurlencode($shareUrl) . '" target="_blank" rel="noopener" class="btn btn-outline-dark btn-sm share-btn" title="Twitter/X\'te paylaş">';
         echo '<i class="bi bi-twitter-x me-1"></i>Twitter';
         echo '</a>';
-        
+
         // Facebook
         echo '<a href="https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($shareUrl) . '" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm share-btn" title="Facebook\'ta paylaş">';
         echo '<i class="bi bi-facebook me-1"></i>Facebook';
         echo '</a>';
-        
+
         // LinkedIn
         echo '<a href="https://www.linkedin.com/shareArticle?mini=true&url=' . rawurlencode($shareUrl) . '&title=' . rawurlencode($shareTitle) . '" target="_blank" rel="noopener" class="btn btn-outline-primary btn-sm share-btn" title="LinkedIn\'de paylaş">';
         echo '<i class="bi bi-linkedin me-1"></i>LinkedIn';
         echo '</a>';
-        
+
         // WhatsApp
         echo '<a href="https://wa.me/?text=' . rawurlencode($shareTitle . ' ' . $shareUrl) . '" target="_blank" rel="noopener" class="btn btn-outline-success btn-sm share-btn" title="WhatsApp\'ta paylaş">';
         echo '<i class="bi bi-whatsapp me-1"></i>WhatsApp';
         echo '</a>';
-        
+
         // Email
         echo '<a href="mailto:?subject=' . rawurlencode($shareTitle) . '&body=' . rawurlencode($shareTitle . ' - ' . $shareUrl) . '" class="btn btn-outline-secondary btn-sm share-btn" title="E-posta ile paylaş">';
         echo '<i class="bi bi-envelope me-1"></i>E-posta';
         echo '</a>';
-        
+
         echo '</div>';
         echo '</div>';
-		
+
 		// Metadata
 		echo '
 			<footer class="alert alert-secondary">
 				<strong>Tarih:</strong> ' . $date;
-				
+
 		if (!empty($category)) {
 			echo ' / <strong>Kategori:</strong> <a href="' . BASE_PATH . 'cat/' . strtolower(rawurlencode($category)) . '" class="text-dark text-decoration-none">' . htmlspecialchars(ucwords(strtolower($category))) . '</a>';
 		}
@@ -167,7 +167,7 @@ if (isset($_GET['slug']) && !empty($slug)) {
 		echo '
 			</footer>';
 
-		
+
     } else {
         echo '<div class="alert alert-warning">YazÃ„Â± bulunamadÃ„Â±.</div>';
     }

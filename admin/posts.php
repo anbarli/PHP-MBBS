@@ -31,7 +31,7 @@ $postFilesWithDates = getCachedPosts();
 if ($postFilesWithDates === null || empty($postFilesWithDates)) {
     $postFilesWithDates = [];
     $postFiles = array_diff(scandir(POSTS_DIR), array('..', '.'));
-    
+
     foreach ($postFiles as $post) {
         if (pathinfo($post, PATHINFO_EXTENSION) === 'md') {
             $postFile = POSTS_DIR . $post;
@@ -48,7 +48,7 @@ if ($postFilesWithDates === null || empty($postFilesWithDates)) {
     usort($postFilesWithDates, function ($a, $b) {
         return $b['lastModified'] - $a['lastModified'];
     });
-    
+
     // Cache'e kaydet
     if (!empty($postFilesWithDates)) {
         setCachedPosts($postFilesWithDates);
@@ -61,11 +61,11 @@ foreach ($postFilesWithDates as $postData) {
     if (!isset($postData['file'], $postData['slug'], $postData['lastModified'])) {
         continue;
     }
-    
+
     $postFile = $postData['file'];
     $slug = $postData['slug'];
     $contentData = getPostContent($postFile);
-    
+
     if ($contentData && isset($contentData['meta'])) {
         $posts[] = [
             'slug' => $slug,
@@ -124,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
             $messageType = 'danger';
         } else {
     $postFile = POSTS_DIR . $slug . '.md';
-    
+
     if (file_exists($postFile)) {
         if (unlink($postFile)) {
             // Cache'i temizle
@@ -150,54 +150,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Yazı Yönetimi - <?php echo SITE_NAME; ?> Admin</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
 <link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
     <link rel="stylesheet" href="<?php echo assetPath('admin/admin.css'); ?>">
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 col-lg-2 px-0">
-                <div class="sidebar p-3">
-                    <div class="text-center mb-4">
-                        <h5 class="text-white">
-                            <i class="bi bi-shield-lock"></i> Admin Panel
-                        </h5>
-                        <small class="text-white-50"><?php echo SITE_NAME; ?></small>
-                    </div>
-                    
-                    <nav class="nav flex-column">
-                        <a class="nav-link" href="dashboard.php">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                        <a class="nav-link active" href="posts.php">
-                            <i class="bi bi-file-text"></i> Yazılar
-                        </a>
-                        <a class="nav-link" href="categories.php">
-                            <i class="bi bi-folder"></i> Kategoriler
-                        </a>
-                        <a class="nav-link" href="settings.php">
-                            <i class="bi bi-gear"></i> Ayarlar
-                        </a>
-                        <hr class="text-white-50">
-                        <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
-                            <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
-                        </a>
-                        <form method="POST" action="dashboard.php" class="sidebar-logout-form">
-                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                            <input type="hidden" name="action" value="logout">
-                            <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
-                            </button>
-                        </form>
-                    </nav>
-                </div>
+    <!-- Sidebar Wrapper -->
+    <div class="sidebar-wrapper">
+        <button class="sidebar-toggle" type="button" title="Menüyü Aç/Kapat">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="sidebar p-3">
+            <div class="sidebar-header">
+                <h5 class="text-white mb-1">
+                    <i class="bi bi-shield-lock"></i> Admin Panel
+                </h5>
+                <small class="text-white-50"><?php echo SITE_NAME; ?></small>
             </div>
-            
-            <!-- Main Content -->
-            <div class="col-md-9 col-lg-10 px-0">
+
+            <nav class="nav flex-column">
+                <a class="nav-link" href="dashboard.php">
+                    <i class="bi bi-speedometer2"></i>
+                    <span class="link-text">Dashboard</span>
+                </a>
+                <a class="nav-link active" href="posts.php">
+                    <i class="bi bi-file-text"></i>
+                    <span class="link-text">Yazılar</span>
+                </a>
+                <a class="nav-link" href="categories.php">
+                    <i class="bi bi-folder"></i>
+                    <span class="link-text">Kategoriler</span>
+                </a>
+                <a class="nav-link" href="settings.php">
+                    <i class="bi bi-gear"></i>
+                    <span class="link-text">Ayarlar</span>
+                </a>
+                <hr class="text-white-50">
+                <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
+                    <i class="bi bi-box-arrow-up-right"></i>
+                    <span class="link-text">Siteyi Görüntüle</span>
+                </a>
+                <form method="POST" action="dashboard.php" class="sidebar-logout-form">
+                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                    <input type="hidden" name="action" value="logout">
+                    <button type="submit" class="nav-link btn btn-link nav-link-logout">
+                        <i class="bi bi-box-arrow-right"></i>
+                        <span class="link-text">Çıkış Yap</span>
+                    </button>
+                </form>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Main Content Wrapper -->
+    <div class="admin-main-wrapper">
                 <div class="main-content">
                     <!-- Top Navbar -->
                     <nav class="navbar navbar-expand-lg">
@@ -210,7 +217,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                             </div>
                         </div>
                     </nav>
-                    
+
                     <!-- Content -->
                     <div class="p-4">
                         <?php if ($message): ?>
@@ -219,16 +226,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         <?php endif; ?>
-                        
+
                         <?php if (!empty($selectedCategory)): ?>
                             <div class="alert alert-info alert-dismissible fade show" role="alert">
-                                <i class="bi bi-funnel"></i> 
-                                <strong><?php echo htmlspecialchars($selectedCategory); ?></strong> kategorisindeki yazılar gösteriliyor. 
+                                <i class="bi bi-funnel"></i>
+                                <strong><?php echo htmlspecialchars($selectedCategory); ?></strong> kategorisindeki yazılar gösteriliyor.
                                 <a href="posts.php" class="alert-link">Tüm yazıları görüntüle</a>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         <?php endif; ?>
-                        
+
                         <!-- Posts Table -->
                         <div class="card">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -239,7 +246,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                     <?php if (!empty($categories)): ?>
                                         <div class="dropdown">
                                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                                <i class="bi bi-funnel"></i> 
+                                                <i class="bi bi-funnel"></i>
                                                 <?php echo !empty($selectedCategory) ? $selectedCategory : 'Tüm Kategoriler'; ?>
                                             </button>
                                             <ul class="dropdown-menu">
@@ -247,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                 <li><hr class="dropdown-divider"></li>
                                                 <?php foreach ($categories as $category): ?>
                                                     <li>
-                                                        <a class="dropdown-item <?php echo $selectedCategory === $category ? 'active' : ''; ?>" 
+                                                        <a class="dropdown-item <?php echo $selectedCategory === $category ? 'active' : ''; ?>"
                                                            href="posts.php?category=<?php echo urlencode($category); ?>">
                                                             <?php echo htmlspecialchars($category); ?>
                                                         </a>
@@ -306,7 +313,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                         <td>
                                                             <?php $status = normalizePostStatus($post['meta']['status'] ?? 'published'); ?>
                                                             <span class="badge <?php echo $status === 'draft' ? 'bg-warning text-dark' : 'bg-success'; ?>">
-                                                                <?php echo $status === 'draft' ? 'Taslak' : 'Yayinda'; ?>
+                                                                <?php echo $status === 'draft' ? 'Taslak' : 'Yayında'; ?>
                                                             </span>
                                                         </td>
                                                         <td>
@@ -328,8 +335,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                         </td>
                                                         <td>
                                                             <div class="btn-group" role="group">
-                                                                <a href="edit_post.php?slug=<?php echo $post['slug']; ?>" 
-                                                                   class="btn btn-sm btn-outline-primary btn-action" 
+                                                                <a href="edit_post.php?slug=<?php echo $post['slug']; ?>"
+                                                                   class="btn btn-sm btn-outline-primary btn-action"
                                                                    title="Düzenle">
                                                                     <i class="bi bi-pencil"></i>
                                                                 </a>
@@ -337,7 +344,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                                    target="_blank" class="btn btn-sm btn-outline-info btn-action">
                                                                     <i class="bi bi-eye"></i>
                                                                 </a>
-                                                                <button type="button" 
+                                                                <button type="button"
                                                                         class="btn btn-sm btn-outline-danger btn-action"
                                                                         onclick="deletePost('<?php echo $post['slug']; ?>', '<?php echo htmlspecialchars($post['meta']['title'] ?? 'Bu yazı'); ?>')"
                                                                         title="Sil">
@@ -363,8 +370,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
         <input type="hidden" name="action" value="delete_post">
         <input type="hidden" name="slug" id="deletePostSlug">
     </form>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="<?php echo assetPath('admin/sidebar.js'); ?>"></script>
     <script>
         function deletePost(slug, title) {
             if (confirm(`"${title}" yazısını silmek istediğinizden emin misiniz?\n\nBu işlem geri alınamaz!`)) {
@@ -373,7 +381,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                 form.submit();
             }
         }
-        
+
         // Auto-hide alerts
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
@@ -384,5 +392,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
         }, 5000);
     </script>
 </body>
-</html> 
+</html>
 

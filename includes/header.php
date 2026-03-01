@@ -9,7 +9,7 @@
 	if (!isset($host)) {
 		$host = htmlspecialchars($_SERVER['SERVER_NAME'] ?? 'localhost', ENT_QUOTES, 'UTF-8');
 	}
-	
+
 	// Ensure SEO variables are defined
 	if (!isset($seoTitle)) {
 		$seoTitle = DEFAULT_TITLE;
@@ -26,17 +26,17 @@
 	if (!isset($loadMarkdownCss)) {
 		$loadMarkdownCss = false;
 	}
-	
+
 	if (!function_exists('buildNormalizedCanonicalUrl')) {
 		function buildNormalizedCanonicalUrl($protocol, $host, $requestUri) {
 			$path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
 			$query = parse_url($requestUri, PHP_URL_QUERY) ?: '';
 			$params = [];
-			
+
 			if ($query !== '') {
 				parse_str($query, $params);
 			}
-			
+
 			foreach ($params as $key => $value) {
 				$lowerKey = strtolower((string)$key);
 				$isTrackingParam = strpos($lowerKey, 'utm_') === 0 || in_array($lowerKey, [
@@ -48,31 +48,31 @@
 					'_hsenc',
 					'_hsmi'
 				], true);
-				
+
 				if ($isTrackingParam) {
 					unset($params[$key]);
 				}
 			}
-			
+
 			if (!empty($params)) {
 				ksort($params);
 			}
-			
+
 			$normalizedQuery = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
 			return $protocol . $host . $path . ($normalizedQuery !== '' ? '?' . $normalizedQuery : '');
 		}
 	}
-	
+
 	if (!isset($seoCanonical) || trim((string)$seoCanonical) === '') {
 		$seoCanonical = buildNormalizedCanonicalUrl($protocol, $host, $_SERVER['REQUEST_URI'] ?? '/');
 	}
-	
+
 	// Generate keywords from tags if available
 	$seoKeywords = '';
 	if (isset($tags) && is_array($tags)) {
 		$seoKeywords = implode(', ', $tags);
 	}
-	
+
 	$seoTitle = preg_replace('/\s+/', ' ', $seoTitle);
 	$seoTitle = trim(htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoDescription = preg_replace('/\s+/', ' ', $seoDescription);
@@ -92,7 +92,7 @@
 	<meta name="revisit-after" content="7 days">
 	<meta name="distribution" content="global">
 	<meta name="rating" content="general">
-	
+
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="article">
 	<meta property="og:url" content="<?php echo BASE_URL . "/" . ($_GET['slug'] ?? ''); ?>">
@@ -109,7 +109,7 @@
 	<?php if (isset($tags) && is_array($tags)): foreach($tags as $tag): ?>
 	<meta property="article:tag" content="<?php echo htmlspecialchars($tag); ?>">
 	<?php endforeach; endif; ?>
-	
+
 	<!-- Twitter -->
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="<?php echo htmlspecialchars($seoTitle); ?>">
@@ -117,14 +117,14 @@
 	<?php if (!empty(TWITTER_USERNAME)): ?>
 	<meta name="twitter:site" content="<?php echo TWITTER_USERNAME; ?>">
 	<?php endif; ?>
-	
+
 	<!-- Structured Data -->
 	<?php
 	$structuredData = [
 		'@context' => 'https://schema.org',
 		'@type' => $structuredDataType
 	];
-	
+
 	if ($structuredDataType === 'BlogPosting') {
 		$structuredData['headline'] = $seoTitle;
 		$structuredData['description'] = $seoDescription;
@@ -178,46 +178,49 @@
 	}
 	?>
 	<script type="application/ld+json"><?php echo json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></script>
-	
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"/>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous"/>
 	<?php if ($loadMarkdownCss): ?>
-	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css" integrity="sha512-VE/TgMJnr0xqgrRN5c5DVDX7f7Q3rHRqcq9qHeBxIrHQrLPnM0i6cLJbsBxoQ0VxYUHT+B4Xmo854R3Z0CnSfmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 	<?php endif; ?>
     <link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
-	
+
 	<!-- Performance Optimizations -->
-	<link rel="preconnect" href="https://cdn.jsdelivr.net">
-	<link rel="preconnect" href="https://cdnjs.cloudflare.com">
+	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+	<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
 	<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 	<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
-	<?php if (!empty(GA_TRACKING_ID)): ?>
+	<?php if (defined('GA_TRACKING_ID') && !empty(trim(GA_TRACKING_ID))): ?>
 	<link rel="preconnect" href="https://www.googletagmanager.com">
+	<link rel="preconnect" href="https://analytics.google.com">
 	<link rel="dns-prefetch" href="//www.googletagmanager.com">
+	<link rel="dns-prefetch" href="//analytics.google.com">
 	<?php endif; ?>
-	
+
 	<!-- Canonical and alternate links -->
 	<link rel="canonical" href="<?php echo $seoCanonical; ?>">
 	<link rel="alternate" type="application/rss+xml" title="<?php echo SITE_NAME; ?> RSS" href="<?php echo BASE_URL; ?>rss">
 	<link rel="sitemap" type="application/xml" title="Sitemap" href="<?php echo BASE_URL; ?>sitemap.xml">
-	
+
 	<!-- Additional meta tags for better SEO -->
 	<meta name="theme-color" content="#212529">
 	<meta name="msapplication-TileColor" content="#212529">
+	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 	<meta name="apple-mobile-web-app-title" content="<?php echo SITE_NAME; ?>">
-	
+
 	<!-- Performance and security headers -->
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="format-detection" content="telephone=no">
-	
-	<?php if (!empty(GA_TRACKING_ID)): ?>
+
+	<?php if (defined('GA_TRACKING_ID') && !empty(trim(GA_TRACKING_ID))): ?>
 	<!-- Google Analytics -->
 	<script async src="https://www.googletagmanager.com/gtag/js?id=<?php echo GA_TRACKING_ID; ?>"></script>
 	<script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","<?php echo GA_TRACKING_ID; ?>")</script>
 	<?php endif; ?>
-	
+
 	<!-- Fallback dark mode styles in case CSS file doesn't load -->
 	<style>
 		/* Palette: 3A015C / 32004F / 220135 / 190028 / 11001C */
