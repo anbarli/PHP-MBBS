@@ -17,6 +17,9 @@
 	if (!isset($seoDescription)) {
 		$seoDescription = DEFAULT_DESCRIPTION;
 	}
+	if (!isset($seoRobots) || trim((string)$seoRobots) === '') {
+		$seoRobots = 'index, follow';
+	}
 	
 	// Generate keywords from tags if available
 	$seoKeywords = '';
@@ -29,6 +32,7 @@
 	$seoDescription = preg_replace('/\s+/', ' ', $seoDescription);
 	$seoDescription = trim(htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoKeywords = trim(htmlspecialchars($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoRobots = trim(htmlspecialchars($seoRobots, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,7 +40,7 @@
     <meta name="description" content="<?php echo htmlspecialchars($seoDescription); ?>">
 	<meta name="keywords" content="<?php echo htmlspecialchars($seoKeywords); ?>">
 	<meta name="author" content="<?php echo AUTHOR_NAME; ?>">
-	<meta name="robots" content="index, follow">
+	<meta name="robots" content="<?php echo $seoRobots; ?>">
 	<meta name="language" content="<?php echo DEFAULT_LANGUAGE; ?>">
 	<meta name="revisit-after" content="7 days">
 	<meta name="distribution" content="global">
@@ -110,10 +114,12 @@
 	<!-- Performance Optimizations -->
 	<link rel="preconnect" href="https://cdn.jsdelivr.net">
 	<link rel="preconnect" href="https://cdnjs.cloudflare.com">
-	<link rel="preconnect" href="https://www.googletagmanager.com">
 	<link rel="dns-prefetch" href="//cdn.jsdelivr.net">
 	<link rel="dns-prefetch" href="//cdnjs.cloudflare.com">
+	<?php if (!empty(GA_TRACKING_ID)): ?>
+	<link rel="preconnect" href="https://www.googletagmanager.com">
 	<link rel="dns-prefetch" href="//www.googletagmanager.com">
+	<?php endif; ?>
 	
 	<!-- Preload critical resources -->
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
@@ -220,6 +226,7 @@ $categoryList = getCategoryListForMenu();
     </div>
 </nav>
 
-<div class="container p-2">
-	<div class="row g-4 py-5">  
-		<div class="col">
+<main id="main-content">
+	<div class="container p-2">
+		<div class="row g-4 py-5">
+			<div class="col">

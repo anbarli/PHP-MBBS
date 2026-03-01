@@ -1,6 +1,7 @@
 		</div>
 	</div>
 </div>
+</main>
 
 <footer class="footer mt-auto py-3 bg-body-secondary">
     <div class="container">
@@ -59,46 +60,32 @@
 (function() {
     'use strict';
     
-    console.log('Dark mode script loaded');
-    
     // Check for saved theme preference or default to light mode
     const currentTheme = localStorage.getItem('theme') || 'light';
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    console.log('Current theme from localStorage:', currentTheme);
-    console.log('Prefers dark mode:', prefersDark);
-    
     // Set initial theme
     if (currentTheme === 'dark' || (!currentTheme && prefersDark)) {
-        console.log('Setting dark mode on page load');
         document.body.classList.add('dark-mode');
         updateDarkModeIcon(true);
     }
     
     // Dark mode toggle functionality
     const darkModeToggle = document.getElementById('darkModeToggle');
-    console.log('Dark mode toggle button found:', !!darkModeToggle);
     
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', function() {
-            console.log('Dark mode toggle clicked');
             const isDark = document.body.classList.contains('dark-mode');
             const newTheme = isDark ? 'light' : 'dark';
             
-            console.log('Current isDark:', isDark, 'New theme:', newTheme);
-            
             if (isDark) {
                 document.body.classList.remove('dark-mode');
-                console.log('Removed dark-mode class');
             } else {
                 document.body.classList.add('dark-mode');
-                console.log('Added dark-mode class');
             }
             
             localStorage.setItem('theme', newTheme);
             updateDarkModeIcon(!isDark);
-            
-            console.log('Theme saved to localStorage:', newTheme);
         });
     }
     
@@ -106,14 +93,9 @@
         const moonIcon = document.getElementById('moonIcon');
         const sunIcon = document.getElementById('sunIcon');
         
-        console.log('Updating icons - isDark:', isDark);
-        console.log('Moon icon found:', !!moonIcon);
-        console.log('Sun icon found:', !!sunIcon);
-        
         if (moonIcon && sunIcon) {
             moonIcon.style.display = isDark ? 'none' : 'inline';
             sunIcon.style.display = isDark ? 'inline' : 'none';
-            console.log('Icons updated successfully');
         }
     }
     
@@ -140,12 +122,7 @@
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
-                .then(registration => {
-                    console.log('SW registered: ', registration);
-                })
-                .catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
-                });
+                .catch(() => {});
         });
     }
     
@@ -284,8 +261,6 @@
     } else {
         addBreadcrumbData();
     }
-    
-    console.log('Dark mode script initialization complete');
     
 })();
 </script>

@@ -3,6 +3,7 @@ include('config.php');
 
 $seoTitle = 'Sayfa Bulunamadı - ' . SITE_NAME;
 $seoDescription = 'Aradığınız sayfa bulunamadı. Ana sayfaya dönmek için tıklayın.';
+$seoRobots = 'noindex, follow';
 
 include('includes/header.php');
 ?>

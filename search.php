@@ -6,6 +6,7 @@ $searchQuery = htmlspecialchars($searchQuery, ENT_QUOTES, 'UTF-8');
 
 $seoTitle = 'Arama - ' . SITE_NAME;
 $seoDescription = 'Blog yazılarında arama yapın.';
+$seoRobots = 'noindex, follow';
 
 if (!empty($searchQuery)) {
     $seoTitle = '"' . $searchQuery . '" için arama sonuçları - ' . SITE_NAME;
@@ -17,7 +18,7 @@ include('includes/header.php');
 echo '<div class="alert alert-secondary">Blog yazılarında arama yapın. Yazı başlığı, içerik, etiket veya kategori ile arama yapabilirsiniz.</div>';
 
 if (!empty($searchQuery)) {
-    echo '<h3>"' . htmlspecialchars($searchQuery) . '" için Arama Sonuçları</h3>';
+    echo '<h1>"' . htmlspecialchars($searchQuery) . '" için Arama Sonuçları</h1>';
     
     // Search functionality
     $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
@@ -113,7 +114,7 @@ if (!empty($searchQuery)) {
         echo '</ul>';
     }
 } else {
-    echo '<h3>Blog Arama</h3>';
+    echo '<h1>Blog Arama</h1>';
     echo '<div class="alert alert-info">Arama yapmak için yukarıdaki arama kutusunu kullanın.</div>';
 }
 

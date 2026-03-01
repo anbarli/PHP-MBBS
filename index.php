@@ -1,6 +1,8 @@
 <?php
 include('config.php');
 
+$seoRobots = 'index, follow';
+
 $seoTitle = 'Son Yazılar - ' . SITE_NAME;
 $seoDescription = 'Blogumuzda son yazılarımızı keşfedin. Teknoloji, yazılım ve hayat üzerine içerikler burada!';
 
@@ -21,7 +23,7 @@ include('includes/header.php');
 
 echo '
 	<div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
-	<h3>Blog Yazıları</h3>';
+	<h1>Blog Yazıları</h1>';
 
 // Try to get cached posts first
 $postFilesWithDates = getCachedPosts();
