@@ -1,22 +1,22 @@
-<?php
+﻿<?php
 /**
  * Admin Edit Post
- * Yazı düzenleme sayfası
+ * YazÄ± dÃ¼zenleme sayfasÄ±
  */
 
 define('ADMIN_SECURE', true);
 
-// Ana config dosyasını dahil et
+// Ana config dosyasÄ±nÄ± dahil et
 require_once '../config.php';
 
-// Güvenlik fonksiyonlarını dahil et
+// GÃ¼venlik fonksiyonlarÄ±nÄ± dahil et
 require_once '../includes/security.php';
 
-// Session başlat ve yetki kontrolü
+// Session baÅŸlat ve yetki kontrolÃ¼
 initSecureSession();
 requireAdminAuth();
 
-// Admin config yükle
+// Admin config yÃ¼kle
 $adminConfig = loadAdminConfig();
 
 // Slug parametresi
@@ -28,7 +28,7 @@ if (empty($slug)) {
 
 $postFile = POSTS_DIR . $slug . '.md';
 
-// Dosya var mı?
+// Dosya var mÄ±?
 if (!file_exists($postFile)) {
     header('Location: posts.php?error=post_not_found');
     exit;
@@ -38,11 +38,11 @@ if (!file_exists($postFile)) {
 $message = '';
 $messageType = '';
 
-// Form gönderildi mi?
+// Form gÃ¶nderildi mi?
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF kontrolü
+    // CSRF kontrolÃ¼
     if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-        $message = 'Güvenlik hatası. Lütfen tekrar deneyin.';
+        $message = 'GÃ¼venlik hatasÄ±. LÃ¼tfen tekrar deneyin.';
         $messageType = 'danger';
     } else {
         // Input temizleme
@@ -55,13 +55,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         // Validasyon
         if (empty($title)) {
-            $message = 'Başlık gereklidir.';
+            $message = 'BaÅŸlÄ±k gereklidir.';
             $messageType = 'danger';
         } elseif (empty($content)) {
-            $message = 'İçerik gereklidir.';
+            $message = 'Ä°Ã§erik gereklidir.';
+            $messageType = 'danger';
+        } elseif (($altIssues = findMissingImageAltText($content)) && count($altIssues) > 0) {
+            $lineNumbers = array_values(array_unique(array_map(function($issue) {
+                return (int)$issue['line'];
+            }, $altIssues)));
+            $linePreview = implode(', ', array_slice($lineNumbers, 0, 8));
+            $message = 'Gorsellerde bos/eksik alt metni bulundu. Lutfen duzeltin. Satir(lar): ' . $linePreview;
+            if (count($lineNumbers) > 8) {
+                $message .= ' ...';
+            }
             $messageType = 'danger';
         } else {
-            // Meta verileri hazırla
+            // Meta verileri hazÄ±rla
             $meta = [
                 'title' => $title,
                 'date' => $date,
@@ -71,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'author' => $adminConfig['ADMIN_NAME'] ?? 'Admin'
             ];
             
-            // Markdown içeriği oluştur
+            // Markdown iÃ§eriÄŸi oluÅŸtur
             $markdown = "---\n";
             foreach ($meta as $key => $value) {
                 if ($key === 'tags') {
@@ -83,29 +93,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $markdown .= "---\n\n";
             $markdown .= $content;
             
-            // Dosyayı kaydet
+            // DosyayÄ± kaydet
             if (file_put_contents($postFile, $markdown)) {
                 // Cache'i temizle
                 clearCache();
                 
-                $message = 'Yazı başarıyla güncellendi!';
+                $message = 'YazÄ± baÅŸarÄ±yla gÃ¼ncellendi!';
                 $messageType = 'success';
                 
                 // Log
                 logAdminAction('edit_post', "Edited post: $slug");
             } else {
-                $message = 'Yazı kaydedilirken hata oluştu.';
+                $message = 'YazÄ± kaydedilirken hata oluÅŸtu.';
                 $messageType = 'danger';
             }
         }
     }
 }
 
-// Mevcut yazıyı oku
+// Mevcut yazÄ±yÄ± oku
 $postContent = file_get_contents($postFile);
 $post = parsePost($postContent, $slug);
 
-// CSRF token oluştur
+// CSRF token oluÅŸtur
 $csrfToken = generateCSRFToken();
 ?>
 <!DOCTYPE html>
@@ -113,7 +123,7 @@ $csrfToken = generateCSRFToken();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yazı Düzenle - <?php echo SITE_NAME; ?> Admin</title>
+    <title>YazÄ± DÃ¼zenle - <?php echo SITE_NAME; ?> Admin</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -139,7 +149,7 @@ $csrfToken = generateCSRFToken();
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                         <a class="nav-link active" href="posts.php">
-                            <i class="bi bi-file-text"></i> Yazılar
+                            <i class="bi bi-file-text"></i> YazÄ±lar
                         </a>
                         <a class="nav-link" href="categories.php">
                             <i class="bi bi-folder"></i> Kategoriler
@@ -149,13 +159,13 @@ $csrfToken = generateCSRFToken();
                         </a>
                         <hr class="text-white-50">
                         <a class="nav-link" href="<?php echo BASE_PATH; ?>" target="_blank">
-                            <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
+                            <i class="bi bi-box-arrow-up-right"></i> Siteyi GÃ¶rÃ¼ntÃ¼le
                         </a>
                         <form method="POST" action="dashboard.php" class="sidebar-logout-form">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                             <input type="hidden" name="action" value="logout">
                             <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                                <i class="bi bi-box-arrow-right"></i> Ã‡Ä±kÄ±ÅŸ Yap
                             </button>
                         </form>
                     </nav>
@@ -168,10 +178,10 @@ $csrfToken = generateCSRFToken();
                     <!-- Top Navbar -->
                     <nav class="navbar navbar-expand-lg">
                         <div class="container-fluid">
-                            <h4 class="mb-0">Yazı Düzenle: <?php echo htmlspecialchars($post['meta']['title']); ?></h4>
+                            <h4 class="mb-0">YazÄ± DÃ¼zenle: <?php echo htmlspecialchars($post['meta']['title']); ?></h4>
                             <div class="d-flex align-items-center">
                                 <a href="<?php echo BASE_PATH . $slug; ?>" target="_blank" class="btn btn-outline-info me-2">
-                                    <i class="bi bi-eye"></i> Görüntüle
+                                    <i class="bi bi-eye"></i> GÃ¶rÃ¼ntÃ¼le
                                 </a>
                                 <a href="posts.php" class="btn btn-outline-secondary me-2">
                                     <i class="bi bi-arrow-left"></i> Geri
@@ -198,17 +208,17 @@ $csrfToken = generateCSRFToken();
                                 
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <!-- Başlık -->
+                                        <!-- BaÅŸlÄ±k -->
                                         <div class="mb-3">
-                                            <label for="title" class="form-label">Başlık *</label>
+                                            <label for="title" class="form-label">BaÅŸlÄ±k *</label>
                                             <input type="text" class="form-control" id="title" name="title" 
                                                    value="<?php echo htmlspecialchars($_POST['title'] ?? $post['meta']['title']); ?>" 
                                                    required>
                                         </div>
                                         
-                                        <!-- İçerik -->
+                                        <!-- Ä°Ã§erik -->
                                         <div class="mb-3">
-                                            <label for="content" class="form-label">İçerik *</label>
+                                            <label for="content" class="form-label">Ä°Ã§erik *</label>
                                             <textarea class="form-control" id="content" name="content" rows="20"><?php echo htmlspecialchars($_POST['content'] ?? $post['content']); ?></textarea>
                                         </div>
                                     </div>
@@ -234,14 +244,14 @@ $csrfToken = generateCSRFToken();
                                             <input type="text" class="form-control" id="tags" name="tags" 
                                                    value="<?php echo htmlspecialchars($_POST['tags'] ?? (isset($post['meta']['tags']) ? implode(', ', $post['meta']['tags']) : '')); ?>"
                                                    placeholder="etiket1, etiket2, etiket3">
-                                            <div class="form-text">Virgülle ayırarak birden fazla etiket ekleyebilirsiniz.</div>
+                                            <div class="form-text">VirgÃ¼lle ayÄ±rarak birden fazla etiket ekleyebilirsiniz.</div>
                                         </div>
                                         
-                                        <!-- Açıklama -->
+                                        <!-- AÃ§Ä±klama -->
                                         <div class="mb-3">
-                                            <label for="description" class="form-label">Açıklama</label>
+                                            <label for="description" class="form-label">AÃ§Ä±klama</label>
                                             <textarea class="form-control" id="description" name="description" rows="3"><?php echo htmlspecialchars($_POST['description'] ?? ($post['meta']['description'] ?? '')); ?></textarea>
-                                            <div class="form-text">SEO için kısa açıklama (160 karakter).</div>
+                                            <div class="form-text">SEO iÃ§in kÄ±sa aÃ§Ä±klama (160 karakter).</div>
                                         </div>
                                         
                                         <!-- Bilgiler -->
@@ -251,7 +261,7 @@ $csrfToken = generateCSRFToken();
                                                 <small class="text-muted">
                                                     <strong>Slug:</strong> <?php echo $slug; ?><br>
                                                     <strong>Dosya:</strong> <?php echo basename($postFile); ?><br>
-                                                    <strong>Son Düzenleme:</strong> <?php echo date('d.m.Y H:i', filemtime($postFile)); ?>
+                                                    <strong>Son DÃ¼zenleme:</strong> <?php echo date('d.m.Y H:i', filemtime($postFile)); ?>
                                                 </small>
                                             </div>
                                         </div>
@@ -273,7 +283,7 @@ $csrfToken = generateCSRFToken();
             element: document.getElementById('content'),
             autoDownloadFontAwesome: false,
             spellChecker: false,
-            placeholder: 'Yazınızı buraya yazın...',
+            placeholder: 'YazÄ±nÄ±zÄ± buraya yazÄ±n...',
             toolbar: [
                 'bold', 'italic', 'heading', '|',
                 'quote', 'unordered-list', 'ordered-list', '|',
@@ -283,21 +293,21 @@ $csrfToken = generateCSRFToken();
             ]
         });
         
-        // Form gönderilmeden önce kontrol
+        // Form gÃ¶nderilmeden Ã¶nce kontrol
         document.getElementById('postForm').addEventListener('submit', function(e) {
             const title = document.getElementById('title').value.trim();
             const content = easyMDE.value().trim();
             
             if (!title) {
                 e.preventDefault();
-                alert('Başlık gereklidir!');
+                alert('BaÅŸlÄ±k gereklidir!');
                 document.getElementById('title').focus();
                 return false;
             }
             
             if (!content) {
                 e.preventDefault();
-                alert('İçerik gereklidir!');
+                alert('Ä°Ã§erik gereklidir!');
                 easyMDE.codemirror.focus();
                 return false;
             }
@@ -305,3 +315,5 @@ $csrfToken = generateCSRFToken();
     </script>
 </body>
 </html> 
+
+

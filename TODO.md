@@ -1,4 +1,4 @@
-# TODO
+﻿# TODO
 
 ## SEO Iyilestirmeleri
 
@@ -16,7 +16,7 @@
   - Arama sayfasinda `h1` kullan.
   - Sayfa basliklarinda `h1 -> h2 -> ...` akisini koru.
 
-- [x] Layout semantiğini guclendir.
+- [x] Layout semantiÄŸini guclendir.
   - Ana icerik kapsayicisini `main` ile tanimla.
   - Gereken yerlerde `section` ve `article` kullanimini arttir.
 
@@ -24,13 +24,13 @@
   - Sadece post detayinda `BlogPosting` kullan.
   - Liste/arama gibi sayfalarda uygun schema tipine gec.
 
-- [ ] Gorsel alt text kontrolu ekle.
+- [x] Gorsel alt text kontrolu ekle.
   - Markdown gorsellerinde bos/eksik `alt` metinlerini engelleyecek kontrol/uyari ekle.
 
 ## Core Web Vitals ve Lighthouse Iyilestirmeleri
 
 - [x] Markdown CSS yuklemesini sayfa bazli yap.
-  - `github-markdown-css` sadece post detay sayfalarinda yüklensin.
+  - `github-markdown-css` sadece post detay sayfalarinda yÃ¼klensin.
   - Liste, arama ve diger sayfalarda gereksiz render-blocking CSS'i kaldir.
 
 - [x] 3rd-party baglanti hazirliklarini kosullu hale getir.
@@ -86,7 +86,7 @@
   - Ozet/tam icerik secimi.
   - Kategori veya etikete gore feed uretimi.
 
-- [ ] Tema (dark/light) kodunu sadeleştir.
+- [ ] Tema (dark/light) kodunu sadeleÅŸtir.
   - Mevcut scripti modulerlestir ve gereksiz isleri kaldir.
   - INP acisindan daha az ana thread maliyeti hedefle.
 
@@ -100,5 +100,6 @@
 
 - [ ] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
+
 
 

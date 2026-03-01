@@ -84,6 +84,43 @@ function generateSlug($string) {
     return trim($string, '-');
 }
 
+function findMissingImageAltText($markdownContent) {
+    $issues = [];
+    $lines = preg_split('/\r\n|\r|\n/', (string)$markdownContent);
+
+    foreach ($lines as $index => $line) {
+        $lineNumber = $index + 1;
+
+        // Markdown image syntax: ![alt](url)
+        if (preg_match_all('/!\[(.*?)\]\((.*?)\)/', $line, $markdownMatches, PREG_SET_ORDER)) {
+            foreach ($markdownMatches as $match) {
+                $altText = trim($match[1] ?? '');
+                if ($altText === '') {
+                    $issues[] = [
+                        'line' => $lineNumber,
+                        'type' => 'markdown'
+                    ];
+                }
+            }
+        }
+
+        // HTML image syntax: <img ...>
+        if (preg_match_all('/<img\b[^>]*>/i', $line, $htmlMatches)) {
+            foreach ($htmlMatches[0] as $imgTag) {
+                $hasAlt = preg_match('/\balt\s*=\s*([\'"])(.*?)\1/i', $imgTag, $altMatch);
+                if (!$hasAlt || trim($altMatch[2] ?? '') === '') {
+                    $issues[] = [
+                        'line' => $lineNumber,
+                        'type' => 'html'
+                    ];
+                }
+            }
+        }
+    }
+
+    return $issues;
+}
+
 function getCachedPosts() {
     if (!CACHE_ENABLED) {
         return null;
