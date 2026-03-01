@@ -247,6 +247,80 @@ a:hover {
     background: linear-gradient(180deg, #ffffff, #f8fbfc);
 }
 
+.footer-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.footer-categories-line {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding-bottom: 0.55rem;
+    border-bottom: 1px solid var(--line-1);
+}
+
+.footer-line-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--text-2);
+    margin-right: 0.35rem;
+}
+
+.footer-category-link {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-1);
+    background: #eef3f7;
+    border: 1px solid var(--line-1);
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+    text-decoration: none;
+}
+
+.footer-category-link:hover {
+    background: #e1e9ef;
+    color: var(--text-1);
+    text-decoration: none;
+}
+
+.footer-main-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.footer-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: var(--text-2);
+    font-size: 0.86rem;
+}
+
+.footer-meta-right {
+    justify-content: flex-end;
+}
+
+.footer-sep {
+    color: #98a4b3;
+}
+
+.footer-rss-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-weight: 700;
+}
+
 .btn:focus,
 .form-control:focus,
 a:focus {
@@ -316,6 +390,16 @@ body.dark-mode .share-btn:hover {
     border-color: #3a015c;
 }
 
+body.dark-mode .footer-category-link {
+    background: #220135;
+    border-color: #32004f;
+    color: #f2ebff;
+}
+
+body.dark-mode .footer-category-link:hover {
+    background: #2a0241;
+}
+
 @media (max-width: 768px) {
     html { font-size: 15px; }
     .container { padding-left: 1rem; padding-right: 1rem; }
@@ -337,6 +421,13 @@ body.dark-mode .share-btn:hover {
     }
     .nav-theme-toggle {
         justify-content: center;
+    }
+    .footer-main-line {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .footer-meta-right {
+        justify-content: flex-start;
     }
 }
 
