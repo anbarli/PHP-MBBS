@@ -40,16 +40,16 @@
   - Gereksiz `console.log` satirlarini temizle.
   - Tek buyuk inline script yerine kucuk ve `defer` script dosyalarina ayir.
 
-- [ ] Markdown gorselleri icin lazy/priority stratejisi uygula.
+- [x] Markdown gorselleri icin lazy/priority stratejisi uygula.
   - Ilk (LCP adayi) gorselde `loading="eager"` ve `fetchpriority="high"` kullan.
   - Diger gorsellerde `loading="lazy"` ve `fetchpriority="low"` kullan.
   - Tum gorsellerde `decoding="async"` uygula.
 
-- [ ] CLS riskini azaltmak icin gorsel alanini stabilize et.
+- [x] CLS riskini azaltmak icin gorsel alanini stabilize et.
   - Mumkun oldugunda `width/height` attribute uret.
   - En azindan CSS ile `max-width: 100%` ve `height: auto` davranisini garanti et.
 
-- [ ] Preload kullanimini optimize et.
+- [x] Preload kullanimini optimize et.
   - Sadece kritik kaynaklari preload et.
   - Kullanilmayan veya etkisiz preload kayitlarini kaldir.
 
@@ -100,3 +100,5 @@
 
 - [ ] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
+
+

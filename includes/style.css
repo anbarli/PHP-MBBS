@@ -236,6 +236,11 @@ a:hover {
     padding: 0 1rem;
 }
 
+.markdown-body img {
+    max-width: 100%;
+    height: auto;
+}
+
 .footer {
     margin-top: auto;
     border-top: 1px solid var(--line-1);

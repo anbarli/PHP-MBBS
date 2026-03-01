@@ -196,10 +196,6 @@
 	<link rel="dns-prefetch" href="//www.googletagmanager.com">
 	<?php endif; ?>
 	
-	<!-- Preload critical resources -->
-	<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" as="style">
-	<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style">
-	
 	<!-- Canonical and alternate links -->
 	<link rel="canonical" href="<?php echo $seoCanonical; ?>">
 	<link rel="alternate" type="application/rss+xml" title="<?php echo SITE_NAME; ?> RSS" href="<?php echo BASE_URL; ?>rss">

@@ -4,6 +4,35 @@ include('config.php');
 $loadMarkdownCss = true;
 $structuredDataType = 'BlogPosting';
 
+function optimizeMarkdownImages($htmlContent) {
+    $imageIndex = 0;
+
+    $setAttribute = function($imgTag, $name, $value) {
+        $escapedName = preg_quote($name, '/');
+        $pattern = '/\b' . $escapedName . '\s*=\s*([\'"]).*?\1/i';
+        $replacement = $name . '="' . $value . '"';
+
+        if (preg_match($pattern, $imgTag)) {
+            return preg_replace($pattern, $replacement, $imgTag, 1);
+        }
+
+        return preg_replace('/\s*\/?>$/', ' ' . $replacement . '$0', $imgTag, 1);
+    };
+
+    return preg_replace_callback('/<img\b[^>]*>/i', function($matches) use (&$imageIndex, $setAttribute) {
+        $imgTag = $matches[0];
+        $loading = $imageIndex === 0 ? 'eager' : 'lazy';
+        $fetchPriority = $imageIndex === 0 ? 'high' : 'low';
+
+        $imgTag = $setAttribute($imgTag, 'loading', $loading);
+        $imgTag = $setAttribute($imgTag, 'fetchpriority', $fetchPriority);
+        $imgTag = $setAttribute($imgTag, 'decoding', 'async');
+
+        $imageIndex++;
+        return $imgTag;
+    }, $htmlContent);
+}
+
 $seoTitle = 'YazÃ„Â± BulunamadÃ„Â± - ' . SITE_NAME;
 $seoDescription = 'Bu yazÃ„Â± bulunamadÃ„Â±. FarklÃ„Â± bir yazÃ„Â± deneyebilirsiniz.';
 
@@ -75,6 +104,7 @@ if (isset($_GET['slug']) && !empty($slug)) {
 		$Parsedown = new Parsedown();
         $Parsedown->setSafeMode(true);
 		$htmlContent = $Parsedown->text($body);
+		$htmlContent = optimizeMarkdownImages($htmlContent);
 		
 		// Ã„Â°ÃƒÂ§erik - Semantic HTML ile
         echo '<article class="markdown-body p-4 mb-4">' . $htmlContent . '</article>';
