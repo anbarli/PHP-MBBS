@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Admin Dashboard
  * Yönetim paneli ana sayfası
@@ -199,10 +199,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                     <div class="card-body p-4 p-lg-5">
                                         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
                                             <div>
-                                                <h5 class="mb-1 text-white">Yonetim Ozeti</h5>
-                                                <p class="mb-0 text-white-50">Blogunun genel durumunu tek ekranda gor.</p>
+                                                <h5 class="mb-1 text-white">Yönetim Özeti</h5>
+                                                <p class="mb-0 text-white-50">Blogunun genel durumunu tek ekranda gör.</p>
                                             </div>
-                                            <span class="badge text-bg-light">Canli Durum</span>
+                                            <span class="badge text-bg-light">Canlı Durum</span>
                                         </div>
 
                                         <div class="row g-3">
@@ -210,7 +210,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                                 <div class="summary-item">
                                                     <span class="summary-icon"><i class="bi bi-file-text"></i></span>
                                                     <div class="summary-value"><?php echo $postCount; ?></div>
-                                                    <div class="summary-label">Toplam Yazi</div>
+                                                    <div class="summary-label">Toplam Yazı</div>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6 col-lg-3">
@@ -224,13 +224,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                                 <div class="summary-item">
                                                     <span class="summary-icon"><i class="bi bi-graph-up-arrow"></i></span>
                                                     <div class="summary-value"><?php echo $postCount > 0 ? round($postCount / 7, 1) : 0; ?></div>
-                                                    <div class="summary-label">Haftalik Ortalama</div>
+                                                    <div class="summary-label">Haftalık Ortalama</div>
                                                 </div>
                                             </div>
                                             <div class="col-sm-6 col-lg-3">
                                                 <div class="summary-item">
                                                     <span class="summary-icon"><i class="bi bi-shield-check"></i></span>
-                                                    <div class="summary-value"><?php echo $configLocalExists ? 'OK' : 'Uyari'; ?></div>
+                                                    <div class="summary-value"><?php echo $configLocalExists ? 'OK' : 'Uyarı'; ?></div>
                                                     <div class="summary-label">Config Durumu</div>
                                                 </div>
                                             </div>
@@ -243,24 +243,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                 <div class="card quick-actions-stack h-100">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-lightning"></i> Hizli Araclar
+                                            <i class="bi bi-lightning"></i> Hızlı Araçlar
                                         </h5>
                                     </div>
                                     <div class="card-body d-grid gap-2">
                                         <a href="posts.php?action=new" class="btn btn-primary w-100 text-start">
-                                            <i class="bi bi-plus-circle me-2"></i>Yeni Yazi Olustur
+                                            <i class="bi bi-plus-circle me-2"></i>Yeni Yazı Oluştur
                                         </a>
                                         <a href="posts.php" class="btn btn-outline-primary w-100 text-start">
-                                            <i class="bi bi-file-earmark-text me-2"></i>Yazilari Yonet
+                                            <i class="bi bi-file-earmark-text me-2"></i>Yazıları Yönet
                                         </a>
                                         <a href="categories.php" class="btn btn-outline-primary w-100 text-start">
-                                            <i class="bi bi-collection me-2"></i>Kategorileri Duzenle
+                                            <i class="bi bi-collection me-2"></i>Kategorileri Düzenle
                                         </a>
                                         <a href="settings.php" class="btn btn-outline-primary w-100 text-start">
-                                            <i class="bi bi-gear me-2"></i>Site Ayarlari
+                                            <i class="bi bi-gear me-2"></i>Site Ayarları
                                         </a>
                                         <a href="<?php echo BASE_PATH; ?>" target="_blank" class="btn btn-outline-secondary w-100 text-start">
-                                            <i class="bi bi-box-arrow-up-right me-2"></i>Siteyi Goruntule
+                                            <i class="bi bi-box-arrow-up-right me-2"></i>Siteyi Görüntüle
                                         </a>
                                     </div>
                                 </div>
@@ -346,16 +346,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                 <div class="card">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-clock-history"></i> Son YazÄ±lar
+                                            <i class="bi bi-clock-history"></i> Son Yazılar
                                         </h5>
                                     </div>
                                     <div class="card-body p-0">
                                         <?php if (empty($recentPosts)): ?>
                                             <div class="p-4 text-center text-muted">
                                                 <i class="bi bi-inbox" style="font-size: 3rem;"></i>
-                                                <p class="mt-2">HenÃ¼z yazÄ± bulunmuyor.</p>
+                                                <p class="mt-2">Henüz yazı bulunmuyor.</p>
                                                 <a href="posts.php" class="btn btn-primary">
-                                                    <i class="bi bi-plus-circle"></i> Ä°lk YazÄ±yÄ± Ekle
+                                                    <i class="bi bi-plus-circle"></i> İlk Yazıyı Ekle
                                                 </a>
                                             </div>
                                         <?php else: ?>
@@ -363,17 +363,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                                 <table class="table table-hover mb-0">
                                                     <thead class="table-light">
                                                         <tr>
-                                                            <th>BaÅŸlÄ±k</th>
+                                                            <th>Başlık</th>
                                                             <th>Kategori</th>
                                                             <th>Tarih</th>
-                                                            <th>Ä°ÅŸlemler</th>
+                                                            <th>İşlemler</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         <?php foreach ($recentPosts as $post): ?>
                                                             <tr>
                                                                 <td>
-                                                                    <strong><?php echo htmlspecialchars($post['meta']['title'] ?? 'BaÅŸlÄ±ksÄ±z'); ?></strong>
+                                                                    <strong><?php echo htmlspecialchars($post['meta']['title'] ?? 'Başlıksız'); ?></strong>
                                                                 </td>
                                                                 <td>
                                                                     <span class="badge bg-secondary">
@@ -390,7 +390,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                                                     </a>
                                                                     <a href="<?php echo BASE_PATH . $post['slug']; ?>"
                                                                        target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                        <i class="bi bi-eye"></i> GÃ¶rÃ¼ntÃ¼le
+                                                                        <i class="bi bi-eye"></i> Görüntüle
                                                                     </a>
                                                                 </td>
                                                             </tr>
@@ -431,4 +431,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
     </script>
 </body>
 </html> 
+
+
 
