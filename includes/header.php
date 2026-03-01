@@ -20,6 +20,49 @@
 	if (!isset($seoRobots) || trim((string)$seoRobots) === '') {
 		$seoRobots = 'index, follow';
 	}
+	if (!isset($loadMarkdownCss)) {
+		$loadMarkdownCss = false;
+	}
+	
+	if (!function_exists('buildNormalizedCanonicalUrl')) {
+		function buildNormalizedCanonicalUrl($protocol, $host, $requestUri) {
+			$path = parse_url($requestUri, PHP_URL_PATH) ?: '/';
+			$query = parse_url($requestUri, PHP_URL_QUERY) ?: '';
+			$params = [];
+			
+			if ($query !== '') {
+				parse_str($query, $params);
+			}
+			
+			foreach ($params as $key => $value) {
+				$lowerKey = strtolower((string)$key);
+				$isTrackingParam = strpos($lowerKey, 'utm_') === 0 || in_array($lowerKey, [
+					'fbclid',
+					'gclid',
+					'msclkid',
+					'mc_cid',
+					'mc_eid',
+					'_hsenc',
+					'_hsmi'
+				], true);
+				
+				if ($isTrackingParam) {
+					unset($params[$key]);
+				}
+			}
+			
+			if (!empty($params)) {
+				ksort($params);
+			}
+			
+			$normalizedQuery = http_build_query($params, '', '&', PHP_QUERY_RFC3986);
+			return $protocol . $host . $path . ($normalizedQuery !== '' ? '?' . $normalizedQuery : '');
+		}
+	}
+	
+	if (!isset($seoCanonical) || trim((string)$seoCanonical) === '') {
+		$seoCanonical = buildNormalizedCanonicalUrl($protocol, $host, $_SERVER['REQUEST_URI'] ?? '/');
+	}
 	
 	// Generate keywords from tags if available
 	$seoKeywords = '';
@@ -33,6 +76,7 @@
 	$seoDescription = trim(htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoKeywords = trim(htmlspecialchars($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoRobots = trim(htmlspecialchars($seoRobots, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoCanonical = trim(htmlspecialchars($seoCanonical, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -108,7 +152,9 @@
 	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
+	<?php if ($loadMarkdownCss): ?>
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"/>
+	<?php endif; ?>
     <link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
 	
 	<!-- Performance Optimizations -->
@@ -126,7 +172,7 @@
 	<link rel="preload" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" as="style">
 	
 	<!-- Canonical and alternate links -->
-	<link rel="canonical" href="<?php echo $protocol . $host . $_SERVER['REQUEST_URI']; ?>">
+	<link rel="canonical" href="<?php echo $seoCanonical; ?>">
 	<link rel="alternate" type="application/rss+xml" title="<?php echo SITE_NAME; ?> RSS" href="<?php echo BASE_URL; ?>rss">
 	<link rel="sitemap" type="application/xml" title="Sitemap" href="<?php echo BASE_URL; ?>sitemap.xml">
 	

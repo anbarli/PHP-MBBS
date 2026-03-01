@@ -7,7 +7,7 @@
   - Arama sayfasi: `noindex, follow`
   - 404 sayfasi: `noindex, follow`
 
-- [ ] Canonical URL olusturmayi normalize et.
+- [x] Canonical URL olusturmayi normalize et.
   - Query parametreli URL'lerde gereksiz canonical varyasyonlarini engelle.
   - `search` icin canonical stratejisini netlestir (`/search` veya `noindex` yaklasimi).
 
@@ -29,7 +29,7 @@
 
 ## Core Web Vitals ve Lighthouse Iyilestirmeleri
 
-- [ ] Markdown CSS yuklemesini sayfa bazli yap.
+- [x] Markdown CSS yuklemesini sayfa bazli yap.
   - `github-markdown-css` sadece post detay sayfalarinda yüklensin.
   - Liste, arama ve diger sayfalarda gereksiz render-blocking CSS'i kaldir.
 
@@ -100,4 +100,5 @@
 
 - [ ] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
+
 

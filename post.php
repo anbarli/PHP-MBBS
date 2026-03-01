@@ -1,6 +1,8 @@
 <?php
 include('config.php');
 
+$loadMarkdownCss = true;
+
 $seoTitle = 'YazÃ„Â± BulunamadÃ„Â± - ' . SITE_NAME;
 $seoDescription = 'Bu yazÃ„Â± bulunamadÃ„Â±. FarklÃ„Â± bir yazÃ„Â± deneyebilirsiniz.';
 
@@ -140,3 +142,4 @@ if (isset($_GET['slug']) && !empty($slug)) {
 
 include('includes/footer.php');
 ?>
+

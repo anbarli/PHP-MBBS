@@ -7,6 +7,7 @@ $searchQuery = htmlspecialchars($searchQuery, ENT_QUOTES, 'UTF-8');
 $seoTitle = 'Arama - ' . SITE_NAME;
 $seoDescription = 'Blog yazılarında arama yapın.';
 $seoRobots = 'noindex, follow';
+$seoCanonical = BASE_URL . 'search';
 
 if (!empty($searchQuery)) {
     $seoTitle = '"' . $searchQuery . '" için arama sonuçları - ' . SITE_NAME;
