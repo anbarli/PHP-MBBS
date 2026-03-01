@@ -20,7 +20,7 @@
   - Ana icerik kapsayicisini `main` ile tanimla.
   - Gereken yerlerde `section` ve `article` kullanimini arttir.
 
-- [ ] JSON-LD tipini sayfa turune gore ayarla.
+- [x] JSON-LD tipini sayfa turune gore ayarla.
   - Sadece post detayinda `BlogPosting` kullan.
   - Liste/arama gibi sayfalarda uygun schema tipine gec.
 
@@ -36,7 +36,7 @@
 - [x] 3rd-party baglanti hazirliklarini kosullu hale getir.
   - `googletagmanager` icin `preconnect/dns-prefetch` sadece `GA_TRACKING_ID` doluysa eklensin.
 
-- [ ] Footer JavaScript yukunu azalt ve modulerlestir.
+- [x] Footer JavaScript yukunu azalt ve modulerlestir.
   - Gereksiz `console.log` satirlarini temizle.
   - Tek buyuk inline script yerine kucuk ve `defer` script dosyalarina ayir.
 
@@ -100,5 +100,3 @@
 
 - [ ] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
-
-

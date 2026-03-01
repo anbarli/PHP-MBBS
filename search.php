@@ -8,6 +8,7 @@ $seoTitle = 'Arama - ' . SITE_NAME;
 $seoDescription = 'Blog yazılarında arama yapın.';
 $seoRobots = 'noindex, follow';
 $seoCanonical = BASE_URL . 'search';
+$structuredDataType = 'CollectionPage';
 
 if (!empty($searchQuery)) {
     $seoTitle = '"' . $searchQuery . '" için arama sonuçları - ' . SITE_NAME;
@@ -120,4 +121,4 @@ if (!empty($searchQuery)) {
 }
 
 include('includes/footer.php');
-?> 
+?>

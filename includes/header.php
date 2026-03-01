@@ -20,6 +20,9 @@
 	if (!isset($seoRobots) || trim((string)$seoRobots) === '') {
 		$seoRobots = 'index, follow';
 	}
+	if (!isset($structuredDataType) || trim((string)$structuredDataType) === '') {
+		$structuredDataType = 'WebSite';
+	}
 	if (!isset($loadMarkdownCss)) {
 		$loadMarkdownCss = false;
 	}
@@ -116,39 +119,65 @@
 	<?php endif; ?>
 	
 	<!-- Structured Data -->
-	<script type="application/ld+json">
-	{
-		"@context": "https://schema.org",
-		"@type": "BlogPosting",
-		"headline": "<?php echo htmlspecialchars($seoTitle); ?>",
-		"description": "<?php echo htmlspecialchars($seoDescription); ?>",
-		"author": {
-			"@type": "Person",
-			"name": "<?php echo AUTHOR_NAME; ?>"
-			<?php if (!empty(AUTHOR_EMAIL)): ?>,
-			"email": "<?php echo AUTHOR_EMAIL; ?>"
-			<?php endif; ?>
-		},
-		"publisher": {
-			"@type": "Organization",
-			"name": "<?php echo SITE_NAME; ?>",
-			"url": "<?php echo BASE_URL; ?>"
-		},
-		"mainEntityOfPage": {
-			"@type": "WebPage",
-			"@id": "<?php echo BASE_URL . "/" . ($_GET['slug'] ?? ''); ?>"
+	<?php
+	$structuredData = [
+		'@context' => 'https://schema.org',
+		'@type' => $structuredDataType
+	];
+	
+	if ($structuredDataType === 'BlogPosting') {
+		$structuredData['headline'] = $seoTitle;
+		$structuredData['description'] = $seoDescription;
+		$structuredData['author'] = [
+			'@type' => 'Person',
+			'name' => AUTHOR_NAME
+		];
+		if (!empty(AUTHOR_EMAIL)) {
+			$structuredData['author']['email'] = AUTHOR_EMAIL;
 		}
-		<?php if (isset($date)): ?>,
-		"datePublished": "<?php echo date('Y-m-d\TH:i:sP', strtotime($date)); ?>"
-		<?php endif; ?>
-		<?php if (isset($category)): ?>,
-		"articleSection": "<?php echo htmlspecialchars($category); ?>"
-		<?php endif; ?>
-		<?php if (isset($tags) && is_array($tags)): ?>,
-		"keywords": "<?php echo htmlspecialchars(implode(', ', $tags)); ?>"
-		<?php endif; ?>
+		$structuredData['publisher'] = [
+			'@type' => 'Organization',
+			'name' => SITE_NAME,
+			'url' => BASE_URL
+		];
+		$structuredData['mainEntityOfPage'] = [
+			'@type' => 'WebPage',
+			'@id' => $seoCanonical
+		];
+		if (isset($date)) {
+			$structuredData['datePublished'] = date('Y-m-d\TH:i:sP', strtotime($date));
+		}
+		if (isset($category)) {
+			$structuredData['articleSection'] = $category;
+		}
+		if (isset($tags) && is_array($tags) && !empty($tags)) {
+			$structuredData['keywords'] = implode(', ', $tags);
+		}
+	} elseif ($structuredDataType === 'CollectionPage') {
+		$structuredData['name'] = $seoTitle;
+		$structuredData['description'] = $seoDescription;
+		$structuredData['url'] = $seoCanonical;
+		$structuredData['isPartOf'] = [
+			'@type' => 'WebSite',
+			'name' => SITE_NAME,
+			'url' => BASE_URL
+		];
+	} else {
+		$structuredData['name'] = SITE_NAME;
+		$structuredData['url'] = BASE_URL;
+		$structuredData['description'] = DEFAULT_DESCRIPTION;
+		$structuredData['publisher'] = [
+			'@type' => 'Organization',
+			'name' => AUTHOR_NAME
+		];
+		$structuredData['potentialAction'] = [
+			'@type' => 'SearchAction',
+			'target' => BASE_URL . 'search?q={search_term_string}',
+			'query-input' => 'required name=search_term_string'
+		];
 	}
-	</script>
+	?>
+	<script type="application/ld+json"><?php echo json_encode($structuredData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES); ?></script>
 	
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>

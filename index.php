@@ -2,6 +2,7 @@
 include('config.php');
 
 $seoRobots = 'index, follow';
+$structuredDataType = 'CollectionPage';
 
 $seoTitle = 'Son Yazılar - ' . SITE_NAME;
 $seoDescription = 'Blogumuzda son yazılarımızı keşfedin. Teknoloji, yazılım ve hayat üzerine içerikler burada!';

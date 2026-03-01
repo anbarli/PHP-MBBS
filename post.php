@@ -2,6 +2,7 @@
 include('config.php');
 
 $loadMarkdownCss = true;
+$structuredDataType = 'BlogPosting';
 
 $seoTitle = 'YazÃ„Â± BulunamadÃ„Â± - ' . SITE_NAME;
 $seoDescription = 'Bu yazÃ„Â± bulunamadÃ„Â±. FarklÃ„Â± bir yazÃ„Â± deneyebilirsiniz.';
