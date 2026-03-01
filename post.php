@@ -50,6 +50,10 @@ if (!file_exists($postFile) || !is_readable($postFile)) {
 
 
 $postData = getPostContent($postFile);
+if (!$postData || !isPostPublished($postData)) {
+    header('HTTP/1.1 404 Not Found'); exit('YazÃƒâ€Ã‚Â± bulunamadÃƒâ€Ã‚Â±.');
+}
+
 if ($postData) {
     $title = htmlspecialchars($postData['meta']['title']);
     $category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');

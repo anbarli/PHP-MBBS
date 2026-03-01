@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $tags = sanitizeInput($_POST['tags'] ?? '');
         $description = sanitizeInput($_POST['description'] ?? '');
         $date = sanitizeInput($_POST['date'] ?? date('Y-m-d'));
+        $status = normalizePostStatus($_POST['status'] ?? 'published');
         
         // Validasyon
         if (empty($title)) {
@@ -74,6 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'date' => $date,
                 'category' => $category,
                 'description' => $description,
+                'status' => $status,
                 'tags' => array_filter(array_map('trim', explode(',', $tags))),
                 'author' => $adminConfig['ADMIN_NAME'] ?? 'Admin'
             ];
@@ -230,6 +232,14 @@ $csrfToken = generateCSRFToken();
                                             <label for="category" class="form-label">Kategori</label>
                                             <input type="text" class="form-control" id="category" name="category" 
                                                    value="<?php echo htmlspecialchars($_POST['category'] ?? 'Genel'); ?>">
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="status" class="form-label">Durum</label>
+                                            <select class="form-select" id="status" name="status">
+                                                <option value="published" <?php echo (($_POST['status'] ?? 'published') === 'published') ? 'selected' : ''; ?>>Yayinda</option>
+                                                <option value="draft" <?php echo (($_POST['status'] ?? '') === 'draft') ? 'selected' : ''; ?>>Taslak</option>
+                                            </select>
                                         </div>
                                         
                                         <!-- Etiketler -->

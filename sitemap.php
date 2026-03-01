@@ -50,10 +50,13 @@ $categories = [];
 $tags = [];
 
 foreach ($posts as $post) {
+    if (pathinfo($post, PATHINFO_EXTENSION) !== 'md') {
+        continue;
+    }
     $postFile = POSTS_DIR . $post;
     $postData = getPostContent($postFile);
     
-    if ($postData) {
+    if ($postData && isPostPublished($postData)) {
         $slug = pathinfo($post, PATHINFO_FILENAME);
         $lastModified = filemtime($postFile);
         $category = strtolower($postData['meta']['category'] ?? 'genel');

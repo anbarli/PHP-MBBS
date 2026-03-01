@@ -121,6 +121,21 @@ function findMissingImageAltText($markdownContent) {
     return $issues;
 }
 
+function normalizePostStatus($status) {
+    $value = strtolower(trim((string)$status));
+    return $value === 'draft' ? 'draft' : 'published';
+}
+
+function isPostPublished($postData) {
+    if (!is_array($postData)) {
+        return false;
+    }
+
+    $meta = $postData['meta'] ?? [];
+    $status = normalizePostStatus($meta['status'] ?? 'published');
+    return $status === 'published';
+}
+
 function getCachedPosts() {
     if (!CACHE_ENABLED) {
         return null;
@@ -193,7 +208,7 @@ function buildBlogStats() {
         $postFile = POSTS_DIR . $post;
         $postData = getPostContent($postFile);
 
-        if ($postData && isset($postData['meta']['category'])) {
+        if ($postData && isPostPublished($postData) && isset($postData['meta']['category'])) {
             $category = trim($postData['meta']['category']);
             if (!empty($category) && !in_array($category, $categories, true)) {
                 $categories[] = $category;
@@ -357,7 +372,7 @@ function generateSitemap() {
             $postFile = POSTS_DIR . $post;
             $postData = getPostContent($postFile);
             
-            if ($postData) {
+            if ($postData && isPostPublished($postData)) {
                 $slug = pathinfo($post, PATHINFO_FILENAME);
                 $lastModified = filemtime($postFile);
                 $category = strtolower($postData['meta']['category'] ?? 'genel');

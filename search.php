@@ -28,10 +28,13 @@ if (!empty($searchQuery)) {
     $searchTerms = explode(' ', strtolower($searchQuery));
     
     foreach ($posts as $post) {
+        if (pathinfo($post, PATHINFO_EXTENSION) !== 'md') {
+            continue;
+        }
         $postFile = POSTS_DIR . $post;
         $postData = getPostContent($postFile);
         
-        if ($postData) {
+        if ($postData && isPostPublished($postData)) {
             $title = strtolower($postData['meta']['title']);
             $content = strtolower(strip_tags($postData['content']));
             $tags = array_map('strtolower', $postData['meta']['tags'] ?? []);

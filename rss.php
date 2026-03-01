@@ -24,12 +24,13 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
         
         foreach ($posts as $post) {
             if ($postCount >= $maxPosts) break;
+            if (pathinfo($post, PATHINFO_EXTENSION) !== 'md') continue;
             
             $postFile = POSTS_DIR . $post;
             $postData = getPostContent($postFile);
             $postSlug = pathinfo($post, PATHINFO_FILENAME);
 
-            if ($postData) {
+            if ($postData && isPostPublished($postData)) {
                 $postCount++;
                 
                 // Başlık, içerik, kategori ve etiketleri al

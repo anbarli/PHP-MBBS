@@ -57,7 +57,7 @@
 
 ### Must Have
 
-- [ ] Draft/Publish akisi ekle.
+- [x] Draft/Publish akisi ekle.
   - Yazilar taslak olarak kaydedilebilsin.
   - Yalnizca yayinlanan yazilar public tarafta gorunsun.
 
@@ -100,6 +100,7 @@
 
 - [ ] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
+
 
 
 

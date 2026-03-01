@@ -80,6 +80,7 @@ foreach ($postFilesWithDates as $postData) {
                 'title' => $slug,
                 'category' => 'Genel',
                 'date' => date('Y-m-d'),
+                'status' => 'published',
                 'tags' => []
             ],
             'content' => $contentData['content'] ?? ''
@@ -283,6 +284,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                 <tr>
                                                     <th>Başlık</th>
                                                     <th>Kategori</th>
+                                                    <th>Durum</th>
                                                     <th>Etiketler</th>
                                                     <th>Tarih</th>
                                                     <th>İşlemler</th>
@@ -299,6 +301,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delet
                                                         <td>
                                                             <span class="badge bg-secondary">
                                                                 <?php echo htmlspecialchars($post['meta']['category'] ?? 'Genel'); ?>
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <?php $status = normalizePostStatus($post['meta']['status'] ?? 'published'); ?>
+                                                            <span class="badge <?php echo $status === 'draft' ? 'bg-warning text-dark' : 'bg-success'; ?>">
+                                                                <?php echo $status === 'draft' ? 'Taslak' : 'Yayinda'; ?>
                                                             </span>
                                                         </td>
                                                         <td>
