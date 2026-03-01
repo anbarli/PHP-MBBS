@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 /**
  * Admin Settings
  * Ayarlar sayfası
@@ -26,6 +26,88 @@ $adminConfig = loadAdminConfig();
 // Config.local.php dosyasını yükle
 $configLocalPath = '../config.local.php';
 $configLocalExists = file_exists($configLocalPath);
+$projectRoot = dirname(__DIR__);
+$backupDir = CACHE_DIR . 'backups' . DIRECTORY_SEPARATOR;
+
+if (!is_dir($backupDir)) {
+    @mkdir($backupDir, 0755, true);
+}
+
+function isValidBackupFilename($filename) {
+    return (bool)preg_match('/^backup-\d{8}-\d{6}\.zip$/', (string)$filename);
+}
+
+function listBackupFiles($backupDir) {
+    if (!is_dir($backupDir)) {
+        return [];
+    }
+
+    $files = glob($backupDir . 'backup-*.zip') ?: [];
+    $result = [];
+    foreach ($files as $filePath) {
+        $filename = basename($filePath);
+        if (!isValidBackupFilename($filename)) {
+            continue;
+        }
+
+        $result[] = [
+            'filename' => $filename,
+            'path' => $filePath,
+            'size' => filesize($filePath) ?: 0,
+            'modified' => filemtime($filePath) ?: 0
+        ];
+    }
+
+    usort($result, function ($a, $b) {
+        return $b['modified'] <=> $a['modified'];
+    });
+
+    return $result;
+}
+
+function addFileToBackupZip($zip, $absolutePath, $archivePath) {
+    if (!is_file($absolutePath)) {
+        return false;
+    }
+
+    return $zip->addFile($absolutePath, str_replace('\\', '/', $archivePath));
+}
+
+function canRestoreEntry($entryName) {
+    $entryName = str_replace('\\', '/', (string)$entryName);
+    if ($entryName === 'config.local.php') {
+        return true;
+    }
+    if ($entryName === 'admin/admin.env') {
+        return true;
+    }
+    if (preg_match('#^posts/[a-z0-9-]+\.md$#i', $entryName)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Backup indirme
+if (isset($_GET['download_backup'])) {
+    $downloadFile = basename((string)$_GET['download_backup']);
+    if (!isValidBackupFilename($downloadFile)) {
+        http_response_code(400);
+        exit('Invalid backup file.');
+    }
+
+    $downloadPath = $backupDir . $downloadFile;
+    if (!is_file($downloadPath)) {
+        http_response_code(404);
+        exit('Backup not found.');
+    }
+
+    header('Content-Type: application/zip');
+    header('Content-Disposition: attachment; filename="' . $downloadFile . '"');
+    header('Content-Length: ' . filesize($downloadPath));
+    readfile($downloadPath);
+    exit;
+}
 
 // Mesajlar
 $message = '';
@@ -245,12 +327,149 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 $message = 'Cache yeniden oluşturulurken hata oluştu.';
                 $messageType = 'danger';
             }
+        } elseif ($action === 'create_backup') {
+            if (!class_exists('ZipArchive')) {
+                $message = 'ZipArchive desteği bulunamadı. Yedek oluşturulamadı.';
+                $messageType = 'danger';
+            } else {
+                if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true)) {
+                    $message = 'Yedek klasörü oluşturulamadı.';
+                    $messageType = 'danger';
+                } else {
+                    $backupFile = 'backup-' . date('Ymd-His') . '.zip';
+                    $backupPath = $backupDir . $backupFile;
+
+                    $zip = new ZipArchive();
+                    if ($zip->open($backupPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+                        $message = 'Yedek dosyası oluşturulamadı.';
+                        $messageType = 'danger';
+                    } else {
+                        $addedCount = 0;
+
+                        foreach (glob(POSTS_DIR . '*.md') ?: [] as $postFile) {
+                            if (addFileToBackupZip($zip, $postFile, 'posts/' . basename($postFile))) {
+                                $addedCount++;
+                            }
+                        }
+
+                        if (addFileToBackupZip($zip, $projectRoot . '/config.local.php', 'config.local.php')) {
+                            $addedCount++;
+                        }
+                        if (addFileToBackupZip($zip, $projectRoot . '/admin/admin.env', 'admin/admin.env')) {
+                            $addedCount++;
+                        }
+
+                        $manifest = [
+                            'created_at' => date('c'),
+                            'source' => 'php-mbbs-admin',
+                            'files_added' => $addedCount
+                        ];
+                        $zip->addFromString('backup-manifest.json', json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+                        $zip->close();
+
+                        clearCache();
+                        $message = 'Yedek oluşturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
+                        $messageType = 'success';
+                        logAdminAction('create_backup', 'Created backup: ' . $backupFile);
+                    }
+                }
+            }
+        } elseif ($action === 'restore_backup') {
+            if (!class_exists('ZipArchive')) {
+                $message = 'ZipArchive desteği bulunamadı. Geri yükleme yapılamadı.';
+                $messageType = 'danger';
+            } elseif (!isset($_FILES['backup_file']) || ($_FILES['backup_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+                $message = 'Lütfen geçerli bir yedek dosyası seçin.';
+                $messageType = 'danger';
+            } else {
+                $uploadName = strtolower((string)($_FILES['backup_file']['name'] ?? ''));
+                $uploadTmp = (string)($_FILES['backup_file']['tmp_name'] ?? '');
+                $uploadSize = (int)($_FILES['backup_file']['size'] ?? 0);
+
+                if (pathinfo($uploadName, PATHINFO_EXTENSION) !== 'zip') {
+                    $message = 'Sadece .zip uzantılı yedek dosyaları kabul edilir.';
+                    $messageType = 'danger';
+                } elseif ($uploadSize <= 0 || $uploadSize > 50 * 1024 * 1024) {
+                    $message = 'Yedek dosyası boyutu geçersiz (maksimum 50MB).';
+                    $messageType = 'danger';
+                } else {
+                    $zip = new ZipArchive();
+                    if ($zip->open($uploadTmp) !== true) {
+                        $message = 'Yedek dosyası açılamadı.';
+                        $messageType = 'danger';
+                    } else {
+                        $restoredCount = 0;
+                        for ($i = 0; $i < $zip->numFiles; $i++) {
+                            $entry = $zip->getNameIndex($i);
+                            if (!is_string($entry)) {
+                                continue;
+                            }
+
+                            $entry = str_replace('\\', '/', $entry);
+                            if ($entry === 'backup-manifest.json' || substr($entry, -1) === '/') {
+                                continue;
+                            }
+
+                            if (!canRestoreEntry($entry)) {
+                                continue;
+                            }
+
+                            $stream = $zip->getStream($entry);
+                            if (!$stream) {
+                                continue;
+                            }
+
+                            $targetPath = $projectRoot . '/' . $entry;
+                            $targetDir = dirname($targetPath);
+                            if (!is_dir($targetDir)) {
+                                @mkdir($targetDir, 0755, true);
+                            }
+
+                            $content = stream_get_contents($stream);
+                            fclose($stream);
+                            if ($content === false) {
+                                continue;
+                            }
+
+                            if (file_put_contents($targetPath, $content) !== false) {
+                                $restoredCount++;
+                            }
+                        }
+                        $zip->close();
+
+                        clearCache();
+                        $message = 'Geri yükleme tamamlandı. Güncellenen dosya sayısı: ' . $restoredCount;
+                        $messageType = $restoredCount > 0 ? 'success' : 'warning';
+                        logAdminAction('restore_backup', 'Restored backup file upload, files: ' . $restoredCount);
+                    }
+                }
+            }
+        } elseif ($action === 'delete_backup') {
+            $backupFilename = basename((string)($_POST['backup_filename'] ?? ''));
+            if (!isValidBackupFilename($backupFilename)) {
+                $message = 'Geçersiz yedek dosyası adı.';
+                $messageType = 'danger';
+            } else {
+                $targetBackup = $backupDir . $backupFilename;
+                if (!is_file($targetBackup)) {
+                    $message = 'Yedek dosyası bulunamadı.';
+                    $messageType = 'danger';
+                } elseif (@unlink($targetBackup)) {
+                    $message = 'Yedek dosyası silindi: ' . $backupFilename;
+                    $messageType = 'success';
+                    logAdminAction('delete_backup', 'Deleted backup: ' . $backupFilename);
+                } else {
+                    $message = 'Yedek dosyası silinemedi.';
+                    $messageType = 'danger';
+                }
+            }
         }
     }
 }
 
 // CSRF token oluştur
 $csrfToken = generateCSRFToken();
+$backupFiles = listBackupFiles($backupDir);
 
 // Mevcut site ayarlarını al
 $currentSiteConfig = [];
@@ -444,6 +663,80 @@ if ($configLocalExists) {
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="card mt-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-hdd-stack"></i> Yedekleme ve Geri Yükleme
+                                        </h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form method="POST" class="mb-3">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                            <input type="hidden" name="action" value="create_backup">
+                                            <button type="submit" class="btn btn-outline-primary w-100">
+                                                <i class="bi bi-download"></i> Yeni Yedek Oluştur
+                                            </button>
+                                            <div class="form-text mt-2">
+                                                <code>posts/*.md</code>, <code>config.local.php</code> ve <code>admin/admin.env</code> tek zip içinde saklanır.
+                                            </div>
+                                        </form>
+
+                                        <form method="POST" enctype="multipart/form-data" class="mb-3">
+                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                            <input type="hidden" name="action" value="restore_backup">
+                                            <label for="backup_file" class="form-label">Yedek Dosyasından Geri Yükle (.zip)</label>
+                                            <input type="file" class="form-control mb-2" id="backup_file" name="backup_file" accept=".zip" required>
+                                            <button type="submit" class="btn btn-outline-danger w-100"
+                                                    onclick="return confirm('Seçilen yedek dosyasındaki içerikler mevcut dosyaların üzerine yazılacaktır. Devam edilsin mi?');">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Geri Yüklemeyi Başlat
+                                            </button>
+                                        </form>
+
+                                        <hr>
+                                        <h6 class="mb-3">Mevcut Yedekler</h6>
+                                        <?php if (empty($backupFiles)): ?>
+                                            <p class="text-muted mb-0">Henüz yedek dosyası bulunmuyor.</p>
+                                        <?php else: ?>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm align-middle">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Dosya</th>
+                                                            <th>Boyut</th>
+                                                            <th>Tarih</th>
+                                                            <th class="text-end">İşlem</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($backupFiles as $backup): ?>
+                                                            <tr>
+                                                                <td><small><?php echo htmlspecialchars($backup['filename']); ?></small></td>
+                                                                <td><small><?php echo number_format($backup['size'] / 1024, 1); ?> KB</small></td>
+                                                                <td><small><?php echo date('d.m.Y H:i', (int)$backup['modified']); ?></small></td>
+                                                                <td class="text-end">
+                                                                    <a href="settings.php?download_backup=<?php echo urlencode($backup['filename']); ?>"
+                                                                       class="btn btn-sm btn-outline-secondary">
+                                                                        <i class="bi bi-cloud-arrow-down"></i>
+                                                                    </a>
+                                                                    <form method="POST" class="d-inline">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                        <input type="hidden" name="action" value="delete_backup">
+                                                                        <input type="hidden" name="backup_filename" value="<?php echo htmlspecialchars($backup['filename']); ?>">
+                                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                                onclick="return confirm('Bu yedek dosyası silinsin mi?');">
+                                                                            <i class="bi bi-trash"></i>
+                                                                        </button>
+                                                                    </form>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
                             </div>
                             
                             <!-- Site Settings - 2. Sütun -->
@@ -547,3 +840,4 @@ if ($configLocalExists) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
+

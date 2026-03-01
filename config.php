@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 // Security headers
 header("X-Content-Type-Options: nosniff");
 header("X-Frame-Options: DENY");
@@ -10,18 +10,18 @@ header("Permissions-Policy: geolocation=(), microphone=(), camera=()");
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https://" : "http://";
 $host = htmlspecialchars($_SERVER['SERVER_NAME'] ?? 'localhost', ENT_QUOTES, 'UTF-8');
 
-// Kişisel ayarları dahil et
+// KiÅŸisel ayarlarÄ± dahil et
 if (file_exists(__DIR__ . '/config.local.php')) {
     include_once __DIR__ . '/config.local.php';
 } else {
-    // Varsayılan ayarlar (config.local.php yoksa)
+    // VarsayÄ±lan ayarlar (config.local.php yoksa)
     define('BASE_PATH', '/blog/');
     define('SITE_NAME', 'Blog');
-    define('DEFAULT_TITLE', 'Blog - Teknoloji ve Yazılım');
-    define('DEFAULT_DESCRIPTION', 'Blog yazıları');
+    define('DEFAULT_TITLE', 'Blog - Teknoloji ve YazÄ±lÄ±m');
+    define('DEFAULT_DESCRIPTION', 'Blog yazÄ±larÄ±');
     define('GA_TRACKING_ID', '');
     define('TWITTER_USERNAME', '');
-    define('AUTHOR_NAME', 'Blog Yazarı');
+    define('AUTHOR_NAME', 'Blog YazarÄ±');
     define('AUTHOR_EMAIL', '');
     define('SOCIAL_TWITTER', '');
     define('SOCIAL_GITHUB', '');
@@ -33,7 +33,7 @@ if (file_exists(__DIR__ . '/config.local.php')) {
     define('SESSION_TIMEOUT', 1800);
     define('DEFAULT_LANGUAGE', 'tr');
     define('DEFAULT_LOCALE', 'tr_TR');
-    define('SITE_KEYWORDS', 'blog, yazılım, teknoloji');
+    define('SITE_KEYWORDS', 'blog, yazÄ±lÄ±m, teknoloji');
 }
 
 // Sistem sabitleri
@@ -71,19 +71,8 @@ if (basename($_SERVER['SCRIPT_NAME']) === 'config.php') {
 }
 
 function generateSlug($string) {
-    // Türkçe karakterleri dönüştür
-    $string = mb_strtolower($string, 'UTF-8');
-    $string = str_replace(
-        ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'],
-        ['c', 'g', 'i', 'o', 's', 'u'],
-        $string
-    );
-
-    // Harf ve rakam dışındaki karakterleri tire ile değiştir
-    $string = preg_replace('/[^a-z0-9]+/', '-', $string);
-    return trim($string, '-');
+    return createSlug($string);
 }
-
 function findMissingImageAltText($markdownContent) {
     $issues = [];
     $lines = preg_split('/\r\n|\r|\n/', (string)$markdownContent);
@@ -116,6 +105,34 @@ function findMissingImageAltText($markdownContent) {
                 }
             }
         }
+    }
+
+    return $issues;
+}
+
+function getSeoChecklistIssues($title, $description, $content) {
+    $issues = [];
+
+    if (trim((string)$title) === '') {
+        $issues[] = 'Baslik eksik.';
+    }
+
+    if (trim((string)$description) === '') {
+        $issues[] = 'Meta aciklama eksik.';
+    }
+
+    if (!preg_match('/^\s*#\s+\S+/m', (string)$content)) {
+        $issues[] = 'Icerikte H1 basligi yok (Markdown: # Baslik).';
+    }
+
+    $altIssues = findMissingImageAltText($content);
+    if (count($altIssues) > 0) {
+        $lineNumbers = array_values(array_unique(array_map(function ($issue) {
+            return (int)($issue['line'] ?? 0);
+        }, $altIssues)));
+        $lineNumbers = array_values(array_filter($lineNumbers));
+        $linePreview = implode(', ', array_slice($lineNumbers, 0, 8));
+        $issues[] = 'Gorsellerde bos/eksik alt metni var. Satirlar: ' . ($linePreview !== '' ? $linePreview : '-');
     }
 
     return $issues;
@@ -236,12 +253,12 @@ function getPostContent($filePath) {
         return null;
     }
 
-    // Meta verileri ayırmak için düzenli ifade
+    // Meta verileri ayÄ±rmak iÃ§in dÃ¼zenli ifade
     if (preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $content, $matches)) {
         $metaRaw = trim($matches[1]);
         $body = trim($matches[2]);
 
-        // Meta verilerini ayrıştır
+        // Meta verilerini ayrÄ±ÅŸtÄ±r
         $meta = [];
         foreach (explode("\n", $metaRaw) as $line) {
             $line = trim($line);
@@ -252,9 +269,9 @@ function getPostContent($filePath) {
                 $key = trim($key);
                 $value = trim($value);
                 
-                // Etiketler için özel işlem
+                // Etiketler iÃ§in Ã¶zel iÅŸlem
                 if ($key === 'tags') {
-                    // [tag1, tag2, tag3] formatını temizle
+                    // [tag1, tag2, tag3] formatÄ±nÄ± temizle
                     $value = trim($value, '[]');
                     $meta[$key] = array_map('trim', explode(',', $value));
                 } else {
@@ -331,10 +348,10 @@ function clearCache() {
 }
 
 function generateSitemap() {
-    // sitemap.php dosyasını çalıştırarak sitemap oluştur
+    // sitemap.php dosyasÄ±nÄ± Ã§alÄ±ÅŸtÄ±rarak sitemap oluÅŸtur
     $sitemapCacheFile = CACHE_DIR . 'sitemap.xml';
     
-    // sitemap.php'nin içeriğini simüle et
+    // sitemap.php'nin iÃ§eriÄŸini simÃ¼le et
     $xml = '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:news="http://www.google.com/schemas/sitemap-news/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">' . "\n";
 
@@ -346,7 +363,7 @@ function generateSitemap() {
     $xml .= '    <priority>1.0</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // Arama sayfası
+    // Arama sayfasÄ±
     $xml .= '  <url>' . "\n";
     $xml .= '    <loc>' . BASE_URL . 'search</loc>' . "\n";
     $xml .= '    <lastmod>' . date('Y-m-d\TH:i:sP') . '</lastmod>' . "\n";
@@ -354,7 +371,7 @@ function generateSitemap() {
     $xml .= '    <priority>0.8</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // RSS sayfası
+    // RSS sayfasÄ±
     $xml .= '  <url>' . "\n";
     $xml .= '    <loc>' . BASE_URL . 'rss</loc>' . "\n";
     $xml .= '    <lastmod>' . date('Y-m-d\TH:i:sP') . '</lastmod>' . "\n";
@@ -362,7 +379,7 @@ function generateSitemap() {
     $xml .= '    <priority>0.9</priority>' . "\n";
     $xml .= '  </url>' . "\n";
 
-    // Blog yazıları
+    // Blog yazÄ±larÄ±
     $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
     $categories = [];
     $tags = [];
@@ -394,7 +411,7 @@ function generateSitemap() {
                 $xml .= '    <changefreq>monthly</changefreq>' . "\n";
                 $xml .= '    <priority>0.8</priority>' . "\n";
                 
-                // News sitemap için ek bilgiler
+                // News sitemap iÃ§in ek bilgiler
                 $xml .= '    <news:news>' . "\n";
                 $xml .= '      <news:publication>' . "\n";
                 $xml .= '        <news:name>' . htmlspecialchars(SITE_NAME) . '</news:name>' . "\n";
@@ -410,7 +427,7 @@ function generateSitemap() {
         }
     }
 
-    // Kategori sayfaları
+    // Kategori sayfalarÄ±
     foreach ($categories as $category) {
         $xml .= '  <url>' . "\n";
         $xml .= '    <loc>' . BASE_URL . 'cat/' . rawurlencode($category) . '</loc>' . "\n";
@@ -420,7 +437,7 @@ function generateSitemap() {
         $xml .= '  </url>' . "\n";
     }
 
-    // Etiket sayfaları
+    // Etiket sayfalarÄ±
     foreach ($tags as $tag) {
         $xml .= '  <url>' . "\n";
         $xml .= '    <loc>' . BASE_URL . 'tag/' . rawurlencode($tag) . '</loc>' . "\n";
@@ -441,12 +458,12 @@ function generateSitemap() {
 }
 
 function parsePost($content, $slug) {
-    // Meta verileri ayırmak için düzenli ifade
+    // Meta verileri ayÄ±rmak iÃ§in dÃ¼zenli ifade
     if (preg_match('/^---\s*\n(.*?)\n---\s*\n(.*)$/s', $content, $matches)) {
         $metaRaw = trim($matches[1]);
         $body = trim($matches[2]);
 
-        // Meta verilerini ayrıştır
+        // Meta verilerini ayrÄ±ÅŸtÄ±r
         $meta = [];
         foreach (explode("\n", $metaRaw) as $line) {
             $line = trim($line);
@@ -457,9 +474,9 @@ function parsePost($content, $slug) {
                 $key = trim($key);
                 $value = trim($value);
                 
-                // Etiketler için özel işlem
+                // Etiketler iÃ§in Ã¶zel iÅŸlem
                 if ($key === 'tags') {
-                    // [tag1, tag2, tag3] formatını temizle
+                    // [tag1, tag2, tag3] formatÄ±nÄ± temizle
                     $value = trim($value, '[]');
                     $meta[$key] = array_map('trim', explode(',', $value));
                 } else {
@@ -479,19 +496,39 @@ function parsePost($content, $slug) {
 }
 
 function createSlug($string) {
-    // Türkçe karakterleri dönüştür
-    $string = mb_strtolower($string, 'UTF-8');
-    $string = str_replace(
-        ['ç', 'ğ', 'ı', 'ö', 'ş', 'ü'],
-        ['c', 'g', 'i', 'o', 's', 'u'],
-        $string
-    );
+    $normalized = mb_strtolower((string)$string, 'UTF-8');
+    $normalized = strtr($normalized, [
+        'ç' => 'c',
+        'ğ' => 'g',
+        'ı' => 'i',
+        'ö' => 'o',
+        'ş' => 's',
+        'ü' => 'u'
+    ]);
+    $normalized = preg_replace('/[^\p{L}\p{N}]+/u', '-', $normalized);
+    $normalized = trim((string)$normalized, '-');
 
-    // Harf ve rakam dışındaki karakterleri tire ile değiştir
-    $string = preg_replace('/[^a-z0-9]+/', '-', $string);
-    return trim($string, '-');
+    // Keep filenames URL-safe and deterministic.
+    $slug = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $normalized);
+    $slug = strtolower((string)$slug);
+    $slug = preg_replace('/[^a-z0-9]+/', '-', $slug);
+    $slug = trim((string)$slug, '-');
+
+    return $slug !== '' ? $slug : 'post';
 }
 
+function generateUniqueSlug($title, $postsDir = POSTS_DIR) {
+    $baseSlug = createSlug($title);
+    $slug = $baseSlug;
+    $counter = 2;
+
+    while (file_exists($postsDir . $slug . '.md')) {
+        $slug = $baseSlug . '-' . $counter;
+        $counter++;
+    }
+
+    return $slug;
+}
 function getCacheSize() {
     if (!is_dir(CACHE_DIR)) {
         return '0 bytes';
@@ -516,3 +553,4 @@ function getCacheSize() {
     }
 }
 ?>
+

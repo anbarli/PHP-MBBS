@@ -61,15 +61,15 @@
   - Yazilar taslak olarak kaydedilebilsin.
   - Yalnizca yayinlanan yazilar public tarafta gorunsun.
 
-- [ ] Otomatik slug uretimi ve cakisma kontrolu ekle.
+- [x] Otomatik slug uretimi ve cakisma kontrolu ekle.
   - Basliktan slug uret.
   - Ayni slug varsa benzersizlestir (`-2`, `-3` vb.).
 
-- [ ] Basit backup/restore araci ekle.
+- [x] Basit backup/restore araci ekle.
   - `posts/` ve kritik config dosyalari tek arsivde yedeklensin.
   - Ihtiyac halinde hizli geri yukleme akisi olsun.
 
-- [ ] Yayin oncesi SEO kontrol listesi ekle.
+- [x] Yayin oncesi SEO kontrol listesi ekle.
   - Eksik `title`, `description`, `h1`, `alt` icin admin tarafta uyari ver.
 
 ### Nice to Have
@@ -78,7 +78,7 @@
   - Boyut limiti, format donusumu (`webp`) ve temel sikistirma uygula.
   - `alt` metni zorunlu/onerili alan olarak destekle.
 
-- [ ] Arama deneyimini iyilestir.
+- [x] Arama deneyimini iyilestir.
   - Baslik ve etiket eslesmelerine daha yuksek agirlik ver.
   - Basit typo toleransi (hafif fuzzy) ekle.
 
@@ -86,7 +86,7 @@
   - Ozet/tam icerik secimi.
   - Kategori veya etikete gore feed uretimi.
 
-- [ ] Tema (dark/light) kodunu sadeleÅŸtir.
+- [x] Tema (dark/light) kodunu sadeleÅŸtir.
   - Mevcut scripti modulerlestir ve gereksiz isleri kaldir.
   - INP acisindan daha az ana thread maliyeti hedefle.
 

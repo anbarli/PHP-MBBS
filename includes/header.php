@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
 	<?php
@@ -249,6 +249,23 @@
 	</style>
 </head>
 <body>
+<script>
+	(function () {
+		try {
+			var storedTheme = localStorage.getItem('theme');
+			var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+			var theme = storedTheme || (prefersDark ? 'dark' : 'light');
+			if (theme === 'dark') {
+				document.body.classList.add('dark-mode');
+				document.documentElement.setAttribute('data-bs-theme', 'dark');
+			} else {
+				document.documentElement.setAttribute('data-bs-theme', 'light');
+			}
+		} catch (e) {
+			document.documentElement.setAttribute('data-bs-theme', 'light');
+		}
+	})();
+</script>
 <?php
 function getCategoryListForMenu() {
 	$stats = getBlogStats();
@@ -258,10 +275,10 @@ $categoryList = getCategoryListForMenu();
 // ...existing code...
 ?>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark site-nav" aria-label="Ana menü">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark site-nav" aria-label="Ana menÃ¼">
     <div class="container">
       <a class="navbar-brand site-brand" href="<?php echo BASE_PATH; ?>"><?php echo SITE_NAME; ?></a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="Menüyü aç/kapat">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbara" aria-controls="navbara" aria-expanded="false" aria-label="MenÃ¼yÃ¼ aÃ§/kapat">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navbara">
@@ -282,13 +299,13 @@ $categoryList = getCategoryListForMenu();
                     </div>
 
                     <form class="d-flex nav-search" role="search" method="get" action="<?php echo BASE_URL; ?>search">
-                        <input class="form-control nav-search-input" type="search" name="q" placeholder="Yazı ara..." aria-label="Yazı ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>">
+                        <input class="form-control nav-search-input" type="search" name="q" placeholder="YazÄ± ara..." aria-label="YazÄ± ara" value="<?php echo isset($_GET['q']) ? htmlspecialchars($_GET['q'], ENT_QUOTES, 'UTF-8') : ''; ?>">
                         <button class="btn btn-outline-light nav-btn nav-search-btn" type="submit" aria-label="Ara">
                             <i class="bi bi-search"></i>
                         </button>
                     </form>
 
-                    <button id="darkModeToggle" class="btn btn-outline-light nav-btn nav-theme-toggle" type="button" title="Karanlık modu aç/kapat" aria-label="Karanlık mod">
+                    <button id="darkModeToggle" class="btn btn-outline-light nav-btn nav-theme-toggle" type="button" title="Tema degistir" aria-label="Tema degistir" aria-pressed="false">
                         <i id="moonIcon" class="bi bi-moon-fill" style="display:inline;"></i>
                         <i id="sunIcon" class="bi bi-sun-fill" style="display:none;"></i>
                     </button>
@@ -301,3 +318,4 @@ $categoryList = getCategoryListForMenu();
 	<div class="container p-2">
 		<div class="row g-4 py-5">
 			<div class="col">
+
