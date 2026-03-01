@@ -1,29 +1,29 @@
 ﻿<?php
 /**
  * Admin Settings
- * Ayarlar sayfası
+ * Ayarlar sayfasÄ±
  */
 
 // UTF-8 encoding ayarla
 header('Content-Type: text/html; charset=utf-8');
 
-// Admin güvenlik sabiti tanımla
+// Admin gÃ¼venlik sabiti tanÄ±mla
 define('ADMIN_SECURE', true);
 
-// Ana config dosyasını dahil et
+// Ana config dosyasÄ±nÄ± dahil et
 require_once '../config.php';
 
-// Güvenlik fonksiyonlarını dahil et
+// GÃ¼venlik fonksiyonlarÄ±nÄ± dahil et
 require_once '../includes/security.php';
 
-// Session başlat ve yetki kontrolü
+// Session baÅŸlat ve yetki kontrolÃ¼
 initSecureSession();
 requireAdminAuth();
 
-// Admin config yükle
+// Admin config yÃ¼kle
 $adminConfig = loadAdminConfig();
 
-// Config.local.php dosyasını yükle
+// Config.local.php dosyasÄ±nÄ± yÃ¼kle
 $configLocalPath = '../config.local.php';
 $configLocalExists = file_exists($configLocalPath);
 $projectRoot = dirname(__DIR__);
@@ -113,17 +113,17 @@ if (isset($_GET['download_backup'])) {
 $message = '';
 $messageType = '';
 
-// Form gönderildi mi?
+// Form gÃ¶nderildi mi?
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF kontrolü
+    // CSRF kontrolÃ¼
     if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-        $message = 'Güvenlik hatası. Lütfen tekrar deneyin.';
+        $message = 'GÃ¼venlik hatasÄ±. LÃ¼tfen tekrar deneyin.';
         $messageType = 'danger';
     } else {
         $action = sanitizeInput($_POST['action'] ?? '');
         
         if ($action === 'update_admin') {
-            // Admin bilgilerini güncelle
+            // Admin bilgilerini gÃ¼ncelle
             $newAdminUsername = sanitizeInput($_POST['admin_username'] ?? '');
             $newAdminName = sanitizeInput($_POST['admin_name'] ?? '');
             $newAdminEmail = sanitizeInput($_POST['admin_email'] ?? '');
@@ -133,46 +133,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Validasyon
             if (empty($newAdminUsername)) {
-                $message = 'Kullanıcı adı gereklidir.';
+                $message = 'KullanÄ±cÄ± adÄ± gereklidir.';
                 $messageType = 'danger';
             } elseif (empty($newAdminName)) {
-                $message = 'Admin adı gereklidir.';
+                $message = 'Admin adÄ± gereklidir.';
                 $messageType = 'danger';
             } elseif (empty($newAdminEmail) || !filter_var($newAdminEmail, FILTER_VALIDATE_EMAIL)) {
-                $message = 'Geçerli bir e-posta adresi girin.';
+                $message = 'GeÃ§erli bir e-posta adresi girin.';
                 $messageType = 'danger';
             } else {
                 $configUpdated = false;
                 
-                // Admin kullanıcı adı, adı ve e-posta güncelle
+                // Admin kullanÄ±cÄ± adÄ±, adÄ± ve e-posta gÃ¼ncelle
                 $adminConfig['ADMIN_USERNAME'] = $newAdminUsername;
                 $adminConfig['ADMIN_NAME'] = $newAdminName;
                 $adminConfig['ADMIN_EMAIL'] = $newAdminEmail;
                 $configUpdated = true;
                 
-                // Şifre değişikliği
+                // Åifre deÄŸiÅŸikliÄŸi
                 if (!empty($currentPassword)) {
                     if (!verifyPassword($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
-                        $message = 'Mevcut şifre yanlış.';
+                        $message = 'Mevcut ÅŸifre yanlÄ±ÅŸ.';
                         $messageType = 'danger';
                     } elseif (empty($newPassword)) {
-                        $message = 'Yeni şifre gereklidir.';
+                        $message = 'Yeni ÅŸifre gereklidir.';
                         $messageType = 'danger';
                     } elseif (strlen($newPassword) < 8) {
-                        $message = 'Yeni şifre en az 8 karakter olmalıdır.';
+                        $message = 'Yeni ÅŸifre en az 8 karakter olmalÄ±dÄ±r.';
                         $messageType = 'danger';
                     } elseif ($newPassword !== $confirmPassword) {
-                        $message = 'Şifreler eşleşmiyor.';
+                        $message = 'Åifreler eÅŸleÅŸmiyor.';
                         $messageType = 'danger';
                     } else {
                         $adminConfig['ADMIN_PASSWORD'] = hashPassword($newPassword);
                         $configUpdated = true;
-                        $message .= ' Şifre güncellendi.';
+                        $message .= ' Åifre gÃ¼ncellendi.';
                     }
                 }
                 
                 if ($configUpdated) {
-                    // Admin klasörünü dinamik olarak bul
+                    // Admin klasÃ¶rÃ¼nÃ¼ dinamik olarak bul
                     $adminDir = dirname(__DIR__) . '/admin';
                     if (!is_dir($adminDir)) {
                         $possibleDirs = ['admin1', 'admin2', 'admin3', 'admin4', 'admin5'];
@@ -186,22 +186,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $envFile = $adminDir . '/admin.env';
                     
-                    // Admin config dosyasını güncelle
+                    // Admin config dosyasÄ±nÄ± gÃ¼ncelle
                     if (updateAdminConfig($adminConfig)) {
-                        // Config'i yeniden yükle
+                        // Config'i yeniden yÃ¼kle
                         $adminConfig = loadAdminConfig();
-                        $message = 'Admin ayarları başarıyla güncellendi.' . $message;
+                        $message = 'Admin ayarlarÄ± baÅŸarÄ±yla gÃ¼ncellendi.' . $message;
                         $messageType = 'success';
                         logAdminAction('update_admin_settings', 'Updated admin settings');
                     } else {
-                        $message = 'Admin ayarları kaydedilirken hata oluştu.';
+                        $message = 'Admin ayarlarÄ± kaydedilirken hata oluÅŸtu.';
                         $messageType = 'danger';
                         logError('Admin settings update failed', ['file' => 'admin/settings.php']);
                     }
                 }
             }
         } elseif ($action === 'update_site_config') {
-            // Site ayarlarını güncelle
+            // Site ayarlarÄ±nÄ± gÃ¼ncelle
             $siteName = sanitizeInput($_POST['site_name'] ?? '');
             $defaultTitle = sanitizeInput($_POST['default_title'] ?? '');
             $defaultDescription = sanitizeInput($_POST['default_description'] ?? '');
@@ -215,91 +215,91 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $siteKeywords = sanitizeInput($_POST['site_keywords'] ?? '');
             $basePath = sanitizeInput($_POST['base_path'] ?? '');
             
-            // Debug: Dosya yolu kontrolü
+            // Debug: Dosya yolu kontrolÃ¼
             $configLocalPath = '../config.local.php';
             $configLocalExists = file_exists($configLocalPath);
             $configLocalWritable = is_writable($configLocalPath);
             
-            // Config.local.php içeriğini oluştur
+            // Config.local.php iÃ§eriÄŸini oluÅŸtur
             $configContent = "<?php
-// Kişisel Ayarlar - Bu dosya git'e dahil edilmez
-// Kendi ayarlarınızı buraya yazın
+// KiÅŸisel Ayarlar - Bu dosya git'e dahil edilmez
+// Kendi ayarlarÄ±nÄ±zÄ± buraya yazÄ±n
 
-// Temel URL ayarları
-define('BASE_PATH', '$basePath'); // Kendi dizin yapınıza göre değiştirin
+// Temel URL ayarlarÄ±
+define('BASE_PATH', '$basePath'); // Kendi dizin yapÄ±nÄ±za gÃ¶re deÄŸiÅŸtirin
 
 // Site bilgileri
 define('SITE_NAME', '$siteName');
 define('DEFAULT_TITLE', '$defaultTitle');
 define('DEFAULT_DESCRIPTION', '$defaultDescription');
 
-// Google Analytics ID (isteğe bağlı)
+// Google Analytics ID (isteÄŸe baÄŸlÄ±)
 define('GA_TRACKING_ID', '$gaTrackingId');
 
-// Twitter kullanıcı adı (isteğe bağlı)
+// Twitter kullanÄ±cÄ± adÄ± (isteÄŸe baÄŸlÄ±)
 define('TWITTER_USERNAME', '$twitterUsername');
 
 // Yazar bilgileri
 define('AUTHOR_NAME', '$authorName');
 define('AUTHOR_EMAIL', '$authorEmail');
 
-// Sosyal medya linkleri (isteğe bağlı)
+// Sosyal medya linkleri (isteÄŸe baÄŸlÄ±)
 define('SOCIAL_TWITTER', '$socialTwitter');
 define('SOCIAL_GITHUB', '$socialGithub');
 define('SOCIAL_LINKEDIN', '$socialLinkedin');
 
-// Cache ayarları
+// Cache ayarlarÄ±
 define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600); // 1 saat
 
-// Güvenlik ayarları
+// GÃ¼venlik ayarlarÄ±
 define('ENABLE_ERROR_LOGGING', true);
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('SESSION_TIMEOUT', 1800); // 30 dakika
 
-// SEO ayarları
+// SEO ayarlarÄ±
 define('DEFAULT_LANGUAGE', 'tr');
 define('DEFAULT_LOCALE', 'tr_TR');
 define('SITE_KEYWORDS', '$siteKeywords');
 ?>";
             
-            // Config.local.php dosyasını güncelle
+            // Config.local.php dosyasÄ±nÄ± gÃ¼ncelle
             if (file_put_contents($configLocalPath, $configContent)) {
-                $message = 'Site ayarları başarıyla güncellendi.';
+                $message = 'Site ayarlarÄ± baÅŸarÄ±yla gÃ¼ncellendi.';
                 $messageType = 'success';
                 logAdminAction('update_site_config', 'Updated site configuration');
                 
                 // Cache'i temizle
                 clearCache();
             } else {
-                $message = 'Site ayarları kaydedilirken hata oluştu.';
+                $message = 'Site ayarlarÄ± kaydedilirken hata oluÅŸtu.';
                 $messageType = 'danger';
                 logError('Site config write failed', ['file' => $configLocalPath]);
             }
         } elseif ($action === 'clear_cache') {
             // Cache temizle
             if (clearCache()) {
-                $message = 'Cache başarıyla temizlendi.';
+                $message = 'Cache baÅŸarÄ±yla temizlendi.';
                 $messageType = 'success';
                 logAdminAction('clear_cache', 'Cleared application cache');
             } else {
-                $message = 'Cache temizlenirken hata oluştu.';
+                $message = 'Cache temizlenirken hata oluÅŸtu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'generate_sitemap') {
-            // Sitemap oluştur
+            // Sitemap oluÅŸtur
             if (generateSitemap()) {
-                $message = 'Sitemap başarıyla oluşturuldu.';
+                $message = 'Sitemap baÅŸarÄ±yla oluÅŸturuldu.';
                 $messageType = 'success';
                 logAdminAction('generate_sitemap', 'Generated sitemap');
             } else {
-                $message = 'Sitemap oluşturulurken hata oluştu.';
+                $message = 'Sitemap oluÅŸturulurken hata oluÅŸtu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'regenerate_cache') {
-            // Cache'i yeniden oluştur
+            // Cache'i yeniden oluÅŸtur
             if (clearCache()) {
-                // Cache'i yeniden oluştur
+                // Cache'i yeniden oluÅŸtur
                 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
                 $postFilesWithDates = [];
                 
@@ -320,20 +320,20 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 });
                 
                 setCachedPosts($postFilesWithDates);
-                $message = 'Cache başarıyla yeniden oluşturuldu. Yazı sayısı: ' . count($postFilesWithDates);
+                $message = 'Cache baÅŸarÄ±yla yeniden oluÅŸturuldu. YazÄ± sayÄ±sÄ±: ' . count($postFilesWithDates);
                 $messageType = 'success';
                 logAdminAction('regenerate_cache', 'Regenerated cache with ' . count($postFilesWithDates) . ' posts');
             } else {
-                $message = 'Cache yeniden oluşturulurken hata oluştu.';
+                $message = 'Cache yeniden oluÅŸturulurken hata oluÅŸtu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'create_backup') {
             if (!class_exists('ZipArchive')) {
-                $message = 'ZipArchive desteği bulunamadı. Yedek oluşturulamadı.';
+                $message = 'ZipArchive desteÄŸi bulunamadÄ±. Yedek oluÅŸturulamadÄ±.';
                 $messageType = 'danger';
             } else {
                 if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true)) {
-                    $message = 'Yedek klasörü oluşturulamadı.';
+                    $message = 'Yedek klasÃ¶rÃ¼ oluÅŸturulamadÄ±.';
                     $messageType = 'danger';
                 } else {
                     $backupFile = 'backup-' . date('Ymd-His') . '.zip';
@@ -341,7 +341,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
 
                     $zip = new ZipArchive();
                     if ($zip->open($backupPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-                        $message = 'Yedek dosyası oluşturulamadı.';
+                        $message = 'Yedek dosyasÄ± oluÅŸturulamadÄ±.';
                         $messageType = 'danger';
                     } else {
                         $addedCount = 0;
@@ -368,7 +368,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         $zip->close();
 
                         clearCache();
-                        $message = 'Yedek oluşturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
+                        $message = 'Yedek oluÅŸturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
                         $messageType = 'success';
                         logAdminAction('create_backup', 'Created backup: ' . $backupFile);
                     }
@@ -376,10 +376,10 @@ define('SITE_KEYWORDS', '$siteKeywords');
             }
         } elseif ($action === 'restore_backup') {
             if (!class_exists('ZipArchive')) {
-                $message = 'ZipArchive desteği bulunamadı. Geri yükleme yapılamadı.';
+                $message = 'ZipArchive desteÄŸi bulunamadÄ±. Geri yÃ¼kleme yapÄ±lamadÄ±.';
                 $messageType = 'danger';
             } elseif (!isset($_FILES['backup_file']) || ($_FILES['backup_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-                $message = 'Lütfen geçerli bir yedek dosyası seçin.';
+                $message = 'LÃ¼tfen geÃ§erli bir yedek dosyasÄ± seÃ§in.';
                 $messageType = 'danger';
             } else {
                 $uploadName = strtolower((string)($_FILES['backup_file']['name'] ?? ''));
@@ -387,15 +387,15 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 $uploadSize = (int)($_FILES['backup_file']['size'] ?? 0);
 
                 if (pathinfo($uploadName, PATHINFO_EXTENSION) !== 'zip') {
-                    $message = 'Sadece .zip uzantılı yedek dosyaları kabul edilir.';
+                    $message = 'Sadece .zip uzantÄ±lÄ± yedek dosyalarÄ± kabul edilir.';
                     $messageType = 'danger';
                 } elseif ($uploadSize <= 0 || $uploadSize > 50 * 1024 * 1024) {
-                    $message = 'Yedek dosyası boyutu geçersiz (maksimum 50MB).';
+                    $message = 'Yedek dosyasÄ± boyutu geÃ§ersiz (maksimum 50MB).';
                     $messageType = 'danger';
                 } else {
                     $zip = new ZipArchive();
                     if ($zip->open($uploadTmp) !== true) {
-                        $message = 'Yedek dosyası açılamadı.';
+                        $message = 'Yedek dosyasÄ± aÃ§Ä±lamadÄ±.';
                         $messageType = 'danger';
                     } else {
                         $restoredCount = 0;
@@ -438,7 +438,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         $zip->close();
 
                         clearCache();
-                        $message = 'Geri yükleme tamamlandı. Güncellenen dosya sayısı: ' . $restoredCount;
+                        $message = 'Geri yÃ¼kleme tamamlandÄ±. GÃ¼ncellenen dosya sayÄ±sÄ±: ' . $restoredCount;
                         $messageType = $restoredCount > 0 ? 'success' : 'warning';
                         logAdminAction('restore_backup', 'Restored backup file upload, files: ' . $restoredCount);
                     }
@@ -447,19 +447,19 @@ define('SITE_KEYWORDS', '$siteKeywords');
         } elseif ($action === 'delete_backup') {
             $backupFilename = basename((string)($_POST['backup_filename'] ?? ''));
             if (!isValidBackupFilename($backupFilename)) {
-                $message = 'Geçersiz yedek dosyası adı.';
+                $message = 'GeÃ§ersiz yedek dosyasÄ± adÄ±.';
                 $messageType = 'danger';
             } else {
                 $targetBackup = $backupDir . $backupFilename;
                 if (!is_file($targetBackup)) {
-                    $message = 'Yedek dosyası bulunamadı.';
+                    $message = 'Yedek dosyasÄ± bulunamadÄ±.';
                     $messageType = 'danger';
                 } elseif (@unlink($targetBackup)) {
-                    $message = 'Yedek dosyası silindi: ' . $backupFilename;
+                    $message = 'Yedek dosyasÄ± silindi: ' . $backupFilename;
                     $messageType = 'success';
                     logAdminAction('delete_backup', 'Deleted backup: ' . $backupFilename);
                 } else {
-                    $message = 'Yedek dosyası silinemedi.';
+                    $message = 'Yedek dosyasÄ± silinemedi.';
                     $messageType = 'danger';
                 }
             }
@@ -467,14 +467,18 @@ define('SITE_KEYWORDS', '$siteKeywords');
     }
 }
 
-// CSRF token oluştur
+// CSRF token oluÅŸtur
 $csrfToken = generateCSRFToken();
 $backupFiles = listBackupFiles($backupDir);
+$backupCount = count($backupFiles);
+$backupDirWritable = is_dir($backupDir) && is_writable($backupDir);
+$configLocalWritable = $configLocalExists ? is_writable($configLocalPath) : is_writable(dirname($configLocalPath));
+$zipArchiveAvailable = class_exists('ZipArchive');
 
-// Mevcut site ayarlarını al
+// Mevcut site ayarlarÄ±nÄ± al
 $currentSiteConfig = [];
 if ($configLocalExists) {
-    // Config.local.php'den mevcut değerleri al
+    // Config.local.php'den mevcut deÄŸerleri al
     $currentSiteConfig = [
         'site_name' => defined('SITE_NAME') ? SITE_NAME : '',
         'default_title' => defined('DEFAULT_TITLE') ? DEFAULT_TITLE : '',
@@ -520,7 +524,7 @@ if ($configLocalExists) {
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                         <a class="nav-link" href="posts.php">
-                            <i class="bi bi-file-text"></i> Yazılar
+                            <i class="bi bi-file-text"></i> YazÄ±lar
                         </a>
                         <a class="nav-link" href="categories.php">
                             <i class="bi bi-folder"></i> Kategoriler
@@ -530,13 +534,13 @@ if ($configLocalExists) {
                         </a>
                         <hr class="text-white-50">
                         <a class="nav-link" href="../" target="_blank">
-                            <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
+                            <i class="bi bi-box-arrow-up-right"></i> Siteyi GÃ¶rÃ¼ntÃ¼le
                         </a>
                         <form method="POST" action="dashboard.php" class="sidebar-logout-form">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                             <input type="hidden" name="action" value="logout">
                             <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                                <i class="bi bi-box-arrow-right"></i> Çıkış Yap
+                                <i class="bi bi-box-arrow-right"></i> Ã‡Ä±kÄ±ÅŸ Yap
                             </button>
                         </form>
                     </nav>
@@ -552,7 +556,7 @@ if ($configLocalExists) {
                             <h4 class="mb-0">Ayarlar</h4>
                             <div class="d-flex align-items-center">
                                 <span class="badge bg-primary fs-6">
-                                    <i class="bi bi-gear"></i> Yönetim
+                                    <i class="bi bi-gear"></i> YÃ¶netim
                                 </span>
                             </div>
                         </div>
@@ -566,15 +570,70 @@ if ($configLocalExists) {
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         <?php endif; ?>
-                        
-                        <div class="row">
-                            <!-- Admin Settings - 1. Sütun -->
-                            <div class="col-md-6">
+                        <div class="settings-page-intro mb-4">
+                            <h5 class="mb-1">Ayar Merkezi</h5>
+                            <p class="text-muted mb-0">Hesap bilgileri, site konfigÃ¼rasyonu ve bakÄ±m iÅŸlemlerini tek ekrandan yÃ¶netebilirsiniz.</p>
+                        </div>
+
+                        <div class="row g-3 mb-4 settings-status-grid">
+                            <div class="col-sm-6 col-xl-3">
+                                <div class="settings-status-card">
+                                    <small class="text-muted">Config Durumu</small>
+                                    <div class="fw-semibold mt-1">
+                                        <?php if ($configLocalExists): ?>
+                                            <span class="badge bg-success">config.local.php var</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-warning text-dark">config.local.php yok</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xl-3">
+                                <div class="settings-status-card">
+                                    <small class="text-muted">Yazma Ä°zni</small>
+                                    <div class="fw-semibold mt-1">
+                                        <?php if ($configLocalWritable): ?>
+                                            <span class="badge bg-success">Config yazÄ±labilir</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">Config yazÄ±lamÄ±yor</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xl-3">
+                                <div class="settings-status-card">
+                                    <small class="text-muted">Yedekler</small>
+                                    <div class="fw-semibold mt-1">
+                                        <span class="badge bg-primary"><?php echo $backupCount; ?> dosya</span>
+                                        <?php if (!$backupDirWritable): ?>
+                                            <span class="badge bg-danger ms-1">KlasÃ¶r yazÄ±lamÄ±yor</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6 col-xl-3">
+                                <div class="settings-status-card">
+                                    <small class="text-muted">ZipArchive</small>
+                                    <div class="fw-semibold mt-1">
+                                        <?php if ($zipArchiveAvailable): ?>
+                                            <span class="badge bg-success">HazÄ±r</span>
+                                        <?php else: ?>
+                                            <span class="badge bg-danger">Eksik</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-4 settings-layout">
+                            <!-- Admin Settings - 1. SÃ¼tun -->
+                            <div class="col-xl-7">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h5 class="mb-0">
                                             <i class="bi bi-person-gear"></i> Admin Bilgileri
                                         </h5>
+                                        <small class="text-muted">KullanÄ±cÄ± bilgileri ve ÅŸifre iÅŸlemleri</small>
                                     </div>
                                     <div class="card-body">
                                         <form method="POST">
@@ -582,13 +641,13 @@ if ($configLocalExists) {
                                             <input type="hidden" name="action" value="update_admin">
                                             
                                             <div class="mb-3">
-                                                <label for="admin_username" class="form-label">Kullanıcı Adı</label>
+                                                <label for="admin_username" class="form-label">KullanÄ±cÄ± AdÄ±</label>
                                                 <input type="text" class="form-control" id="admin_username" name="admin_username" 
                                                        value="<?php echo htmlspecialchars($adminConfig['ADMIN_USERNAME'] ?? ''); ?>" required>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="admin_name" class="form-label">Admin Adı</label>
+                                                <label for="admin_name" class="form-label">Admin AdÄ±</label>
                                                 <input type="text" class="form-control" id="admin_name" name="admin_name" 
                                                        value="<?php echo htmlspecialchars($adminConfig['ADMIN_NAME'] ?? ''); ?>" required>
                                             </div>
@@ -600,152 +659,198 @@ if ($configLocalExists) {
                                             </div>
                                             
                                             <hr>
-                                            <h6>Şifre Değiştir</h6>
-                                            <small class="text-muted">Şifrenizi değiştirmek istemiyorsanız boş bırakın.</small>
+                                            <h6>Åifre DeÄŸiÅŸtir</h6>
+                                            <small class="text-muted">Åifrenizi deÄŸiÅŸtirmek istemiyorsanÄ±z boÅŸ bÄ±rakÄ±n.</small>
                                             
                                             <div class="mb-3">
-                                                <label for="current_password" class="form-label">Mevcut Şifre</label>
+                                                <label for="current_password" class="form-label">Mevcut Åifre</label>
                                                 <input type="password" class="form-control" id="current_password" name="current_password">
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="new_password" class="form-label">Yeni Şifre</label>
+                                                <label for="new_password" class="form-label">Yeni Åifre</label>
                                                 <input type="password" class="form-control" id="new_password" name="new_password" 
                                                        minlength="8">
                                                 <div class="form-text">En az 8 karakter</div>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="confirm_password" class="form-label">Yeni Şifre (Tekrar)</label>
+                                                <label for="confirm_password" class="form-label">Yeni Åifre (Tekrar)</label>
                                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
                                                        minlength="8">
                                             </div>
                                             
                                             <button type="submit" class="btn btn-primary">
-                                                <i class="bi bi-check-circle"></i> Güncelle
+                                                <i class="bi bi-check-circle"></i> GÃ¼ncelle
                                             </button>
                                         </form>
                                     </div>
                                 </div>
-                                
-                                <!-- System Tools - Admin Bilgileri altinda -->
-                                <div class="card">
+
+                                <div class="card mt-4 settings-ops-card">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-tools"></i> Sistem Araçları
+                                            <i class="bi bi-sliders"></i> Sistem Islemleri
                                         </h5>
+                                        <small class="text-muted">Bakim araclari ve yedekleme adimlari</small>
                                     </div>
                                     <div class="card-body">
-                                        <div class="d-grid gap-2">
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="clear_cache">
-                                                <button type="submit" class="btn btn-outline-warning w-100 mb-2">
-                                                    <i class="bi bi-trash"></i> Cache Temizle
+                                        <ul class="nav nav-tabs settings-ops-tabs mb-3" id="settingsOpsTabs" role="tablist">
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link active" id="ops-maintenance-tab" data-bs-toggle="tab" data-bs-target="#ops-maintenance-pane" type="button" role="tab" aria-controls="ops-maintenance-pane" aria-selected="true">
+                                                    Bakim
                                                 </button>
-                                            </form>
-                                            
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="generate_sitemap">
-                                                <button type="submit" class="btn btn-outline-info w-100 mb-2">
-                                                    <i class="bi bi-sitemap"></i> Sitemap Oluştur
+                                            </li>
+                                            <li class="nav-item" role="presentation">
+                                                <button class="nav-link" id="ops-backup-tab" data-bs-toggle="tab" data-bs-target="#ops-backup-pane" type="button" role="tab" aria-controls="ops-backup-pane" aria-selected="false">
+                                                    Yedekleme
                                                 </button>
-                                            </form>
-                                            
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                <input type="hidden" name="action" value="regenerate_cache">
-                                                <button type="submit" class="btn btn-outline-success w-100 mb-2">
-                                                    <i class="bi bi-arrow-clockwise"></i> Cache Yeniden Oluştur
-                                                </button>
-                                            </form>
+                                            </li>
+                                        </ul>
+
+                                        <div class="tab-content" id="settingsOpsTabContent">
+                                            <div class="tab-pane fade show active" id="ops-maintenance-pane" role="tabpanel" aria-labelledby="ops-maintenance-tab" tabindex="0">
+                                                <div class="accordion" id="maintenanceAccordion">
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header" id="maintenanceHeadingOne">
+                                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#maintenanceCollapseOne" aria-expanded="true" aria-controls="maintenanceCollapseOne">
+                                                                Hizli Bakim Araclari
+                                                            </button>
+                                                        </h2>
+                                                        <div id="maintenanceCollapseOne" class="accordion-collapse collapse show" aria-labelledby="maintenanceHeadingOne" data-bs-parent="#maintenanceAccordion">
+                                                            <div class="accordion-body">
+                                                                <div class="d-grid gap-2">
+                                                                    <form method="POST">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                        <input type="hidden" name="action" value="clear_cache">
+                                                                        <button type="submit" class="btn btn-outline-warning w-100">
+                                                                            <i class="bi bi-trash"></i> Cache Temizle
+                                                                        </button>
+                                                                    </form>
+
+                                                                    <form method="POST">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                        <input type="hidden" name="action" value="generate_sitemap">
+                                                                        <button type="submit" class="btn btn-outline-info w-100">
+                                                                            <i class="bi bi-sitemap"></i> Sitemap Olustur
+                                                                        </button>
+                                                                    </form>
+
+                                                                    <form method="POST">
+                                                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                        <input type="hidden" name="action" value="regenerate_cache">
+                                                                        <button type="submit" class="btn btn-outline-success w-100">
+                                                                            <i class="bi bi-arrow-clockwise"></i> Cache Yeniden Olustur
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="tab-pane fade" id="ops-backup-pane" role="tabpanel" aria-labelledby="ops-backup-tab" tabindex="0">
+                                                <div class="accordion" id="backupAccordion">
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header" id="backupHeadingOne">
+                                                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#backupCollapseOne" aria-expanded="true" aria-controls="backupCollapseOne">
+                                                                Yedek Olustur ve Geri Yukle
+                                                            </button>
+                                                        </h2>
+                                                        <div id="backupCollapseOne" class="accordion-collapse collapse show" aria-labelledby="backupHeadingOne" data-bs-parent="#backupAccordion">
+                                                            <div class="accordion-body">
+                                                                <form method="POST" class="mb-3">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                    <input type="hidden" name="action" value="create_backup">
+                                                                    <button type="submit" class="btn btn-outline-primary w-100">
+                                                                        <i class="bi bi-download"></i> Yeni Yedek Olustur
+                                                                    </button>
+                                                                    <div class="form-text mt-2">
+                                                                        <code>posts/*.md</code>, <code>config.local.php</code> ve <code>admin/admin.env</code> tek zip icinde saklanir.
+                                                                    </div>
+                                                                </form>
+
+                                                                <form method="POST" enctype="multipart/form-data">
+                                                                    <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                    <input type="hidden" name="action" value="restore_backup">
+                                                                    <label for="backup_file" class="form-label">Yedek Dosyasindan Geri Yukle (.zip)</label>
+                                                                    <input type="file" class="form-control mb-2" id="backup_file" name="backup_file" accept=".zip" required>
+                                                                    <button type="submit" class="btn btn-outline-danger w-100"
+                                                                            onclick="return confirm('Secilen yedek dosyasindaki icerikler mevcut dosyalarin uzerine yazilacaktir. Devam edilsin mi?');">
+                                                                        <i class="bi bi-arrow-counterclockwise"></i> Geri Yuklemeyi Baslat
+                                                                    </button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header" id="backupHeadingTwo">
+                                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#backupCollapseTwo" aria-expanded="false" aria-controls="backupCollapseTwo">
+                                                                Mevcut Yedekler (<?php echo $backupCount; ?>)
+                                                            </button>
+                                                        </h2>
+                                                        <div id="backupCollapseTwo" class="accordion-collapse collapse" aria-labelledby="backupHeadingTwo" data-bs-parent="#backupAccordion">
+                                                            <div class="accordion-body">
+                                                                <?php if (empty($backupFiles)): ?>
+                                                                    <p class="text-muted mb-0">Henuz yedek dosyasi bulunmuyor.</p>
+                                                                <?php else: ?>
+                                                                    <div class="table-responsive">
+                                                                        <table class="table table-sm align-middle">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Dosya</th>
+                                                                                    <th>Boyut</th>
+                                                                                    <th>Tarih</th>
+                                                                                    <th class="text-end">Islem</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <?php foreach ($backupFiles as $backup): ?>
+                                                                                    <tr>
+                                                                                        <td><small><?php echo htmlspecialchars($backup['filename']); ?></small></td>
+                                                                                        <td><small><?php echo number_format($backup['size'] / 1024, 1); ?> KB</small></td>
+                                                                                        <td><small><?php echo date('d.m.Y H:i', (int)$backup['modified']); ?></small></td>
+                                                                                        <td class="text-end">
+                                                                                            <a href="settings.php?download_backup=<?php echo urlencode($backup['filename']); ?>"
+                                                                                               class="btn btn-sm btn-outline-secondary">
+                                                                                                <i class="bi bi-cloud-arrow-down"></i>
+                                                                                            </a>
+                                                                                            <form method="POST" class="d-inline">
+                                                                                                <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
+                                                                                                <input type="hidden" name="action" value="delete_backup">
+                                                                                                <input type="hidden" name="backup_filename" value="<?php echo htmlspecialchars($backup['filename']); ?>">
+                                                                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                                                                        onclick="return confirm('Bu yedek dosyasi silinsin mi?');">
+                                                                                                    <i class="bi bi-trash"></i>
+                                                                                                </button>
+                                                                                            </form>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                <?php endforeach; ?>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="card mt-4">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="bi bi-hdd-stack"></i> Yedekleme ve Geri Yükleme
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <form method="POST" class="mb-3">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                            <input type="hidden" name="action" value="create_backup">
-                                            <button type="submit" class="btn btn-outline-primary w-100">
-                                                <i class="bi bi-download"></i> Yeni Yedek Oluştur
-                                            </button>
-                                            <div class="form-text mt-2">
-                                                <code>posts/*.md</code>, <code>config.local.php</code> ve <code>admin/admin.env</code> tek zip içinde saklanır.
-                                            </div>
-                                        </form>
-
-                                        <form method="POST" enctype="multipart/form-data" class="mb-3">
-                                            <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                            <input type="hidden" name="action" value="restore_backup">
-                                            <label for="backup_file" class="form-label">Yedek Dosyasından Geri Yükle (.zip)</label>
-                                            <input type="file" class="form-control mb-2" id="backup_file" name="backup_file" accept=".zip" required>
-                                            <button type="submit" class="btn btn-outline-danger w-100"
-                                                    onclick="return confirm('Seçilen yedek dosyasındaki içerikler mevcut dosyaların üzerine yazılacaktır. Devam edilsin mi?');">
-                                                <i class="bi bi-arrow-counterclockwise"></i> Geri Yüklemeyi Başlat
-                                            </button>
-                                        </form>
-
-                                        <hr>
-                                        <h6 class="mb-3">Mevcut Yedekler</h6>
-                                        <?php if (empty($backupFiles)): ?>
-                                            <p class="text-muted mb-0">Henüz yedek dosyası bulunmuyor.</p>
-                                        <?php else: ?>
-                                            <div class="table-responsive">
-                                                <table class="table table-sm align-middle">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>Dosya</th>
-                                                            <th>Boyut</th>
-                                                            <th>Tarih</th>
-                                                            <th class="text-end">İşlem</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php foreach ($backupFiles as $backup): ?>
-                                                            <tr>
-                                                                <td><small><?php echo htmlspecialchars($backup['filename']); ?></small></td>
-                                                                <td><small><?php echo number_format($backup['size'] / 1024, 1); ?> KB</small></td>
-                                                                <td><small><?php echo date('d.m.Y H:i', (int)$backup['modified']); ?></small></td>
-                                                                <td class="text-end">
-                                                                    <a href="settings.php?download_backup=<?php echo urlencode($backup['filename']); ?>"
-                                                                       class="btn btn-sm btn-outline-secondary">
-                                                                        <i class="bi bi-cloud-arrow-down"></i>
-                                                                    </a>
-                                                                    <form method="POST" class="d-inline">
-                                                                        <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
-                                                                        <input type="hidden" name="action" value="delete_backup">
-                                                                        <input type="hidden" name="backup_filename" value="<?php echo htmlspecialchars($backup['filename']); ?>">
-                                                                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                                                onclick="return confirm('Bu yedek dosyası silinsin mi?');">
-                                                                            <i class="bi bi-trash"></i>
-                                                                        </button>
-                                                                    </form>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Site Settings - 2. Sütun -->
-                            <div class="col-md-6">
+                            <!-- Site Settings - 2. SÃ¼tun -->
+                            <div class="col-xl-5">
+                                <div class="settings-sticky-stack">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-globe"></i> Site Ayarları
+                                            <i class="bi bi-globe"></i> Site AyarlarÄ±
                                         </h5>
+                                        <small class="text-muted">SEO, yazar bilgileri ve sosyal medya adresleri</small>
                                     </div>
                                     <div class="card-body">
                                         <form method="POST">
@@ -753,24 +858,24 @@ if ($configLocalExists) {
                                             <input type="hidden" name="action" value="update_site_config">
                                             
                                             <div class="mb-3">
-                                                <label for="site_name" class="form-label">Site Adı</label>
+                                                <label for="site_name" class="form-label">Site AdÄ±</label>
                                                 <input type="text" class="form-control" id="site_name" name="site_name" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['site_name'] ?? ''); ?>" required>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="default_title" class="form-label">Varsayılan Başlık</label>
+                                                <label for="default_title" class="form-label">VarsayÄ±lan BaÅŸlÄ±k</label>
                                                 <input type="text" class="form-control" id="default_title" name="default_title" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['default_title'] ?? ''); ?>">
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="default_description" class="form-label">Varsayılan Açıklama</label>
+                                                <label for="default_description" class="form-label">VarsayÄ±lan AÃ§Ä±klama</label>
                                                 <textarea class="form-control" id="default_description" name="default_description" rows="3"><?php echo htmlspecialchars($currentSiteConfig['default_description'] ?? ''); ?></textarea>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="author_name" class="form-label">Yazar Adı</label>
+                                                <label for="author_name" class="form-label">Yazar AdÄ±</label>
                                                 <input type="text" class="form-control" id="author_name" name="author_name" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['author_name'] ?? ''); ?>">
                                             </div>
@@ -785,14 +890,14 @@ if ($configLocalExists) {
                                                 <label for="base_path" class="form-label">Temel URL Yolu</label>
                                                 <input type="text" class="form-control" id="base_path" name="base_path" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['base_path'] ?? '/blog/'); ?>">
-                                                <div class="form-text">Örnek: /blog/ veya /</div>
+                                                <div class="form-text">Ã–rnek: /blog/ veya /</div>
                                             </div>
                                             
                                             <div class="mb-3">
                                                 <label for="site_keywords" class="form-label">Site Anahtar Kelimeleri</label>
                                                 <input type="text" class="form-control" id="site_keywords" name="site_keywords" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['site_keywords'] ?? ''); ?>">
-                                                <div class="form-text">Virgülle ayırarak yazın</div>
+                                                <div class="form-text">VirgÃ¼lle ayÄ±rarak yazÄ±n</div>
                                             </div>
                                             
                                             <hr>
@@ -802,7 +907,7 @@ if ($configLocalExists) {
                                                 <label for="ga_tracking_id" class="form-label">Google Analytics ID</label>
                                                 <input type="text" class="form-control" id="ga_tracking_id" name="ga_tracking_id" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['ga_tracking_id'] ?? ''); ?>">
-                                                <div class="form-text">Örnek: G-XXXXXXXXXX</div>
+                                                <div class="form-text">Ã–rnek: G-XXXXXXXXXX</div>
                                             </div>
                                             
                                             <div class="mb-3">
@@ -824,10 +929,11 @@ if ($configLocalExists) {
                                             </div>
                                             
                                             <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-check-circle"></i> Site Ayarlarını Güncelle
+                                                <i class="bi bi-check-circle"></i> Site AyarlarÄ±nÄ± GÃ¼ncelle
                                             </button>
                                         </form>
                                     </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
@@ -840,4 +946,5 @@ if ($configLocalExists) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html> 
+
 
