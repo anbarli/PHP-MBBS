@@ -1,29 +1,29 @@
-﻿<?php
+<?php
 /**
  * Admin Settings
- * Ayarlar sayfasÄ±
+ * Ayarlar sayfasi
  */
 
 // UTF-8 encoding ayarla
 header('Content-Type: text/html; charset=utf-8');
 
-// Admin gÃ¼venlik sabiti tanÄ±mla
+// Admin guvenlik sabiti tanimla
 define('ADMIN_SECURE', true);
 
-// Ana config dosyasÄ±nÄ± dahil et
+// Ana config dosyasini dahil et
 require_once '../config.php';
 
-// GÃ¼venlik fonksiyonlarÄ±nÄ± dahil et
+// Guvenlik fonksiyonlarini dahil et
 require_once '../includes/security.php';
 
-// Session baÅŸlat ve yetki kontrolÃ¼
+// Session baslat ve yetki kontrolu
 initSecureSession();
 requireAdminAuth();
 
-// Admin config yÃ¼kle
+// Admin config yukle
 $adminConfig = loadAdminConfig();
 
-// Config.local.php dosyasÄ±nÄ± yÃ¼kle
+// Config.local.php dosyasini yukle
 $configLocalPath = '../config.local.php';
 $configLocalExists = file_exists($configLocalPath);
 $projectRoot = dirname(__DIR__);
@@ -113,17 +113,17 @@ if (isset($_GET['download_backup'])) {
 $message = '';
 $messageType = '';
 
-// Form gÃ¶nderildi mi?
+// Form gonderildi mi?
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // CSRF kontrolÃ¼
+    // CSRF kontrolu
     if (!validateCSRFToken($_POST['csrf_token'] ?? '')) {
-        $message = 'GÃ¼venlik hatasÄ±. LÃ¼tfen tekrar deneyin.';
+        $message = 'Guvenlik hatasi. Lutfen tekrar deneyin.';
         $messageType = 'danger';
     } else {
         $action = sanitizeInput($_POST['action'] ?? '');
         
         if ($action === 'update_admin') {
-            // Admin bilgilerini gÃ¼ncelle
+            // Admin bilgilerini guncelle
             $newAdminUsername = sanitizeInput($_POST['admin_username'] ?? '');
             $newAdminName = sanitizeInput($_POST['admin_name'] ?? '');
             $newAdminEmail = sanitizeInput($_POST['admin_email'] ?? '');
@@ -133,46 +133,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Validasyon
             if (empty($newAdminUsername)) {
-                $message = 'KullanÄ±cÄ± adÄ± gereklidir.';
+                $message = 'Kullanici adi gereklidir.';
                 $messageType = 'danger';
             } elseif (empty($newAdminName)) {
-                $message = 'Admin adÄ± gereklidir.';
+                $message = 'Admin adi gereklidir.';
                 $messageType = 'danger';
             } elseif (empty($newAdminEmail) || !filter_var($newAdminEmail, FILTER_VALIDATE_EMAIL)) {
-                $message = 'GeÃ§erli bir e-posta adresi girin.';
+                $message = 'Gecerli bir e-posta adresi girin.';
                 $messageType = 'danger';
             } else {
                 $configUpdated = false;
                 
-                // Admin kullanÄ±cÄ± adÄ±, adÄ± ve e-posta gÃ¼ncelle
+                // Admin kullanici adi, adi ve e-posta guncelle
                 $adminConfig['ADMIN_USERNAME'] = $newAdminUsername;
                 $adminConfig['ADMIN_NAME'] = $newAdminName;
                 $adminConfig['ADMIN_EMAIL'] = $newAdminEmail;
                 $configUpdated = true;
                 
-                // Åifre deÄŸiÅŸikliÄŸi
+                // Sifre degisikligi
                 if (!empty($currentPassword)) {
                     if (!verifyPassword($currentPassword, $adminConfig['ADMIN_PASSWORD'])) {
-                        $message = 'Mevcut ÅŸifre yanlÄ±ÅŸ.';
+                        $message = 'Mevcut sifre yanlis.';
                         $messageType = 'danger';
                     } elseif (empty($newPassword)) {
-                        $message = 'Yeni ÅŸifre gereklidir.';
+                        $message = 'Yeni sifre gereklidir.';
                         $messageType = 'danger';
                     } elseif (strlen($newPassword) < 8) {
-                        $message = 'Yeni ÅŸifre en az 8 karakter olmalÄ±dÄ±r.';
+                        $message = 'Yeni sifre en az 8 karakter olmalidir.';
                         $messageType = 'danger';
                     } elseif ($newPassword !== $confirmPassword) {
-                        $message = 'Åifreler eÅŸleÅŸmiyor.';
+                        $message = 'Sifreler eslesmiyor.';
                         $messageType = 'danger';
                     } else {
                         $adminConfig['ADMIN_PASSWORD'] = hashPassword($newPassword);
                         $configUpdated = true;
-                        $message .= ' Åifre gÃ¼ncellendi.';
+                        $message .= ' Sifre guncellendi.';
                     }
                 }
                 
                 if ($configUpdated) {
-                    // Admin klasÃ¶rÃ¼nÃ¼ dinamik olarak bul
+                    // Admin klasorunu dinamik olarak bul
                     $adminDir = dirname(__DIR__) . '/admin';
                     if (!is_dir($adminDir)) {
                         $possibleDirs = ['admin1', 'admin2', 'admin3', 'admin4', 'admin5'];
@@ -186,22 +186,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                     $envFile = $adminDir . '/admin.env';
                     
-                    // Admin config dosyasÄ±nÄ± gÃ¼ncelle
+                    // Admin config dosyasini guncelle
                     if (updateAdminConfig($adminConfig)) {
-                        // Config'i yeniden yÃ¼kle
+                        // Config'i yeniden yukle
                         $adminConfig = loadAdminConfig();
-                        $message = 'Admin ayarlarÄ± baÅŸarÄ±yla gÃ¼ncellendi.' . $message;
+                        $message = 'Admin ayarlari basariyla guncellendi.' . $message;
                         $messageType = 'success';
                         logAdminAction('update_admin_settings', 'Updated admin settings');
                     } else {
-                        $message = 'Admin ayarlarÄ± kaydedilirken hata oluÅŸtu.';
+                        $message = 'Admin ayarlari kaydedilirken hata olustu.';
                         $messageType = 'danger';
                         logError('Admin settings update failed', ['file' => 'admin/settings.php']);
                     }
                 }
             }
         } elseif ($action === 'update_site_config') {
-            // Site ayarlarÄ±nÄ± gÃ¼ncelle
+            // Site ayarlarini guncelle
             $siteName = sanitizeInput($_POST['site_name'] ?? '');
             $defaultTitle = sanitizeInput($_POST['default_title'] ?? '');
             $defaultDescription = sanitizeInput($_POST['default_description'] ?? '');
@@ -215,91 +215,91 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $siteKeywords = sanitizeInput($_POST['site_keywords'] ?? '');
             $basePath = sanitizeInput($_POST['base_path'] ?? '');
             
-            // Debug: Dosya yolu kontrolÃ¼
+            // Debug: Dosya yolu kontrolu
             $configLocalPath = '../config.local.php';
             $configLocalExists = file_exists($configLocalPath);
             $configLocalWritable = is_writable($configLocalPath);
             
-            // Config.local.php iÃ§eriÄŸini oluÅŸtur
+            // Config.local.php icerigini olustur
             $configContent = "<?php
-// KiÅŸisel Ayarlar - Bu dosya git'e dahil edilmez
-// Kendi ayarlarÄ±nÄ±zÄ± buraya yazÄ±n
+// Kisisel Ayarlar - Bu dosya git'e dahil edilmez
+// Kendi ayarlarinizi buraya yazin
 
-// Temel URL ayarlarÄ±
-define('BASE_PATH', '$basePath'); // Kendi dizin yapÄ±nÄ±za gÃ¶re deÄŸiÅŸtirin
+// Temel URL ayarlari
+define('BASE_PATH', '$basePath'); // Kendi dizin yapiniza gore degistirin
 
 // Site bilgileri
 define('SITE_NAME', '$siteName');
 define('DEFAULT_TITLE', '$defaultTitle');
 define('DEFAULT_DESCRIPTION', '$defaultDescription');
 
-// Google Analytics ID (isteÄŸe baÄŸlÄ±)
+// Google Analytics ID (istege bagli)
 define('GA_TRACKING_ID', '$gaTrackingId');
 
-// Twitter kullanÄ±cÄ± adÄ± (isteÄŸe baÄŸlÄ±)
+// Twitter kullanici adi (istege bagli)
 define('TWITTER_USERNAME', '$twitterUsername');
 
 // Yazar bilgileri
 define('AUTHOR_NAME', '$authorName');
 define('AUTHOR_EMAIL', '$authorEmail');
 
-// Sosyal medya linkleri (isteÄŸe baÄŸlÄ±)
+// Sosyal medya linkleri (istege bagli)
 define('SOCIAL_TWITTER', '$socialTwitter');
 define('SOCIAL_GITHUB', '$socialGithub');
 define('SOCIAL_LINKEDIN', '$socialLinkedin');
 
-// Cache ayarlarÄ±
+// Cache ayarlari
 define('CACHE_ENABLED', true);
 define('CACHE_DURATION', 3600); // 1 saat
 
-// GÃ¼venlik ayarlarÄ±
+// Guvenlik ayarlari
 define('ENABLE_ERROR_LOGGING', true);
 define('MAX_LOGIN_ATTEMPTS', 5);
 define('SESSION_TIMEOUT', 1800); // 30 dakika
 
-// SEO ayarlarÄ±
+// SEO ayarlari
 define('DEFAULT_LANGUAGE', 'tr');
 define('DEFAULT_LOCALE', 'tr_TR');
 define('SITE_KEYWORDS', '$siteKeywords');
 ?>";
             
-            // Config.local.php dosyasÄ±nÄ± gÃ¼ncelle
+            // Config.local.php dosyasini guncelle
             if (file_put_contents($configLocalPath, $configContent)) {
-                $message = 'Site ayarlarÄ± baÅŸarÄ±yla gÃ¼ncellendi.';
+                $message = 'Site ayarlari basariyla guncellendi.';
                 $messageType = 'success';
                 logAdminAction('update_site_config', 'Updated site configuration');
                 
                 // Cache'i temizle
                 clearCache();
             } else {
-                $message = 'Site ayarlarÄ± kaydedilirken hata oluÅŸtu.';
+                $message = 'Site ayarlari kaydedilirken hata olustu.';
                 $messageType = 'danger';
                 logError('Site config write failed', ['file' => $configLocalPath]);
             }
         } elseif ($action === 'clear_cache') {
             // Cache temizle
             if (clearCache()) {
-                $message = 'Cache baÅŸarÄ±yla temizlendi.';
+                $message = 'Cache basariyla temizlendi.';
                 $messageType = 'success';
                 logAdminAction('clear_cache', 'Cleared application cache');
             } else {
-                $message = 'Cache temizlenirken hata oluÅŸtu.';
+                $message = 'Cache temizlenirken hata olustu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'generate_sitemap') {
-            // Sitemap oluÅŸtur
+            // Sitemap olustur
             if (generateSitemap()) {
-                $message = 'Sitemap baÅŸarÄ±yla oluÅŸturuldu.';
+                $message = 'Sitemap basariyla olusturuldu.';
                 $messageType = 'success';
                 logAdminAction('generate_sitemap', 'Generated sitemap');
             } else {
-                $message = 'Sitemap oluÅŸturulurken hata oluÅŸtu.';
+                $message = 'Sitemap olusturulurken hata olustu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'regenerate_cache') {
-            // Cache'i yeniden oluÅŸtur
+            // Cache'i yeniden olustur
             if (clearCache()) {
-                // Cache'i yeniden oluÅŸtur
+                // Cache'i yeniden olustur
                 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
                 $postFilesWithDates = [];
                 
@@ -320,20 +320,20 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 });
                 
                 setCachedPosts($postFilesWithDates);
-                $message = 'Cache baÅŸarÄ±yla yeniden oluÅŸturuldu. YazÄ± sayÄ±sÄ±: ' . count($postFilesWithDates);
+                $message = 'Cache basariyla yeniden olusturuldu. Yazi sayisi: ' . count($postFilesWithDates);
                 $messageType = 'success';
                 logAdminAction('regenerate_cache', 'Regenerated cache with ' . count($postFilesWithDates) . ' posts');
             } else {
-                $message = 'Cache yeniden oluÅŸturulurken hata oluÅŸtu.';
+                $message = 'Cache yeniden olusturulurken hata olustu.';
                 $messageType = 'danger';
             }
         } elseif ($action === 'create_backup') {
             if (!class_exists('ZipArchive')) {
-                $message = 'ZipArchive desteÄŸi bulunamadÄ±. Yedek oluÅŸturulamadÄ±.';
+                $message = 'ZipArchive destegi bulunamadi. Yedek olusturulamadi.';
                 $messageType = 'danger';
             } else {
                 if (!is_dir($backupDir) && !mkdir($backupDir, 0755, true)) {
-                    $message = 'Yedek klasÃ¶rÃ¼ oluÅŸturulamadÄ±.';
+                    $message = 'Yedek klasoru olusturulamadi.';
                     $messageType = 'danger';
                 } else {
                     $backupFile = 'backup-' . date('Ymd-His') . '.zip';
@@ -341,7 +341,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
 
                     $zip = new ZipArchive();
                     if ($zip->open($backupPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-                        $message = 'Yedek dosyasÄ± oluÅŸturulamadÄ±.';
+                        $message = 'Yedek dosyasi olusturulamadi.';
                         $messageType = 'danger';
                     } else {
                         $addedCount = 0;
@@ -368,7 +368,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         $zip->close();
 
                         clearCache();
-                        $message = 'Yedek oluÅŸturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
+                        $message = 'Yedek olusturuldu: ' . $backupFile . ' (' . $addedCount . ' dosya).';
                         $messageType = 'success';
                         logAdminAction('create_backup', 'Created backup: ' . $backupFile);
                     }
@@ -376,10 +376,10 @@ define('SITE_KEYWORDS', '$siteKeywords');
             }
         } elseif ($action === 'restore_backup') {
             if (!class_exists('ZipArchive')) {
-                $message = 'ZipArchive desteÄŸi bulunamadÄ±. Geri yÃ¼kleme yapÄ±lamadÄ±.';
+                $message = 'ZipArchive destegi bulunamadi. Geri yukleme yapilamadi.';
                 $messageType = 'danger';
             } elseif (!isset($_FILES['backup_file']) || ($_FILES['backup_file']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-                $message = 'LÃ¼tfen geÃ§erli bir yedek dosyasÄ± seÃ§in.';
+                $message = 'Lutfen gecerli bir yedek dosyasi secin.';
                 $messageType = 'danger';
             } else {
                 $uploadName = strtolower((string)($_FILES['backup_file']['name'] ?? ''));
@@ -387,15 +387,15 @@ define('SITE_KEYWORDS', '$siteKeywords');
                 $uploadSize = (int)($_FILES['backup_file']['size'] ?? 0);
 
                 if (pathinfo($uploadName, PATHINFO_EXTENSION) !== 'zip') {
-                    $message = 'Sadece .zip uzantÄ±lÄ± yedek dosyalarÄ± kabul edilir.';
+                    $message = 'Sadece .zip uzantili yedek dosyalari kabul edilir.';
                     $messageType = 'danger';
                 } elseif ($uploadSize <= 0 || $uploadSize > 50 * 1024 * 1024) {
-                    $message = 'Yedek dosyasÄ± boyutu geÃ§ersiz (maksimum 50MB).';
+                    $message = 'Yedek dosyasi boyutu gecersiz (maksimum 50MB).';
                     $messageType = 'danger';
                 } else {
                     $zip = new ZipArchive();
                     if ($zip->open($uploadTmp) !== true) {
-                        $message = 'Yedek dosyasÄ± aÃ§Ä±lamadÄ±.';
+                        $message = 'Yedek dosyasi acilamadi.';
                         $messageType = 'danger';
                     } else {
                         $restoredCount = 0;
@@ -438,7 +438,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
                         $zip->close();
 
                         clearCache();
-                        $message = 'Geri yÃ¼kleme tamamlandÄ±. GÃ¼ncellenen dosya sayÄ±sÄ±: ' . $restoredCount;
+                        $message = 'Geri yukleme tamamlandi. Guncellenen dosya sayisi: ' . $restoredCount;
                         $messageType = $restoredCount > 0 ? 'success' : 'warning';
                         logAdminAction('restore_backup', 'Restored backup file upload, files: ' . $restoredCount);
                     }
@@ -447,19 +447,19 @@ define('SITE_KEYWORDS', '$siteKeywords');
         } elseif ($action === 'delete_backup') {
             $backupFilename = basename((string)($_POST['backup_filename'] ?? ''));
             if (!isValidBackupFilename($backupFilename)) {
-                $message = 'GeÃ§ersiz yedek dosyasÄ± adÄ±.';
+                $message = 'Gecersiz yedek dosyasi adi.';
                 $messageType = 'danger';
             } else {
                 $targetBackup = $backupDir . $backupFilename;
                 if (!is_file($targetBackup)) {
-                    $message = 'Yedek dosyasÄ± bulunamadÄ±.';
+                    $message = 'Yedek dosyasi bulunamadi.';
                     $messageType = 'danger';
                 } elseif (@unlink($targetBackup)) {
-                    $message = 'Yedek dosyasÄ± silindi: ' . $backupFilename;
+                    $message = 'Yedek dosyasi silindi: ' . $backupFilename;
                     $messageType = 'success';
                     logAdminAction('delete_backup', 'Deleted backup: ' . $backupFilename);
                 } else {
-                    $message = 'Yedek dosyasÄ± silinemedi.';
+                    $message = 'Yedek dosyasi silinemedi.';
                     $messageType = 'danger';
                 }
             }
@@ -467,7 +467,7 @@ define('SITE_KEYWORDS', '$siteKeywords');
     }
 }
 
-// CSRF token oluÅŸtur
+// CSRF token olustur
 $csrfToken = generateCSRFToken();
 $backupFiles = listBackupFiles($backupDir);
 $backupCount = count($backupFiles);
@@ -475,10 +475,10 @@ $backupDirWritable = is_dir($backupDir) && is_writable($backupDir);
 $configLocalWritable = $configLocalExists ? is_writable($configLocalPath) : is_writable(dirname($configLocalPath));
 $zipArchiveAvailable = class_exists('ZipArchive');
 
-// Mevcut site ayarlarÄ±nÄ± al
+// Mevcut site ayarlarini al
 $currentSiteConfig = [];
 if ($configLocalExists) {
-    // Config.local.php'den mevcut deÄŸerleri al
+    // Config.local.php'den mevcut degerleri al
     $currentSiteConfig = [
         'site_name' => defined('SITE_NAME') ? SITE_NAME : '',
         'default_title' => defined('DEFAULT_TITLE') ? DEFAULT_TITLE : '',
@@ -524,7 +524,7 @@ if ($configLocalExists) {
                             <i class="bi bi-speedometer2"></i> Dashboard
                         </a>
                         <a class="nav-link" href="posts.php">
-                            <i class="bi bi-file-text"></i> YazÄ±lar
+                            <i class="bi bi-file-text"></i> Yazilar
                         </a>
                         <a class="nav-link" href="categories.php">
                             <i class="bi bi-folder"></i> Kategoriler
@@ -534,13 +534,13 @@ if ($configLocalExists) {
                         </a>
                         <hr class="text-white-50">
                         <a class="nav-link" href="../" target="_blank">
-                            <i class="bi bi-box-arrow-up-right"></i> Siteyi GÃ¶rÃ¼ntÃ¼le
+                            <i class="bi bi-box-arrow-up-right"></i> Siteyi Goruntule
                         </a>
                         <form method="POST" action="dashboard.php" class="sidebar-logout-form">
                             <input type="hidden" name="csrf_token" value="<?php echo $csrfToken; ?>">
                             <input type="hidden" name="action" value="logout">
                             <button type="submit" class="nav-link btn btn-link nav-link-logout">
-                                <i class="bi bi-box-arrow-right"></i> Ã‡Ä±kÄ±ÅŸ Yap
+                                <i class="bi bi-box-arrow-right"></i> Cikis Yap
                             </button>
                         </form>
                     </nav>
@@ -556,7 +556,7 @@ if ($configLocalExists) {
                             <h4 class="mb-0">Ayarlar</h4>
                             <div class="d-flex align-items-center">
                                 <span class="badge bg-primary fs-6">
-                                    <i class="bi bi-gear"></i> YÃ¶netim
+                                    <i class="bi bi-gear"></i> Yonetim
                                 </span>
                             </div>
                         </div>
@@ -572,7 +572,7 @@ if ($configLocalExists) {
                         <?php endif; ?>
                         <div class="settings-page-intro mb-4">
                             <h5 class="mb-1">Ayar Merkezi</h5>
-                            <p class="text-muted mb-0">Hesap bilgileri, site konfigÃ¼rasyonu ve bakÄ±m iÅŸlemlerini tek ekrandan yÃ¶netebilirsiniz.</p>
+                            <p class="text-muted mb-0">Hesap bilgileri, site konfigurasyonu ve bakim islemlerini tek ekrandan yonetebilirsiniz.</p>
                         </div>
 
                         <div class="row g-3 mb-4 settings-status-grid">
@@ -590,12 +590,12 @@ if ($configLocalExists) {
                             </div>
                             <div class="col-sm-6 col-xl-3">
                                 <div class="settings-status-card">
-                                    <small class="text-muted">Yazma Ä°zni</small>
+                                    <small class="text-muted">Yazma Izni</small>
                                     <div class="fw-semibold mt-1">
                                         <?php if ($configLocalWritable): ?>
-                                            <span class="badge bg-success">Config yazÄ±labilir</span>
+                                            <span class="badge bg-success">Config yazilabilir</span>
                                         <?php else: ?>
-                                            <span class="badge bg-danger">Config yazÄ±lamÄ±yor</span>
+                                            <span class="badge bg-danger">Config yazilamiyor</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -606,7 +606,7 @@ if ($configLocalExists) {
                                     <div class="fw-semibold mt-1">
                                         <span class="badge bg-primary"><?php echo $backupCount; ?> dosya</span>
                                         <?php if (!$backupDirWritable): ?>
-                                            <span class="badge bg-danger ms-1">KlasÃ¶r yazÄ±lamÄ±yor</span>
+                                            <span class="badge bg-danger ms-1">Klasor yazilamiyor</span>
                                         <?php endif; ?>
                                     </div>
                                 </div>
@@ -616,7 +616,7 @@ if ($configLocalExists) {
                                     <small class="text-muted">ZipArchive</small>
                                     <div class="fw-semibold mt-1">
                                         <?php if ($zipArchiveAvailable): ?>
-                                            <span class="badge bg-success">HazÄ±r</span>
+                                            <span class="badge bg-success">Hazir</span>
                                         <?php else: ?>
                                             <span class="badge bg-danger">Eksik</span>
                                         <?php endif; ?>
@@ -626,14 +626,14 @@ if ($configLocalExists) {
                         </div>
 
                         <div class="row g-4 settings-layout">
-                            <!-- Admin Settings - 1. SÃ¼tun -->
-                            <div class="col-xl-7">
+                            <!-- Admin Settings - 1. Sutun -->
+                            <div class="col-lg-7">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h5 class="mb-0">
                                             <i class="bi bi-person-gear"></i> Admin Bilgileri
                                         </h5>
-                                        <small class="text-muted">KullanÄ±cÄ± bilgileri ve ÅŸifre iÅŸlemleri</small>
+                                        <small class="text-muted">Kullanici bilgileri ve sifre islemleri</small>
                                     </div>
                                     <div class="card-body">
                                         <form method="POST">
@@ -641,13 +641,13 @@ if ($configLocalExists) {
                                             <input type="hidden" name="action" value="update_admin">
                                             
                                             <div class="mb-3">
-                                                <label for="admin_username" class="form-label">KullanÄ±cÄ± AdÄ±</label>
+                                                <label for="admin_username" class="form-label">Kullanici Adi</label>
                                                 <input type="text" class="form-control" id="admin_username" name="admin_username" 
                                                        value="<?php echo htmlspecialchars($adminConfig['ADMIN_USERNAME'] ?? ''); ?>" required>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="admin_name" class="form-label">Admin AdÄ±</label>
+                                                <label for="admin_name" class="form-label">Admin Adi</label>
                                                 <input type="text" class="form-control" id="admin_name" name="admin_name" 
                                                        value="<?php echo htmlspecialchars($adminConfig['ADMIN_NAME'] ?? ''); ?>" required>
                                             </div>
@@ -659,29 +659,29 @@ if ($configLocalExists) {
                                             </div>
                                             
                                             <hr>
-                                            <h6>Åifre DeÄŸiÅŸtir</h6>
-                                            <small class="text-muted">Åifrenizi deÄŸiÅŸtirmek istemiyorsanÄ±z boÅŸ bÄ±rakÄ±n.</small>
+                                            <h6>Sifre Degistir</h6>
+                                            <small class="text-muted">Sifrenizi degistirmek istemiyorsaniz bos birakin.</small>
                                             
                                             <div class="mb-3">
-                                                <label for="current_password" class="form-label">Mevcut Åifre</label>
+                                                <label for="current_password" class="form-label">Mevcut Sifre</label>
                                                 <input type="password" class="form-control" id="current_password" name="current_password">
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="new_password" class="form-label">Yeni Åifre</label>
+                                                <label for="new_password" class="form-label">Yeni Sifre</label>
                                                 <input type="password" class="form-control" id="new_password" name="new_password" 
                                                        minlength="8">
                                                 <div class="form-text">En az 8 karakter</div>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="confirm_password" class="form-label">Yeni Åifre (Tekrar)</label>
+                                                <label for="confirm_password" class="form-label">Yeni Sifre (Tekrar)</label>
                                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
                                                        minlength="8">
                                             </div>
                                             
                                             <button type="submit" class="btn btn-primary">
-                                                <i class="bi bi-check-circle"></i> GÃ¼ncelle
+                                                <i class="bi bi-check-circle"></i> Guncelle
                                             </button>
                                         </form>
                                     </div>
@@ -841,14 +841,15 @@ if ($configLocalExists) {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
 
-                            <!-- Site Settings - 2. SÃ¼tun -->
-                            <div class="col-xl-5">
+                            <!-- Site Settings - 2. Sutun -->
+                            <div class="col-lg-5">
                                 <div class="settings-sticky-stack">
                                 <div class="card mb-4">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-globe"></i> Site AyarlarÄ±
+                                            <i class="bi bi-globe"></i> Site Ayarlari
                                         </h5>
                                         <small class="text-muted">SEO, yazar bilgileri ve sosyal medya adresleri</small>
                                     </div>
@@ -858,24 +859,24 @@ if ($configLocalExists) {
                                             <input type="hidden" name="action" value="update_site_config">
                                             
                                             <div class="mb-3">
-                                                <label for="site_name" class="form-label">Site AdÄ±</label>
+                                                <label for="site_name" class="form-label">Site Adi</label>
                                                 <input type="text" class="form-control" id="site_name" name="site_name" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['site_name'] ?? ''); ?>" required>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="default_title" class="form-label">VarsayÄ±lan BaÅŸlÄ±k</label>
+                                                <label for="default_title" class="form-label">Varsayilan Baslik</label>
                                                 <input type="text" class="form-control" id="default_title" name="default_title" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['default_title'] ?? ''); ?>">
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="default_description" class="form-label">VarsayÄ±lan AÃ§Ä±klama</label>
+                                                <label for="default_description" class="form-label">Varsayilan Aciklama</label>
                                                 <textarea class="form-control" id="default_description" name="default_description" rows="3"><?php echo htmlspecialchars($currentSiteConfig['default_description'] ?? ''); ?></textarea>
                                             </div>
                                             
                                             <div class="mb-3">
-                                                <label for="author_name" class="form-label">Yazar AdÄ±</label>
+                                                <label for="author_name" class="form-label">Yazar Adi</label>
                                                 <input type="text" class="form-control" id="author_name" name="author_name" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['author_name'] ?? ''); ?>">
                                             </div>
@@ -890,14 +891,14 @@ if ($configLocalExists) {
                                                 <label for="base_path" class="form-label">Temel URL Yolu</label>
                                                 <input type="text" class="form-control" id="base_path" name="base_path" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['base_path'] ?? '/blog/'); ?>">
-                                                <div class="form-text">Ã–rnek: /blog/ veya /</div>
+                                                <div class="form-text">Ornek: /blog/ veya /</div>
                                             </div>
                                             
                                             <div class="mb-3">
                                                 <label for="site_keywords" class="form-label">Site Anahtar Kelimeleri</label>
                                                 <input type="text" class="form-control" id="site_keywords" name="site_keywords" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['site_keywords'] ?? ''); ?>">
-                                                <div class="form-text">VirgÃ¼lle ayÄ±rarak yazÄ±n</div>
+                                                <div class="form-text">Virgulle ayirarak yazin</div>
                                             </div>
                                             
                                             <hr>
@@ -907,7 +908,7 @@ if ($configLocalExists) {
                                                 <label for="ga_tracking_id" class="form-label">Google Analytics ID</label>
                                                 <input type="text" class="form-control" id="ga_tracking_id" name="ga_tracking_id" 
                                                        value="<?php echo htmlspecialchars($currentSiteConfig['ga_tracking_id'] ?? ''); ?>">
-                                                <div class="form-text">Ã–rnek: G-XXXXXXXXXX</div>
+                                                <div class="form-text">Ornek: G-XXXXXXXXXX</div>
                                             </div>
                                             
                                             <div class="mb-3">
@@ -929,7 +930,7 @@ if ($configLocalExists) {
                                             </div>
                                             
                                             <button type="submit" class="btn btn-success">
-                                                <i class="bi bi-check-circle"></i> Site AyarlarÄ±nÄ± GÃ¼ncelle
+                                                <i class="bi bi-check-circle"></i> Site Ayarlarini Guncelle
                                             </button>
                                         </form>
                                     </div>
