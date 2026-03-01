@@ -3,12 +3,14 @@
  * Minimal implementation for offline support and caching
  */
 
-const CACHE_NAME = 'php-mbbs-v1';
+const CACHE_NAME = 'php-mbbs-v2';
+const SCOPE_PATH = new URL(self.registration.scope).pathname.replace(/\/$/, '');
+const appUrl = (path) => `${SCOPE_PATH}${path}`;
 const urlsToCache = [
-    '/blog/',
-    '/blog/includes/style.css',
-    '/blog/includes/js/theme.js',
-    '/blog/includes/js/perf.js'
+    SCOPE_PATH ? `${SCOPE_PATH}/` : '/',
+    appUrl('/includes/style.css'),
+    appUrl('/includes/js/theme.js'),
+    appUrl('/includes/js/perf.js')
 ];
 
 // Install event - cache core assets
