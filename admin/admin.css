@@ -198,6 +198,65 @@ small, .small, .form-text, .text-muted {
     box-shadow: none;
 }
 
+.summary-hero {
+    border-radius: var(--admin-radius-lg);
+    background:
+        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.2), transparent 35%),
+        linear-gradient(135deg, #2b2d42, #3a3f62);
+    color: #fff;
+    box-shadow: 0 14px 30px rgba(43, 45, 66, 0.22);
+}
+
+.summary-item {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: var(--admin-radius-md);
+    padding: 0.9rem;
+    min-height: 130px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.summary-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    background: rgba(255, 255, 255, 0.22);
+    font-size: 0.95rem;
+}
+
+.summary-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 0.3rem;
+}
+
+.summary-label {
+    font-size: var(--admin-fs-sm);
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: 600;
+}
+
+.quick-actions-stack {
+    border-radius: var(--admin-radius-lg);
+}
+
+.quick-actions-stack .card-body {
+    background: var(--admin-surface);
+}
+
+.quick-actions-stack .btn {
+    padding-top: 0.62rem;
+    padding-bottom: 0.62rem;
+    border-width: 1px;
+}
+
 .stat-card:hover,
 .category-card:hover,
 .info-card:hover {
@@ -304,8 +363,23 @@ body.dark-mode .login-header {
     background: linear-gradient(135deg, #1f2131, #2b2d42);
 }
 
+body.dark-mode .summary-hero {
+    background:
+        radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.1), transparent 35%),
+        linear-gradient(135deg, #22263d, #2f3556);
+}
+
+body.dark-mode .summary-item {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.13);
+}
+
 @media (max-width: 991px) {
     .sidebar {
         min-height: auto;
+    }
+
+    .summary-item {
+        min-height: 110px;
     }
 }

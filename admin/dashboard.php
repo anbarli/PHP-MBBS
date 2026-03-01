@@ -192,147 +192,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                     
                     <!-- Content -->
                     <div class="p-4">
-                        <!-- Statistics Cards -->
-                        <div class="row mb-4">
-                            <div class="col-md-4 mb-3">
-                                <div class="stat-card p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="stat-icon bg-primary me-3">
-                                            <i class="bi bi-file-text"></i>
+                        <!-- Overview + Quick Actions -->
+                        <div class="row g-4 mb-4">
+                            <div class="col-xl-8">
+                                <div class="summary-hero card border-0 h-100">
+                                    <div class="card-body p-4 p-lg-5">
+                                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+                                            <div>
+                                                <h5 class="mb-1 text-white">Yonetim Ozeti</h5>
+                                                <p class="mb-0 text-white-50">Blogunun genel durumunu tek ekranda gor.</p>
+                                            </div>
+                                            <span class="badge text-bg-light">Canli Durum</span>
                                         </div>
-                                        <div>
-                                            <h3 class="mb-0"><?php echo $postCount; ?></h3>
-                                            <p class="text-muted mb-0">Toplam Yazı</p>
+
+                                        <div class="row g-3">
+                                            <div class="col-sm-6 col-lg-3">
+                                                <div class="summary-item">
+                                                    <span class="summary-icon"><i class="bi bi-file-text"></i></span>
+                                                    <div class="summary-value"><?php echo $postCount; ?></div>
+                                                    <div class="summary-label">Toplam Yazi</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-lg-3">
+                                                <div class="summary-item">
+                                                    <span class="summary-icon"><i class="bi bi-folder2-open"></i></span>
+                                                    <div class="summary-value"><?php echo $categoryCount; ?></div>
+                                                    <div class="summary-label">Kategori</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-lg-3">
+                                                <div class="summary-item">
+                                                    <span class="summary-icon"><i class="bi bi-graph-up-arrow"></i></span>
+                                                    <div class="summary-value"><?php echo $postCount > 0 ? round($postCount / 7, 1) : 0; ?></div>
+                                                    <div class="summary-label">Haftalik Ortalama</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-6 col-lg-3">
+                                                <div class="summary-item">
+                                                    <span class="summary-icon"><i class="bi bi-shield-check"></i></span>
+                                                    <div class="summary-value"><?php echo $configLocalExists ? 'OK' : 'Uyari'; ?></div>
+                                                    <div class="summary-label">Config Durumu</div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="stat-card p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="stat-icon bg-success me-3">
-                                            <i class="bi bi-folder"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="mb-0"><?php echo $categoryCount; ?></h3>
-                                            <p class="text-muted mb-0">Kategori</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="stat-card p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="stat-icon bg-info me-3">
-                                            <i class="bi bi-eye"></i>
-                                        </div>
-                                        <div>
-                                            <h3 class="mb-0"><?php echo $postCount > 0 ? round($postCount / 7, 1) : 0; ?></h3>
-                                            <p class="text-muted mb-0">Haftalık Ortalama</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Recent Posts -->
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
+
+                            <div class="col-xl-4">
+                                <div class="card quick-actions-stack h-100">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            <i class="bi bi-clock-history"></i> Son Yazılar
+                                            <i class="bi bi-lightning"></i> Hizli Araclar
                                         </h5>
                                     </div>
-                                    <div class="card-body p-0">
-                                        <?php if (empty($recentPosts)): ?>
-                                            <div class="p-4 text-center text-muted">
-                                                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
-                                                <p class="mt-2">Henüz yazı bulunmuyor.</p>
-                                                <a href="posts.php" class="btn btn-primary">
-                                                    <i class="bi bi-plus-circle"></i> İlk Yazıyı Ekle
-                                                </a>
-                                            </div>
-                                        <?php else: ?>
-                                            <div class="table-responsive">
-                                                <table class="table table-hover mb-0">
-                                                    <thead class="table-light">
-                                                        <tr>
-                                                            <th>Başlık</th>
-                                                            <th>Kategori</th>
-                                                            <th>Tarih</th>
-                                                            <th>İşlemler</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        <?php foreach ($recentPosts as $post): ?>
-                                                            <tr>
-                                                                <td>
-                                                                    <strong><?php echo htmlspecialchars($post['meta']['title'] ?? 'Başlıksız'); ?></strong>
-                                                                </td>
-                                                                <td>
-                                                                    <span class="badge bg-secondary">
-                                                                        <?php echo htmlspecialchars($post['meta']['category'] ?? 'Genel'); ?>
-                                                                    </span>
-                                                                </td>
-                                                                <td>
-                                                                    <?php echo date('d.m.Y', strtotime($post['meta']['date'] ?? 'now')); ?>
-                                                                </td>
-                                                                <td>
-                                                                    <a href="edit_post.php?slug=<?php echo $post['slug']; ?>" 
-                                                                       class="btn btn-sm btn-outline-primary btn-action">
-                                                                        <i class="bi bi-pencil"></i>
-                                                                    </a>
-                                                                    <a href="<?php echo BASE_PATH . $post['slug']; ?>"
-                                                                       target="_blank" class="btn btn-sm btn-outline-primary">
-                                                                        <i class="bi bi-eye"></i> Görüntüle
-                                                                    </a>
-                                                                </td>
-                                                            </tr>
-                                                        <?php endforeach; ?>
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        <?php endif; ?>
+                                    <div class="card-body d-grid gap-2">
+                                        <a href="posts.php?action=new" class="btn btn-primary w-100 text-start">
+                                            <i class="bi bi-plus-circle me-2"></i>Yeni Yazi Olustur
+                                        </a>
+                                        <a href="posts.php" class="btn btn-outline-primary w-100 text-start">
+                                            <i class="bi bi-file-earmark-text me-2"></i>Yazilari Yonet
+                                        </a>
+                                        <a href="categories.php" class="btn btn-outline-primary w-100 text-start">
+                                            <i class="bi bi-collection me-2"></i>Kategorileri Duzenle
+                                        </a>
+                                        <a href="settings.php" class="btn btn-outline-primary w-100 text-start">
+                                            <i class="bi bi-gear me-2"></i>Site Ayarlari
+                                        </a>
+                                        <a href="<?php echo BASE_PATH; ?>" target="_blank" class="btn btn-outline-secondary w-100 text-start">
+                                            <i class="bi bi-box-arrow-up-right me-2"></i>Siteyi Goruntule
+                                        </a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Quick Actions -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-header">
-                                        <h5 class="mb-0">
-                                            <i class="bi bi-lightning"></i> Hızlı İşlemler
-                                        </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-3 mb-2">
-                                                <a href="posts.php?action=new" class="btn btn-primary w-100">
-                                                    <i class="bi bi-plus-circle"></i> Yeni Yazı
-                                                </a>
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <a href="settings.php" class="btn btn-info w-100">
-                                                    <i class="bi bi-gear"></i> Site Ayarları
-                                                </a>
-                                            </div>
-                                            <div class="col-md-3 mb-2">
-                                                <a href="<?php echo BASE_PATH; ?>" target="_blank" class="btn btn-outline-secondary w-100">
-                                                    <i class="bi bi-box-arrow-up-right"></i> Siteyi Görüntüle
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
                         <!-- System Info -->
                         <div class="row mt-4">
                             <div class="col-12">
@@ -406,6 +339,70 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Recent Posts -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">
+                                            <i class="bi bi-clock-history"></i> Son YazÄ±lar
+                                        </h5>
+                                    </div>
+                                    <div class="card-body p-0">
+                                        <?php if (empty($recentPosts)): ?>
+                                            <div class="p-4 text-center text-muted">
+                                                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                                <p class="mt-2">HenÃ¼z yazÄ± bulunmuyor.</p>
+                                                <a href="posts.php" class="btn btn-primary">
+                                                    <i class="bi bi-plus-circle"></i> Ä°lk YazÄ±yÄ± Ekle
+                                                </a>
+                                            </div>
+                                        <?php else: ?>
+                                            <div class="table-responsive">
+                                                <table class="table table-hover mb-0">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>BaÅŸlÄ±k</th>
+                                                            <th>Kategori</th>
+                                                            <th>Tarih</th>
+                                                            <th>Ä°ÅŸlemler</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <?php foreach ($recentPosts as $post): ?>
+                                                            <tr>
+                                                                <td>
+                                                                    <strong><?php echo htmlspecialchars($post['meta']['title'] ?? 'BaÅŸlÄ±ksÄ±z'); ?></strong>
+                                                                </td>
+                                                                <td>
+                                                                    <span class="badge bg-secondary">
+                                                                        <?php echo htmlspecialchars($post['meta']['category'] ?? 'Genel'); ?>
+                                                                    </span>
+                                                                </td>
+                                                                <td>
+                                                                    <?php echo date('d.m.Y', strtotime($post['meta']['date'] ?? 'now')); ?>
+                                                                </td>
+                                                                <td>
+                                                                    <a href="edit_post.php?slug=<?php echo $post['slug']; ?>" 
+                                                                       class="btn btn-sm btn-outline-primary btn-action">
+                                                                        <i class="bi bi-pencil"></i>
+                                                                    </a>
+                                                                    <a href="<?php echo BASE_PATH . $post['slug']; ?>"
+                                                                       target="_blank" class="btn btn-sm btn-outline-primary">
+                                                                        <i class="bi bi-eye"></i> GÃ¶rÃ¼ntÃ¼le
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                        <?php endforeach; ?>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -434,3 +431,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'logou
     </script>
 </body>
 </html> 
+
