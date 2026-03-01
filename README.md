@@ -212,3 +212,23 @@ For issues, use [GitHub Issues](https://github.com/anbarli/PHP-MBBS/issues).
 - `.htaccess` CSP has been updated:
   - `script-src`: added `https://static.cloudflareinsights.com`
   - `connect-src`: added `https://cdn.jsdelivr.net` and `https://static.cloudflareinsights.com`
+
+## CLI Quick Post
+
+Create a draft post file from terminal:
+
+```bash
+./new-post "Post Title"
+```
+
+Windows:
+
+```powershell
+new-post.cmd "Post Title"
+```
+
+Options:
+
+```bash
+./new-post "Post Title" --category=Genel --tags=php,blog --status=draft --description="Kisa ozet" --date=2026-03-01
+```

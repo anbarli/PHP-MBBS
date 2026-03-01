@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+set -e
+php "$(dirname "$0")/bin/new-post.php" "$@"
+

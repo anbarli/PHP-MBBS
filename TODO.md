@@ -98,7 +98,7 @@
 - [ ] Yorum sistemi yerine geri bildirim baglantisi/formu ekle.
   - Spam maliyeti dusuk, bakimi kolay bir geri bildirim akisi sun.
 
-- [ ] CLI ile hizli yazi olusturma komutu ekle.
+- [x] CLI ile hizli yazi olusturma komutu ekle.
   - Ornek: `new-post "Baslik"` ile tarihli markdown taslagi uret.
 
 
