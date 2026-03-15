@@ -47,6 +47,26 @@ function getClosestDistance($term, $tokens) {
     return $closest;
 }
 
+function buildPostExcerpt($contentData) {
+    $metaDescription = trim((string)($contentData['meta']['description'] ?? ''));
+    if ($metaDescription !== '') {
+        return htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8');
+    }
+
+    $contentText = strip_tags((string)($contentData['content'] ?? ''));
+    $contentText = preg_replace('/\s+/', ' ', $contentText);
+    $contentText = trim((string)$contentText);
+
+    $excerpt = mb_substr($contentText, 0, 160, 'UTF-8');
+    $excerpt = htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8');
+
+    if (mb_strlen($contentText, 'UTF-8') > 160) {
+        $excerpt .= '...';
+    }
+
+    return $excerpt;
+}
+
 $seoTitle = 'Arama - ' . SITE_NAME;
 $seoDescription = 'Blog yazilarinda arama yapin.';
 $seoRobots = 'noindex, follow';
@@ -172,6 +192,7 @@ if ($searchQuery !== '') {
             $tags = $result['data']['meta']['tags'] ?? [];
             $date = htmlspecialchars((string)($result['data']['meta']['date'] ?? ''));
             $slug = $result['slug'];
+            $excerpt = buildPostExcerpt($result['data']);
 
             echo '
               <li class="list-group-item d-flex justify-content-between align-items-start">
@@ -179,9 +200,10 @@ if ($searchQuery !== '') {
                   <div class="fw-bold">
                     <a href="' . BASE_PATH . $slug . '" class="text-dark">' . $title . '</a>
                   </div>
-                  ' . $date . ' tarihinde <strong>' . ucwords(strtolower($category)) . '</strong> kategorisinde yayinlandi.
-                  Etiketler: ' . implode(', ', array_map('ucwords', $tags)) . '
-                  <br><small class="text-muted">Arama puani: ' . $result['score'] . '</small>
+                  <div class="text-muted small mb-1">' . $date . ' tarihinde <strong>' . ucwords(strtolower($category)) . '</strong> kategorisinde yayinlandi.
+                  Etiketler: ' . implode(', ', array_map('ucwords', $tags)) . '</div>
+                  <div>' . $excerpt . '</div>
+                  <small class="text-muted">Arama puani: ' . $result['score'] . '</small>
                 </div>
                 <span class="badge text-bg-primary rounded-pill">' . ucwords(strtolower($category)) . '</span>
               </li>

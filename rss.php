@@ -5,6 +5,24 @@ header("Content-Type: application/rss+xml; charset=UTF-8");
 
 $posts = array_diff(scandir(POSTS_DIR), array('..', '.'));
 
+function buildRssDescription($postData) {
+    $metaDescription = trim((string)($postData['meta']['description'] ?? ''));
+    if ($metaDescription !== '') {
+        return $metaDescription;
+    }
+
+    $contentText = strip_tags((string)($postData['content'] ?? ''));
+    $contentText = preg_replace('/\s+/', ' ', $contentText);
+    $contentText = trim((string)$contentText);
+
+    $description = mb_substr($contentText, 0, 200, 'UTF-8');
+    if (mb_strlen($contentText, 'UTF-8') > 200) {
+        $description .= '...';
+    }
+
+    return $description;
+}
+
 echo '<?xml version="1.0" encoding="UTF-8" ?>';
 ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -35,11 +53,9 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
                 
                 // Başlık, içerik, kategori ve etiketleri al
                 $title = htmlspecialchars($postData['meta']['title'] ?? 'Başlık Yok', ENT_QUOTES, 'UTF-8');
-                $content = htmlspecialchars($postData['content'], ENT_QUOTES, 'UTF-8');
-                $content = preg_replace('/\s+/', ' ', $content);
                 $category = htmlspecialchars($postData['meta']['category'] ?? 'Genel', ENT_QUOTES, 'UTF-8');
                 $tags = implode(', ', $postData['meta']['tags'] ?? []);
-                $description = substr(strip_tags($content), 0, 200);
+                $description = buildRssDescription($postData);
                 $pubDate = date("D, d M Y H:i:s O", filemtime($postFile));
                 $guid = BASE_URL . $postSlug;
 
@@ -50,7 +66,7 @@ echo '<?xml version="1.0" encoding="UTF-8" ?>';
                     <link><?php echo BASE_URL . $postSlug; ?></link>
                     <guid><?php echo htmlspecialchars($guid, ENT_QUOTES, 'UTF-8'); ?></guid>
                     <description><![CDATA[
-                        <?php echo $description; ?>... 
+                        <?php echo $description; ?>
                     ]]></description>
                     <category><?php echo $category; ?></category>
                     <tags><?php echo $tags; ?></tags>

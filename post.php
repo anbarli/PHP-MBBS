@@ -61,12 +61,18 @@ if ($postData) {
     $date = htmlspecialchars($postData['meta']['date']);
     // SEO için değişkenler
     $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
-    // Daha iyi meta description oluştur
-    $contentText = strip_tags($postData['content']);
-    $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
-    $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
-    if (strlen($contentText) > 160) {
-        $seoDescription .= '...';
+    $metaDescription = trim((string)($postData['meta']['description'] ?? ''));
+
+    if ($metaDescription !== '') {
+        $seoDescription = htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8');
+    } else {
+        // Meta description yoksa içerikten özet üret.
+        $contentText = strip_tags($postData['content']);
+        $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
+        $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
+        if (strlen($contentText) > 160) {
+            $seoDescription .= '...';
+        }
     }
 }
 

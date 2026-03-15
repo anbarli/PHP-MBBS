@@ -25,6 +25,26 @@ echo '
     <div class="alert alert-secondary">' . DEFAULT_DESCRIPTION . '</div>
     <h1>Blog Yazıları</h1>';
 
+function buildPostExcerpt($contentData) {
+    $metaDescription = trim((string)($contentData['meta']['description'] ?? ''));
+    if ($metaDescription !== '') {
+        return htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8');
+    }
+
+    $contentText = strip_tags((string)($contentData['content'] ?? ''));
+    $contentText = preg_replace('/\s+/', ' ', $contentText);
+    $contentText = trim((string)$contentText);
+
+    $excerpt = mb_substr($contentText, 0, 160, 'UTF-8');
+    $excerpt = htmlspecialchars($excerpt, ENT_QUOTES, 'UTF-8');
+
+    if (mb_strlen($contentText, 'UTF-8') > 160) {
+        $excerpt .= '...';
+    }
+
+    return $excerpt;
+}
+
 $postFilesWithDates = getCachedPosts();
 
 if ($postFilesWithDates === null) {
@@ -75,9 +95,17 @@ foreach ($postFilesWithDates as $postData) {
         'title' => $title,
         'category' => $category,
         'date' => htmlspecialchars($contentData['meta']['date'] ?? date('Y-m-d')),
-        'tags' => array_map('ucwords', $contentData['meta']['tags'] ?? [])
+        'tags' => array_map('ucwords', $contentData['meta']['tags'] ?? []),
+        'excerpt' => buildPostExcerpt($contentData)
     ];
 }
+
+usort($visiblePosts, function ($a, $b) {
+    $aTimestamp = strtotime(html_entity_decode($a['date'], ENT_QUOTES, 'UTF-8')) ?: 0;
+    $bTimestamp = strtotime(html_entity_decode($b['date'], ENT_QUOTES, 'UTF-8')) ?: 0;
+
+    return $bTimestamp <=> $aTimestamp;
+});
 
 $postsPerPage = 10;
 $totalPosts = count($visiblePosts);
@@ -94,7 +122,8 @@ foreach ($pagedPosts as $postItem) {
                 <div class='fw-bold'>
                     <a href='" . BASE_PATH . $postItem['slug'] . "' class='text-dark'>" . $postItem['title'] . "</a>
                 </div>
-                " . $postItem['date'] . " tarihinde <strong>" . ucwords(strtolower($postItem['category'])) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $postItem['tags']) . "
+                <div class='text-muted small mb-1'>" . $postItem['date'] . " tarihinde <strong>" . ucwords(strtolower($postItem['category'])) . "</strong> kategorisinde yayınlandı. Etiketler: " . implode(', ', $postItem['tags']) . "</div>
+                <div>" . $postItem['excerpt'] . "</div>
             </div>
             <span class='badge text-bg-primary rounded-pill'>" . ucwords(strtolower($postItem['category'])) . "</span>
         </li>
