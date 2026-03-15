@@ -12,8 +12,53 @@
 - [x] **Dinamik CSP implementasyonu** - Google Analytics kullanıldığında otomatik olarak domain'ler ekleniyor
 - [x] **500 Internal Server Error düzeltildi** - config.php syntax hatası giderildi
 - [x] **Anasayfa sayfalama iyileştirildi** - 10 yazı/sayfa, prev/next butonları, ellipsis, sayfa bilgisi, modern tasarım
+- [x] **Anasayfa sıralaması yayın tarihine göre düzeltildi** - Yazılar dosya güncellenme zamanına göre değil, metadata içindeki yayın tarihine göre sıralanıyor
+- [x] **Post description kullanımı tutarlı hale getirildi** - Post detay sayfasında meta description için önce post `description` alanı kullanılıyor, yoksa içerikten fallback özet üretiliyor
+- [x] **Liste ve arama sonuçlarına excerpt alanı eklendi** - Anasayfa ve arama sonuçlarında post `description` alanı öncelikli özet olarak gösteriliyor
+- [x] **RSS açıklamaları metadata ile uyumlu hale getirildi** - RSS item description alanında önce post `description` değeri kullanılıyor, içerik tabanlı fallback korunuyor
 
 > **Not:** CSP artık `config.php`'den dinamik olarak gönderiliyor. `GA_TRACKING_ID` tanımlıysa Google Analytics domain'leri otomatik eklenir.
+
+---
+
+## Yeni Teknik İyileştirme Önerileri
+
+### Yüksek Etki
+
+- [ ] Post yardımcı fonksiyonlarını tek yerde topla
+  - `description`, `excerpt`, tarih sıralama ve benzeri mantıkları ortak helper katmanına taşı.
+  - `index.php`, `post.php`, `search.php`, `rss.php` içindeki tekrarları azalt.
+
+- [ ] Front matter / metadata parser'ını güçlendir
+  - `:` içeren değerleri, boşluk varyasyonlarını ve çok satırlı alanları daha güvenli işle.
+  - `description`, `tags`, `status`, `date` alanları için daha sağlam validation ekle.
+
+- [ ] `published_at` ve `updated_at` ayrımını netleştir
+  - Admin tarafında yayın tarihi ve güncellenme tarihini ayrı alanlar olarak yönet.
+  - Public listeleme, sitemap ve RSS davranışlarını bu alanlara göre standartlaştır.
+
+### Orta Öncelik
+
+- [ ] Post cache yapısını zenginleştir
+  - Parse edilmiş metadata, excerpt ve sort key gibi alanları cache içinde sakla.
+  - Listeleme ve arama ekranlarında tekrar parse maliyetini azalt.
+
+- [ ] Arama skorlamasına `description` alanını dahil et
+  - Başlık, etiket ve kategori yanında özet/description eşleşmelerini de puanlamaya kat.
+  - Filtrelenebilir arama için kategori, etiket ve tarih alanlarını genişlet.
+
+- [ ] Temel test altyapısı ekle
+  - Metadata parse testi
+  - Published/draft filtre testi
+  - Description fallback testi
+  - Anasayfa sıralama testi
+  - RSS çıktı testi
+
+### UX / Admin İyileştirmeleri
+
+- [ ] Admin yazı formuna SEO önizleme ekle
+  - Title ve description için canlı önizleme göster.
+  - Description karakter sayacı ve eksik metadata uyarısı ekle.
 
 ---
 
