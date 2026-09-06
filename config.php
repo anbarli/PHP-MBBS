@@ -290,9 +290,11 @@ function getPostContent($filePath) {
                 if ($key === 'tags') {
                     // [tag1, tag2, tag3] formatını temizle
                     $value = trim($value, '[]');
-                    $meta[$key] = array_map('trim', explode(',', $value));
+                    $meta[$key] = array_map(function ($tag) {
+                        return html_entity_decode(trim($tag), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    }, explode(',', $value));
                 } else {
-                    $meta[$key] = $value;
+                    $meta[$key] = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
                 }
             }
         }

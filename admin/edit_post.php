@@ -46,12 +46,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $messageType = 'danger';
     } else {
         // Input temizleme
-        $title = sanitizeInput($_POST['title'] ?? '');
+        $title = normalizePlainTextInput($_POST['title'] ?? '');
         $content = $_POST['content'] ?? '';
-        $category = sanitizeInput($_POST['category'] ?? 'Genel');
-        $tags = sanitizeInput($_POST['tags'] ?? '');
-        $description = sanitizeInput($_POST['description'] ?? '');
-        $date = sanitizeInput($_POST['date'] ?? date('Y-m-d'));
+        $category = normalizePlainTextInput($_POST['category'] ?? 'Genel');
+        $tags = normalizePlainTextInput($_POST['tags'] ?? '');
+        $description = normalizePlainTextInput($_POST['description'] ?? '');
+        $date = normalizePlainTextInput($_POST['date'] ?? date('Y-m-d'));
         $status = normalizePostStatus($_POST['status'] ?? ($post['meta']['status'] ?? 'published'));
 
         // Validasyon

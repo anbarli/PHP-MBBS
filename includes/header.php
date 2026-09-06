@@ -76,21 +76,19 @@
 		$seoKeywords = implode(', ', $tags);
 	}
 
-	$seoTitle = preg_replace('/\s+/', ' ', $seoTitle);
-	$seoTitle = trim(htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-	$seoDescription = preg_replace('/\s+/', ' ', $seoDescription);
-	$seoDescription = trim(htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-	$seoKeywords = trim(htmlspecialchars($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-	$seoRobots = trim(htmlspecialchars($seoRobots, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-	$seoCanonical = trim(htmlspecialchars($seoCanonical, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-	$seoImage = trim(htmlspecialchars($seoImage, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoTitle = trim(preg_replace('/\s+/', ' ', html_entity_decode((string)$seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+	$seoDescription = trim(preg_replace('/\s+/', ' ', html_entity_decode((string)$seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+	$seoKeywords = trim(html_entity_decode($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoRobots = trim(html_entity_decode($seoRobots, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoCanonical = trim(html_entity_decode($seoCanonical, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoImage = trim(html_entity_decode($seoImage, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$ogType = $structuredDataType === 'BlogPosting' ? 'article' : 'website';
 	?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title><?php echo htmlspecialchars($seoTitle); ?></title>
-    <meta name="description" content="<?php echo htmlspecialchars($seoDescription); ?>">
-	<meta name="keywords" content="<?php echo htmlspecialchars($seoKeywords); ?>">
+	<title><?php echo htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?></title>
+    <meta name="description" content="<?php echo htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta name="keywords" content="<?php echo htmlspecialchars($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
 	<meta name="author" content="<?php echo AUTHOR_NAME; ?>">
 	<meta name="robots" content="<?php echo $seoRobots; ?>">
 	<meta name="language" content="<?php echo DEFAULT_LANGUAGE; ?>">
@@ -100,11 +98,11 @@
 
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="<?php echo $ogType; ?>">
-	<meta property="og:url" content="<?php echo $seoCanonical; ?>">
-	<meta property="og:title" content="<?php echo htmlspecialchars($seoTitle); ?>">
-	<meta property="og:description" content="<?php echo htmlspecialchars($seoDescription); ?>">
-	<meta property="og:image" content="<?php echo $seoImage; ?>">
-	<meta property="og:image:alt" content="<?php echo htmlspecialchars($seoTitle); ?>">
+	<meta property="og:url" content="<?php echo htmlspecialchars($seoCanonical, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta property="og:title" content="<?php echo htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta property="og:description" content="<?php echo htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta property="og:image" content="<?php echo htmlspecialchars($seoImage, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta property="og:image:alt" content="<?php echo htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
 	<meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
 	<meta property="og:locale" content="<?php echo DEFAULT_LOCALE; ?>">
 	<?php if (isset($date)): ?>
@@ -119,10 +117,10 @@
 
 	<!-- Twitter -->
 	<meta name="twitter:card" content="summary_large_image">
-	<meta name="twitter:title" content="<?php echo htmlspecialchars($seoTitle); ?>">
-	<meta name="twitter:description" content="<?php echo htmlspecialchars($seoDescription); ?>">
-	<meta name="twitter:image" content="<?php echo $seoImage; ?>">
-	<meta name="twitter:image:alt" content="<?php echo htmlspecialchars($seoTitle); ?>">
+	<meta name="twitter:title" content="<?php echo htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta name="twitter:description" content="<?php echo htmlspecialchars($seoDescription, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta name="twitter:image" content="<?php echo htmlspecialchars($seoImage, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
+	<meta name="twitter:image:alt" content="<?php echo htmlspecialchars($seoTitle, ENT_QUOTES | ENT_HTML5, 'UTF-8'); ?>">
 	<?php if (!empty(TWITTER_USERNAME)): ?>
 	<meta name="twitter:site" content="<?php echo TWITTER_USERNAME; ?>">
 	<?php endif; ?>

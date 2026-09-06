@@ -56,21 +56,21 @@ if (!$postData || !isPostPublished($postData)) {
 }
 
 if ($postData) {
-    $title = htmlspecialchars($postData['meta']['title']);
-    $category = htmlspecialchars($postData['meta']['category'] ?? 'Genel');
+    $title = $postData['meta']['title'];
+    $category = $postData['meta']['category'] ?? 'Genel';
     $tags = $postData['meta']['tags'] ?? [];
-    $date = htmlspecialchars($postData['meta']['date']);
+    $date = $postData['meta']['date'];
     // SEO için değişkenler
-    $seoTitle = htmlspecialchars($title, ENT_QUOTES, 'UTF-8') . ' - ' . SITE_NAME;
+    $seoTitle = $title . ' - ' . SITE_NAME;
     $metaDescription = trim((string)($postData['meta']['description'] ?? ''));
 
     if ($metaDescription !== '') {
-        $seoDescription = htmlspecialchars($metaDescription, ENT_QUOTES, 'UTF-8');
+        $seoDescription = $metaDescription;
     } else {
         // Meta description yoksa içerikten özet üret.
         $contentText = strip_tags($postData['content']);
         $contentText = preg_replace('/\s+/', ' ', $contentText); // Fazla boşlukları temizle
-        $seoDescription = htmlspecialchars(substr($contentText, 0, 160), ENT_QUOTES, 'UTF-8');
+        $seoDescription = substr($contentText, 0, 160);
         if (strlen($contentText) > 160) {
             $seoDescription .= '...';
         }
@@ -104,10 +104,10 @@ if (isset($postData) && $postData) {
                 <a class="link-body-emphasis fw-semibold text-decoration-none" href="' . BASE_PATH . '">Blog</a>
               </li>
               <li class="breadcrumb-item">
-                <a class="link-body-emphasis fw-semibold text-decoration-none" href="' . BASE_PATH . 'cat/' . strtolower(rawurlencode($category)) . '">' . $category . '</a>
+                                <a class="link-body-emphasis fw-semibold text-decoration-none" href="' . BASE_PATH . 'cat/' . strtolower(rawurlencode($category)) . '">' . htmlspecialchars($category, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '</a>
               </li>
               <li class="breadcrumb-item active" aria-current="page">
-                '.$title.'
+                                '.htmlspecialchars($title, ENT_QUOTES | ENT_HTML5, 'UTF-8').'
               </li>
             </ol>
         </nav>
@@ -169,7 +169,7 @@ if (isset($_GET['slug']) && !empty($slug)) {
 		// Metadata
 		echo '
 			<footer class="alert alert-secondary">
-				<strong>Tarih:</strong> ' . $date;
+                <strong>Tarih:</strong> ' . htmlspecialchars($date, ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
 		if (!empty($category)) {
 			echo ' / <strong>Kategori:</strong> <a href="' . BASE_PATH . 'cat/' . strtolower(rawurlencode($category)) . '" class="text-dark text-decoration-none">' . htmlspecialchars(ucwords(strtolower($category))) . '</a>';
