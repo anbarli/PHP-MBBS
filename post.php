@@ -35,6 +35,7 @@ function optimizeMarkdownImages($htmlContent) {
 
 $seoTitle = 'Yazı Bulunamadı - ' . SITE_NAME;
 $seoDescription = 'Bu yazı bulunamadı. Farklı bir yazı deneyebilirsiniz.';
+$seoImage = BASE_URL . 'og-default.svg';
 
 
 $slug = isset($_GET['slug']) ? $_GET['slug'] : '';
@@ -73,6 +74,16 @@ if ($postData) {
         if (strlen($contentText) > 160) {
             $seoDescription .= '...';
         }
+    }
+
+    $postImage = trim((string)($postData['meta']['image'] ?? ''));
+    if ($postImage === '' && preg_match('/!\[[^\]]*\]\(([^)\s]+)(?:\s+["\'][^"\']*["\'])?\)/', $postData['content'], $imageMatch)) {
+        $postImage = trim($imageMatch[1]);
+    }
+    if (filter_var($postImage, FILTER_VALIDATE_URL) && preg_match('/^https?:\/\//i', $postImage)) {
+        $seoImage = $postImage;
+    } elseif ($postImage !== '' && strpos($postImage, '//') !== 0 && strpos($postImage, 'data:') !== 0) {
+        $seoImage = rtrim(BASE_URL, '/') . '/' . ltrim($postImage, '/');
     }
 }
 

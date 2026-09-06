@@ -241,23 +241,25 @@ function loadAdminConfig() {
 
     $envFile = $adminDir . '/admin.env';
 
-    // Varsayilan config
+    if (!file_exists($envFile) || !is_readable($envFile)) {
+        die('Admin yapilandirma dosyasi (admin.env) bulunamadi veya okunamiyor. Lutfen yoneticinizle iletisime gecin.');
+    }
+
     $config = [
-        'ADMIN_USERNAME' => 'admin',
-        'ADMIN_PASSWORD' => hashPassword('yeni_sifreniz123'),
-        'ADMIN_EMAIL' => 'admin@example.com',
-        'ADMIN_NAME' => 'Admin',
+        'ADMIN_USERNAME' => '',
+        'ADMIN_PASSWORD' => '',
+        'ADMIN_EMAIL' => '',
+        'ADMIN_NAME' => '',
         'SESSION_TIMEOUT' => 7200,
         'MAX_UPLOAD_SIZE' => 5242880,
         'ALLOWED_FILE_TYPES' => ['jpg', 'jpeg', 'png', 'gif', 'webp']
     ];
 
     // admin.env dosyasini oku
-    if (file_exists($envFile)) {
-        $envContent = file_get_contents($envFile);
-        $lines = explode("\n", $envContent);
+    $envContent = file_get_contents($envFile);
+    $lines = explode("\n", $envContent);
 
-        foreach ($lines as $line) {
+    foreach ($lines as $line) {
             $line = trim($line);
 
             // Yorum satirlarini ve bos satirlari atla
@@ -296,7 +298,10 @@ function loadAdminConfig() {
                         break;
                 }
             }
-        }
+    }
+
+    if ($config['ADMIN_USERNAME'] === '' || $config['ADMIN_PASSWORD'] === '') {
+        die('Admin yapilandirmasi eksik. Lutfen admin.env dosyasini kontrol edin.');
     }
 
     return $config;

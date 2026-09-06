@@ -23,6 +23,9 @@
 	if (!isset($structuredDataType) || trim((string)$structuredDataType) === '') {
 		$structuredDataType = 'WebSite';
 	}
+	if (!isset($seoImage) || trim((string)$seoImage) === '') {
+		$seoImage = BASE_URL . 'og-default.svg';
+	}
 	if (!isset($loadMarkdownCss)) {
 		$loadMarkdownCss = false;
 	}
@@ -80,6 +83,8 @@
 	$seoKeywords = trim(htmlspecialchars($seoKeywords, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoRobots = trim(htmlspecialchars($seoRobots, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
 	$seoCanonical = trim(htmlspecialchars($seoCanonical, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$seoImage = trim(htmlspecialchars($seoImage, ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+	$ogType = $structuredDataType === 'BlogPosting' ? 'article' : 'website';
 	?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -94,10 +99,12 @@
 	<meta name="rating" content="general">
 
 	<!-- Open Graph / Facebook -->
-	<meta property="og:type" content="article">
-	<meta property="og:url" content="<?php echo BASE_URL . "/" . ($_GET['slug'] ?? ''); ?>">
+	<meta property="og:type" content="<?php echo $ogType; ?>">
+	<meta property="og:url" content="<?php echo $seoCanonical; ?>">
 	<meta property="og:title" content="<?php echo htmlspecialchars($seoTitle); ?>">
 	<meta property="og:description" content="<?php echo htmlspecialchars($seoDescription); ?>">
+	<meta property="og:image" content="<?php echo $seoImage; ?>">
+	<meta property="og:image:alt" content="<?php echo htmlspecialchars($seoTitle); ?>">
 	<meta property="og:site_name" content="<?php echo SITE_NAME; ?>">
 	<meta property="og:locale" content="<?php echo DEFAULT_LOCALE; ?>">
 	<?php if (isset($date)): ?>
@@ -114,6 +121,8 @@
 	<meta name="twitter:card" content="summary_large_image">
 	<meta name="twitter:title" content="<?php echo htmlspecialchars($seoTitle); ?>">
 	<meta name="twitter:description" content="<?php echo htmlspecialchars($seoDescription); ?>">
+	<meta name="twitter:image" content="<?php echo $seoImage; ?>">
+	<meta name="twitter:image:alt" content="<?php echo htmlspecialchars($seoTitle); ?>">
 	<?php if (!empty(TWITTER_USERNAME)): ?>
 	<meta name="twitter:site" content="<?php echo TWITTER_USERNAME; ?>">
 	<?php endif; ?>
@@ -128,6 +137,7 @@
 	if ($structuredDataType === 'BlogPosting') {
 		$structuredData['headline'] = $seoTitle;
 		$structuredData['description'] = $seoDescription;
+		$structuredData['image'] = $seoImage;
 		$structuredData['author'] = [
 			'@type' => 'Person',
 			'name' => AUTHOR_NAME
@@ -156,6 +166,7 @@
 	} elseif ($structuredDataType === 'CollectionPage') {
 		$structuredData['name'] = $seoTitle;
 		$structuredData['description'] = $seoDescription;
+		$structuredData['image'] = $seoImage;
 		$structuredData['url'] = $seoCanonical;
 		$structuredData['isPartOf'] = [
 			'@type' => 'WebSite',
@@ -182,7 +193,7 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"/>
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous"/>
 	<?php if ($loadMarkdownCss): ?>
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css" integrity="sha512-VE/TgMJnr0xqgrRN5c5DVDX7f7Q3rHRqcq9qHeBxIrHQrLPnM0i6cLJbsBxoQ0VxYUHT+B4Xmo854R3Z0CnSfmQ==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css" integrity="sha512-BrOPA520KmDMqieeM7XFe6a3u3Sb3F1JBaQnrIAmWg3EYrciJ+Qqe6ZcKCdfPv26rGcgTrJnZ/IdQEct8h3Zhw==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 	<?php endif; ?>
     <link rel="stylesheet" href="<?php echo assetPath('includes/style.css'); ?>">
 

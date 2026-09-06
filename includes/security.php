@@ -277,6 +277,11 @@ function loadAdminConfig() {
             }
         }
     }
+
+    if ($config['ADMIN_USERNAME'] === '' || $config['ADMIN_PASSWORD'] === '') {
+        die('Admin yapilandirmasi eksik. Lutfen admin.env dosyasini kontrol edin.');
+    }
+
     return $config;
 }
 

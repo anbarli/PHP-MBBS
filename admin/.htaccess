@@ -2,13 +2,13 @@
 # Bu dosya admin klasörünü korur
 
 # admin.env dosyasına erişimi engelle
-<Files "admin.env">
+<FilesMatch "^admin\.env(?:\.example)?$">
     Order allow,deny
     Deny from all
-</Files>
+</FilesMatch>
 
 # Diğer gizli dosyalara erişimi engelle
-<FilesMatch "^(\.env|\.htaccess|\.git|admin\.env)$">
+<FilesMatch "^(\.env|\.htaccess|\.git|admin\.env(?:\.example)?)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -58,4 +58,4 @@
 <Files "debug.php">
     Order allow,deny
     Allow from all
-</Files> 
+</Files>

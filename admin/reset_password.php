@@ -9,8 +9,11 @@ if (php_sapi_name() !== 'cli') {
     exit('Forbidden');
 }
 
-// Yeni sifre (buraya istediginiz sifreyi yazin)
-$newPassword = 'yeni_sifreniz123';
+$newPassword = $argv[1] ?? '';
+if ($newPassword === '') {
+    fwrite(STDERR, "Kullanim: php reset_password.php <yeni-sifre>\n");
+    exit(1);
+}
 
 // Sifreyi hash'le
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);

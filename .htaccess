@@ -74,7 +74,7 @@ RewriteRule ^cat/(.+)$ index.php?cat=$1 [L,QSA]
 RewriteRule ^([a-zA-Z0-9_-]+)/?$ post.php?slug=$1 [L,QSA]
 
 # Security: Block access to sensitive files
-<FilesMatch "^(config\.local\.php|\.htaccess|\.git|\.env|composer\.(json|lock)|package\.json|yarn\.lock|README\.md|LICENSE)$">
+<FilesMatch "^(admin\.env(?:\.example)?|config\.local\.php|\.htaccess|\.git|\.env|composer\.(json|lock)|package\.json|yarn\.lock|README\.md|LICENSE)$">
     Order allow,deny
     Deny from all
 </FilesMatch>

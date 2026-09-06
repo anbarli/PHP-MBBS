@@ -24,7 +24,8 @@
 
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+            const serviceWorkerUrl = `${config.baseUrl || '/'}sw.js`;
+            navigator.serviceWorker.register(serviceWorkerUrl).catch(() => {});
         });
     }
 
